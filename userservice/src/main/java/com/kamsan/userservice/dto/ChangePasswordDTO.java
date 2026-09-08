@@ -1,7 +1,12 @@
 package com.kamsan.userservice.dto;
 
-import java.util.UUID;
+import jakarta.validation.constraints.NotEmpty;
 
-public record ChangePasswordDTO(UUID userPublicId, String currentPassword, String newPassword,
-                                String confirmNewPassword) {
+public record ChangePasswordDTO(
+        @NotEmpty(message = "Field cannot be empty or null")
+        String currentPassword,
+        @NotEmpty(message = "Field cannot be empty or null")
+        String newPassword,
+        @NotEmpty(message = "Field cannot be empty or null")
+        String confirmNewPassword) {
 }

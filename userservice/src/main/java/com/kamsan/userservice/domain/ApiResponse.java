@@ -2,11 +2,9 @@ package com.kamsan.userservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.util.Map;
-
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public record ApiResponse(
+public record ApiResponse<T>(
         int code,
         String message,
-        Map<String, ?> data) {
+        T data) {
 }

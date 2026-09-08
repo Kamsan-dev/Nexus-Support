@@ -1,6 +1,7 @@
 package com.kamsan.userservice.service;
 
 import com.kamsan.userservice.dto.*;
+import com.kamsan.userservice.model.User;
 import com.kamsan.userservice.repository.projection.UserSecurityProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ public interface UserService {
 
     UserSecurityProjection getUserSecurityData(UUID publicId);
 
-    ReadUserDTO updateUser(UpdateUserDTO updateUserDTO);
+    ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId);
 
     void createUser(CreateUserDTO createUserDTO);
 
@@ -28,9 +29,11 @@ public interface UserService {
 
     ReadUserDTO uploadPhoto(UUID userPublicId, MultipartFile file);
 
-    void updatePassword(ChangePasswordDTO changePasswordDTO);
+    void updatePassword(ChangePasswordDTO changePasswordDTO, UUID userPublicId);
 
     void resetPassword(String email);
+
+    User verifyPasswordToken(String token);
 
     void doResetPassword(DoResetPasswordDTO doResetPasswordDTO);
 
@@ -54,6 +57,6 @@ public interface UserService {
 
     ReadUserDTO toggleCredentialsExpired(UUID userPublicId);
 
-    ReadUserDTO updateRole(UUID userPublicId, UUID publicId);
+    ReadUserDTO updateRole(UUID userPublicId, UUID rolePublicId);
 
 }

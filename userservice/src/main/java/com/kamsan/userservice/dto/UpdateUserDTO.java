@@ -1,12 +1,16 @@
 package com.kamsan.userservice.dto;
 
-import java.util.UUID;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 
-public record UpdateUserDTO(UUID userPublicId,
-                            String email,
-                            String firstName,
-                            String lastName,
-                            String bio,
-                            String phone,
-                            String address) {
+public record UpdateUserDTO(
+        @Email(message = "Invalid email address")
+        String email,
+        @NotEmpty(message = "Field cannot be empty or null")
+        String firstName,
+        @NotEmpty(message = "Field cannot be empty or null")
+        String lastName,
+        String bio,
+        String phone,
+        String address) {
 }

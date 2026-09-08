@@ -15,7 +15,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -86,9 +85,13 @@ public class RequestUtils {
             writeResponse.accept(response, apiResponse);
         }
     }
-    
-    public static ApiResponse getResponse(Map<String, ?> data, String message, HttpStatus status) {
-        return new ApiResponse(status.value(), message, data);
+
+    public static <T> ApiResponse<T> getResponse(T data, String message, HttpStatus status) {
+        return new ApiResponse<>(
+                status.value(),
+                message,
+                data
+        );
     }
 
     private static Response getErrorResponse(HttpServletRequest request, HttpServletResponse response, Exception exception, HttpStatus httpStatus) {

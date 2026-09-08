@@ -11,7 +11,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.kamsan.userservice.constants.Constants.kamsanIO;
+import static com.kamsan.userservice.constants.Constants.KAMSAN_IO;
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
@@ -24,8 +24,8 @@ public class UserUtils {
     public static Supplier<String> memberId = () -> randomNumeric(4) + "-" + randomNumeric(2) + "-" + randomNumeric(4);
     public static Supplier<String> qrCodeSecret = () -> new DefaultSecretGenerator().generate();
     public static Function<String, QrData> qrDataFunction = codeSecret -> new QrData.Builder()
-            .issuer(kamsanIO)
-            .label(kamsanIO)
+            .issuer(KAMSAN_IO)
+            .label(KAMSAN_IO)
             .algorithm(HashingAlgorithm.SHA1)
             .secret(codeSecret)
             .digits(6)

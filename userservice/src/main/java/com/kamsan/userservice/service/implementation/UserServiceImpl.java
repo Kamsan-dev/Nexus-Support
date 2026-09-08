@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ReadUserDTO updateUser(UpdateUserDTO updateUserDTO) {
-        var user = this.getUserByUUID(updateUserDTO.userPublicId());
+    public ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId) {
+        var user = this.getUserByUUID(userPublicId);
         userMapper.updateUser(updateUserDTO, user);
         return userMapper.userToReadUserDTO(userRepository.save(user));
     }
@@ -180,12 +180,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updatePassword(ChangePasswordDTO changePasswordDTO) {
+    public void updatePassword(ChangePasswordDTO changePasswordDTO, UUID userPublicId) {
         if (!Objects.equals(changePasswordDTO.newPassword(), changePasswordDTO.confirmNewPassword())) {
             throw new ApiException("Passwords don't match. Please try again");
         }
 
-        User user = this.getUserByUUID(changePasswordDTO.userPublicId());
+        User user = this.getUserByUUID(userPublicId);
 
         var credential = credentialRepository.findByUserId(user.getUserId()).orElseThrow(
                 () -> new ApiException(String.format("Unable to retrieve credential for user with publicId %s",
@@ -251,7 +251,8 @@ public class UserServiceImpl implements UserService {
      * @param token
      * @return
      */
-    private User verifyPasswordToken(String token) {
+    @Override
+    public User verifyPasswordToken(String token) {
         var passwordToken = passwordTokenRepository.findByToken(token)
                                                    .orElseThrow(() -> new ApiException(
                                                            "Invalid link. Please try again."));
