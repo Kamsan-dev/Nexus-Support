@@ -1,6 +1,6 @@
 spring:
   application:
-    name: AUTHORIZATIONSERVER
+    name: USERSERVICE
   cloud:
     discovery:
       enabled: true

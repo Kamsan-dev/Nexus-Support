@@ -1,6 +1,9 @@
 package com.kamsan.userservice.mapper;
 
-import com.kamsan.userservice.dto.*;
+import com.kamsan.userservice.dto.CreateUserDTO;
+import com.kamsan.userservice.dto.CredentialDTO;
+import com.kamsan.userservice.dto.ReadUserDTO;
+import com.kamsan.userservice.dto.UpdateUserDTO;
 import com.kamsan.userservice.model.Credential;
 import com.kamsan.userservice.model.User;
 import org.mapstruct.*;
@@ -17,7 +20,5 @@ public interface UserMapper {
     User createUserDTOToUser(CreateUserDTO createUserDTO);
 
     CredentialDTO credentialToCredentialDTO(Credential credential);
-
-    DeviceDTO deviceToDeviceDTO(Device device);
 
 }

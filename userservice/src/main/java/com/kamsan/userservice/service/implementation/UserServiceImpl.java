@@ -12,9 +12,8 @@ import com.kamsan.userservice.repository.projection.UserSecurityProjection;
 import com.kamsan.userservice.service.UserService;
 import com.kamsan.userservice.sharedkernel.exception.ApiException;
 import com.kamsan.userservice.utils.UserUtils;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +29,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static com.kamsan.userservice.enumeration.EventType.RESETPASSWORD;
@@ -41,7 +39,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -52,11 +50,9 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final UserProperties userProperties;
     private final UserMapper userMapper;
-    private BCryptPasswordEncoder encoder;
-    private ApplicationEventPublisher publisher;
-    @Value("${ui.app.url}")
-    private String upAppUrl;
-
+    private final BCryptPasswordEncoder encoder;
+    private final ApplicationEventPublisher publisher;
+    
     @Override
     @Transactional(readOnly = true)
     public ReadUserDTO getUserByEmail(String email) {
@@ -173,7 +169,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ReadUserDTO uploadPhoto(UUID userPublicId, MultipartFile file) {
         User user = this.getUserByUUID(userPublicId);
-        String imageUrl = photoFunction.apply(user.getImageUrl(), file);
+        String imageUrl = processPhoto(user.getImageUrl(), file);
         user.setImageUrl(imageUrl + "?timestamp=" + System.currentTimeMillis());
         return userMapper.userToReadUserDTO(user);
     }
@@ -358,29 +354,37 @@ public class UserServiceImpl implements UserService {
                        .map(name -> name.substring(fileName.lastIndexOf("."))).orElse(".png");
     };
 
-    private final BiFunction<String, MultipartFile, String> photoFunction = (imageUrl, image) -> {
+    private String processPhoto(String imageUrl, MultipartFile image) {
         try {
             String[] splitUrl = imageUrl.split("/");
-            // /server/image/profile.png --> profile.png --> profile
-            var fileName = splitUrl[splitUrl.length - 1].split("\\.")[0] + fileExtension.apply(imageUrl);
+            var fileName =
+                    splitUrl[splitUrl.length - 1].split("\\.")[0]
+                            + fileExtension.apply(imageUrl);
             var existingImage = Paths.get(userProperties.imagesFolder() + splitUrl[splitUrl.length - 1]);
-            var fileStorageLocation = Paths.get(userProperties.imagesFolder()).toAbsolutePath().normalize();
+
+            var fileStorageLocation = Paths.get(userProperties.imagesFolder())
+                                           .toAbsolutePath()
+                                           .normalize();
+
             if (!Files.exists(fileStorageLocation)) {
                 Files.createDirectories(fileStorageLocation);
             } else {
                 Files.deleteIfExists(existingImage);
             }
-
-            Files.copy(image.getInputStream(), fileStorageLocation.resolve(fileName), REPLACE_EXISTING);
-
+            Files.copy(
+                    image.getInputStream(),
+                    fileStorageLocation.resolve(fileName),
+                    REPLACE_EXISTING
+            );
             return ServletUriComponentsBuilder
                     .fromCurrentContextPath()
-                    .path("/user/image/" + fileName).toUriString();
+                    .path("/user/image/" + fileName)
+                    .toUriString();
 
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw new ApiException(ex.getMessage());
         }
-    };
+    }
 
 }
