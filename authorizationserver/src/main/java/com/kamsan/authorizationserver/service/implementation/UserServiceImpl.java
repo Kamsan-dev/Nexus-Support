@@ -8,6 +8,7 @@ import com.kamsan.authorizationserver.sharedkernel.exception.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -48,8 +49,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void addLoginDevice(Long userId, String deviceName, String client, String ipAddress) {
-        //userRepository.addLoginDevice(userId, deviceName, client, ipAddress);
+        userRepository.addLoginDevice(userId, deviceName, client, ipAddress);
     }
 
     @Override

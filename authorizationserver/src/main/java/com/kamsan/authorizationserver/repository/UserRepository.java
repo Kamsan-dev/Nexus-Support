@@ -2,6 +2,7 @@ package com.kamsan.authorizationserver.repository;
 
 import com.kamsan.authorizationserver.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -27,11 +28,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """, nativeQuery = true)
     Optional<UserSecurityProjection> findSecurityDataByPublicId(UUID publicId);
 
-//    void resetLoginAttempts(UUID userPublicId);
+    //    void resetLoginAttempts(UUID userPublicId);
 //
 //    void updateLoginAttempts(String email);
 //
 //    void setLastLogin(Long userId);
 //
-//    void addLoginDevice(Long userId, String deviceName, String client, String ipAddress);
+    @Modifying
+    @Query(value = """
+            INSERT INTO DEVICES
+            (user_id, machine, client, ip_address)
+            VALUES (:userId, :deviceName, :client, :ipAddress)
+            """, nativeQuery = true)
+    void addLoginDevice(
+            Long userId,
+            String deviceName,
+            String client,
+            String ipAddress
+    );
 }

@@ -66,7 +66,8 @@ public class UserQueryRepository {
                    .query((rs, rowNum) -> new DeviceDTO(
                            rs.getString("machine"),
                            rs.getString("client"),
-                           rs.getString("ip_address")
+                           rs.getString("ip_address"),
+                           rs.getObject("created_at", OffsetDateTime.class)
                    ))
                    .list();
     }

@@ -33,7 +33,8 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
             UserSecurityProjection userSecurityData = userService.getUserSecurityData(user.getUserPublicId());
             if (passwordEncoder.matches((String) authentication.getCredentials(), userSecurityData.getPassword())) {
                 // 3ème parametre -> liste de GrantedAuthorities, exemple : role_admin,ticket:create,ticket:delete...
-                // return new UsernamePasswordAuthenticationToken
+                // retourne une nouvelle instance de UsernamePasswordAuthenticationToken
+                log.info("Building new UsernamePasswordAuthenticationToken for new authenticated user");
                 return authenticated(user,
                         "[PROTECTED]",
                         commaSeparatedStringToAuthorityList(userSecurityData.getRole() + "," + userSecurityData.getAuthorities()));

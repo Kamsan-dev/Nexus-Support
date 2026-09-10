@@ -7,27 +7,28 @@ spring:
     discovery:
       enabled: true
     gateway:
-      mvc:
-        routes:
-          - id: authorization-server
-            uri: lb://AUTHORIZATIONSERVER
-            predicates:
-              - Path=/authorization/**
+      server:
+        webmvc:
+          routes:
+            - id: authorization-server
+              uri: lb://AUTHORIZATIONSERVER
+              predicates:
+                - Path=/authorization/**
 
-          - id: user-service
-            uri: lb://USERSERVICE
-            predicates:
-              - Path=/user/**
+            - id: user-service
+              uri: lb://USERSERVICE
+              predicates:
+                - Path=/user/**
 
-          - id: ticket-service
-            uri: lb://TICKETSERVICE
-            predicates:
-              - Path=/ticket/**
+            - id: ticket-service
+              uri: lb://TICKETSERVICE
+              predicates:
+                - Path=/ticket/**
 
-          - id: notification-service
-            uri: lb://NOTIFICATIONSERVICE
-            predicates:
-              - Path=/notification/**
+            - id: notification-service
+              uri: lb://NOTIFICATIONSERVICE
+              predicates:
+                - Path=/notification/**
 
 eureka:
   instance:
@@ -38,6 +39,12 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
 
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.route: DEBUG
 
 server:
   port: ${SERVER_PORT}

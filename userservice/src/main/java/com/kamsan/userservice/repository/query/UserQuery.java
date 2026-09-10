@@ -13,7 +13,7 @@ public class UserQuery {
                 u.last_name,
                 u.member_id,
                 u.bio,
-                u.imageUrl,
+                u.image_url,
                 u.phone,
                 u.address,
                 u.created_at,
@@ -47,7 +47,8 @@ public class UserQuery {
             SELECT
                 d.machine,
                 d.client,
-                d.ip_address
+                d.ip_address,
+                d.created_at
             FROM devices d
             JOIN users u
                 ON u.user_id = d.user_id

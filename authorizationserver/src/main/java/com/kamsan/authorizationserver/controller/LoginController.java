@@ -2,7 +2,7 @@ package com.kamsan.authorizationserver.controller;
 
 import com.kamsan.authorizationserver.model.User;
 import com.kamsan.authorizationserver.security.authentication.mfa.MfaAuthentication;
-import com.kamsan.authorizationserver.service.UserService;
+import com.kamsan.authorizationserver.service.implementation.UserServiceImpl;
 import com.kamsan.authorizationserver.sharedkernel.exception.ApiException;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -35,7 +35,7 @@ import static com.kamsan.authorizationserver.utils.UserUtils.getUser;
 @Controller
 @AllArgsConstructor
 public class LoginController {
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
     private final AuthenticationFailureHandler authenticationFailureHandler = new SimpleUrlAuthenticationFailureHandler(
             "/mfa?error");

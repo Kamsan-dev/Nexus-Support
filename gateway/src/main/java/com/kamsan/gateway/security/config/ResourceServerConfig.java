@@ -39,8 +39,8 @@ public class ResourceServerConfig {
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers("/user/register/**",
                             "/user/verify/**",
-                            "/user/reset-password/**",
-                            "/user/images/**",
+                            "/user/password/reset/**",
+                            "/user/image/**",
                             "/authorization/**")
                     .permitAll()
                     .anyRequest()

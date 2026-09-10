@@ -5,6 +5,7 @@ import com.kamsan.userservice.mapper.UserMapper;
 import com.kamsan.userservice.model.User;
 import com.kamsan.userservice.repository.UserRepository;
 import com.kamsan.userservice.repository.projection.UserRoleAndAuthoritiesProjection;
+import com.kamsan.userservice.service.implementation.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,7 +28,7 @@ class UserServiceTest {
     @Mock
     UserMapper userMapper;
     @InjectMocks
-    UserService userService;
+    UserServiceImpl userService;
 
     @Test
     void getUserByEmail_shouldReturnDto_whenUserExists() {
@@ -40,7 +41,7 @@ class UserServiceTest {
         user.setEmail(email);
 
         var projection = mock(UserRoleAndAuthoritiesProjection.class);
-        when(projection.getRole()).thenReturn("ROLE_USER");
+        when(projection.getRole()).thenReturn("USER");
         when(projection.getAuthorities()).thenReturn(
                 "user:read,user:update,ticket:create,ticket:read,ticket:update,comment:create,comment:read,comment:update,comment:delete,task:read");
 
@@ -52,10 +53,9 @@ class UserServiceTest {
 
         // When
         ReadUserDTO result = userService.getUserByEmail(email);
-
         // Then
         assertThat(result).isSameAs(expectedDto);
-        assertThat(user.getRole()).isEqualTo("ROLE_USER");
+        assertThat(user.getRole()).isEqualTo("USER");
         assertThat(user.getAuthorities()).contains(
                 "user:read,user:update,ticket:create,ticket:read,ticket:update,comment:create,comment:read,comment:update,comment:delete,task:read");
 
@@ -74,4 +74,6 @@ class UserServiceTest {
         verify(userRepository).findByEmail("unknown@example.com");
         verifyNoInteractions(userMapper);
     }
+
+
 }

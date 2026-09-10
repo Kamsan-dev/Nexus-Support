@@ -3,7 +3,7 @@ package com.kamsan.userservice.resource;
 import com.kamsan.userservice.domain.ApiResponse;
 import com.kamsan.userservice.domain.UserProperties;
 import com.kamsan.userservice.dto.*;
-import com.kamsan.userservice.service.UserService;
+import com.kamsan.userservice.service.implementation.UserServiceImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -34,7 +34,7 @@ import static com.kamsan.userservice.utils.RequestUtils.getResponse;
 @RequestMapping("/user")
 public class UserResource {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final UserProperties userProperties;
 
     @PostMapping("/register")

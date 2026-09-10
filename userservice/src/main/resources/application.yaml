@@ -24,6 +24,9 @@ spring:
         default_schema: public
         format_sql: true
 
+server:
+  port: ${SERVER_PORT}
+
 logging:
   level:
     org.springframework.security: DEBUG
