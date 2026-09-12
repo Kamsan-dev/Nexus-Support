@@ -1,5 +1,6 @@
 package com.kamsan.userservice.repository;
 
+import com.kamsan.userservice.model.Attachment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -7,16 +8,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PasswordTokenRepository extends JpaRepository<PasswordToken, Long> {
+public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
 
     @Query(value = """
             SELECT *, (created_at + INTERVAL '24 HOURS') < NOW() as is_expired
-            FROM password_token
+            FROM account_token
             WHERE token = :token
             """, nativeQuery = true)
-    Optional<PasswordToken> findByToken(String token);
-
-    Optional<PasswordToken> findByUserId(Long userId);
+    Optional<AccountToken> findByToken(String token);
 
     void deleteByToken(String token);
 }

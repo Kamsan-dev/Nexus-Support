@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface TicketService {
 
-    List<TicketDTO> getTickets(RequestPageTicketDTO request);
+    List<TicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
 
-    int getPages(RequestPageTicketDTO request);
+    int getPages(int page);
 
     TicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO);
 
@@ -48,6 +48,6 @@ public interface TicketService {
     ReadUserDTO getTicketUser(UUID ticketPublicId);
 
     List<TicketDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
-    
+
     void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO);
 }

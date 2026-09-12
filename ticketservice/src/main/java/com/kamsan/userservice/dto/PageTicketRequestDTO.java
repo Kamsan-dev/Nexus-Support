@@ -1,10 +1,6 @@
 package com.kamsan.userservice.dto;
 
-import org.hibernate.validator.constraints.UUID;
-
-public record RequestPageTicketDTO(
-        @UUID
-        UUID userPublicId,
+public record PageTicketRequestDTO(
         int page,
         int size,
         String status,
