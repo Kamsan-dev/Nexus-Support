@@ -2,6 +2,7 @@ package com.kamsan.userservice.service;
 
 import com.kamsan.userservice.dto.*;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -9,9 +10,7 @@ import java.util.UUID;
 
 public interface TicketService {
 
-    List<TicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
-
-    int getPages(int page);
+    Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
 
     TicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO);
 

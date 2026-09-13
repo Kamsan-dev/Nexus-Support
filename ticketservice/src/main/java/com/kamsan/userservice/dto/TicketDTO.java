@@ -14,15 +14,13 @@ import java.util.UUID;
 public record TicketDTO(OffsetDateTime createdAt,
                         OffsetDateTime updatedAt,
                         @NotNull UUID ticketPublicId,
-                        Long issuerPublicId,
-                        Long assigneePublicId,
+                        UUID issuerPublicId,
+                        UUID assigneePublicId,
                         String title,
                         String description,
                         @Min(0) @Max(100) int progress,
                         String status,
                         String priority,
                         String typeId,
-                        OffsetDateTime dueDate,
-                        int fileCount,
-                        int commentCount) implements Serializable {
+                        OffsetDateTime dueDate) implements Serializable {
 }

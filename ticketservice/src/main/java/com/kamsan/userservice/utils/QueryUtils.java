@@ -1,5 +1,6 @@
 package com.kamsan.userservice.utils;
 
+import static com.kamsan.userservice.repository.query.TicketQuery.SELECT_COUNT_TICKET_NUMBER_QUERY;
 import static com.kamsan.userservice.repository.query.TicketQuery.SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.replace;
@@ -28,8 +29,8 @@ public class QueryUtils {
         return replace(query.toString(), "\\n", "");
     }
 
-    public static String createSelectPagesQuery(String status, String type, String filter) {
-        var query = getStringBuilder(SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY);
+    public static String createSelectTotalElementsQuery(String status, String type, String filter) {
+        var query = getStringBuilder(SELECT_COUNT_TICKET_NUMBER_QUERY);
         if (isNotBlank(status)) {
             query.append(" AND s.status = :status");
         }

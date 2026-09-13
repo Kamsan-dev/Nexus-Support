@@ -3,6 +3,7 @@ package com.kamsan.userservice.sharedkernel.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +54,16 @@ public class GlobalExceptionHandler {
         log.error("Database access error", ex);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred."
+        );
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
+
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    public ResponseEntity<ProblemDetail> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex) {
+        log.error("Database error", ex);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
                 "An unexpected error occurred."
         );
         return ResponseEntity.internalServerError().body(problemDetail);

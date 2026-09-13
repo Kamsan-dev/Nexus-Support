@@ -1,6 +1,6 @@
 package com.kamsan.userservice.event;
 
-import com.kamsan.userservice.enumeration.EventType;
+import com.kamsan.userservice.enumeration.TicketType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,6 +13,6 @@ import java.util.Map;
 @Setter
 @AllArgsConstructor
 public class Event {
-    private EventType eventType;
+    private TicketType eventType;
     private Map<String, ?> data;
 }

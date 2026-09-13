@@ -1,11 +1,18 @@
 package com.kamsan.userservice.service.implementation;
 
 import com.kamsan.userservice.dto.*;
+import com.kamsan.userservice.enumeration.TicketStatus;
+import com.kamsan.userservice.mapper.TicketMapper;
+import com.kamsan.userservice.model.Ticket;
+import com.kamsan.userservice.repository.TicketQueryRepository;
 import com.kamsan.userservice.service.TicketService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -16,29 +23,33 @@ import java.util.UUID;
 @Slf4j
 public class TicketServiceImpl implements TicketService {
 
+    private final TicketQueryRepository ticketQueryRepository;
+    private final TicketMapper ticketMapper;
+
     @Override
-    public List<TicketDTO> getTickets(PageTicketRequestDTO request) {
-        return List.of();
+    @Transactional(readOnly = true)
+    public Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request) {
+        List<PageTicketDTO> ticketsPage = ticketQueryRepository.getTicketsPage(userPublicId, request);
+        int totalElements = ticketQueryRepository.getNumberOfTickets(userPublicId, request);
+        return new PageImpl<>(ticketsPage, request.page(), totalElements);
     }
 
     @Override
-    public int getPages(int page) {
-        return 0;
-    }
-
-    @Override
+    @Transactional
     public TicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO) {
-        return null;
+        Ticket ticket = ticketQueryRepository.insertNewTicket(userPublicId, createTicketDTO, TicketStatus.NEW);
+        return ticketMapper.ticketToTicketDTO(ticket);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TicketDTO getUserTicket(UUID userPublicId, UUID ticketPublicId) {
-        return null;
+        return ticketQueryRepository.getTicketByTicketPublicId(userPublicId, ticketPublicId);
     }
 
     @Override
     public List<CommentDTO> getTicketComments(UUID ticketPublicId) {
-        return List.of();
+        return ticketQueryRepository.getCommentsByTicketPublicId(ticketPublicId);
     }
 
     @Override

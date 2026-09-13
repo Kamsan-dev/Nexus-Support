@@ -30,6 +30,7 @@ public class Comment extends AbstractAuditingEntity<Long> {
 
     @Transient
     private UUID userPublicId;
+    @Transient
     private String firstName;
     @Transient
     private String lastName;

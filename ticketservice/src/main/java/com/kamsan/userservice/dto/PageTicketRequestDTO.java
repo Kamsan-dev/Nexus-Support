@@ -1,8 +1,9 @@
 package com.kamsan.userservice.dto;
 
+import org.springframework.data.domain.Pageable;
+
 public record PageTicketRequestDTO(
-        int page,
-        int size,
+        Pageable page,
         String status,
         String type,
         String filter

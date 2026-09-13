@@ -10,4 +10,6 @@ public interface UserService {
 
     ReadUserDTO getAssignee(UUID ticketPublicId);
 
+
+
 }

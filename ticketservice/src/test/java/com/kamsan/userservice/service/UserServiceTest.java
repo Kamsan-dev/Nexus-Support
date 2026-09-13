@@ -1,6 +1,7 @@
 package com.kamsan.userservice.service;
 
-import com.kamsan.userservice.mapper.UserMapper;
+import com.kamsan.userservice.dto.ReadUserDTO;
+import com.kamsan.userservice.mapper.TicketMapper;
 import com.kamsan.userservice.repository.UserRepository;
 import com.kamsan.userservice.repository.projection.UserRoleAndAuthoritiesProjection;
 import com.kamsan.userservice.service.implementation.TicketServiceImpl;
@@ -23,7 +24,7 @@ class UserServiceTest {
     @Mock
     UserRepository userRepository;
     @Mock
-    UserMapper userMapper;
+    TicketMapper userMapper;
     @InjectMocks
     TicketServiceImpl userService;
 

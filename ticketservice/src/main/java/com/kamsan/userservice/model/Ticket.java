@@ -30,7 +30,10 @@ public class Ticket extends AbstractAuditingEntity<Long> {
     private String description;
     private int progress;
     private OffsetDateTime dueDate;
-    
+    private Long statusId;
+    private Long priorityId;
+    private Long typeId;
+
     @Transient
     private int fileCount;
     @Transient

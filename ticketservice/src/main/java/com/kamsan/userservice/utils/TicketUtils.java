@@ -15,9 +15,9 @@ import static com.kamsan.userservice.constants.Constants.KAMSAN_IO;
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 
-public class UserUtils {
+public class TicketUtils {
 
-    private UserUtils() {
+    private TicketUtils() {
     }
 
     public static Supplier<UUID> randomUUID = UUID::randomUUID;
