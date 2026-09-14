@@ -23,7 +23,7 @@ public class Task extends AbstractAuditingEntity<Long> {
     @Id
     private Long taskId;
     private UUID taskPublicId;
-    private Long ticketIdId;
+    private Long ticketId;
     private Long assigneeId;
     private String name;
     private String description;

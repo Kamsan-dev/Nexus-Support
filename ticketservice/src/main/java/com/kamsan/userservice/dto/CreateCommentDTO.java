@@ -1,4 +1,9 @@
 package com.kamsan.userservice.dto;
 
-public record CreateCommentDTO() {
+import java.util.UUID;
+
+public record CreateCommentDTO(
+        UUID ticketPublicId,
+        String comment
+) {
 }

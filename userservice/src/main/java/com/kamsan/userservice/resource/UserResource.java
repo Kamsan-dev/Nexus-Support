@@ -57,6 +57,7 @@ public class UserResource {
 
     @PatchMapping("/mfa/enable")
     public ResponseEntity<ApiResponse<ReadUserDTO>> enableMfa(@NotNull Authentication authentication) {
+        authentication.get
         ReadUserDTO userDTO = userService.enableMfa(UUID.fromString(authentication.getName()));
         return ResponseEntity.ok().body(getResponse(
                 userDTO,

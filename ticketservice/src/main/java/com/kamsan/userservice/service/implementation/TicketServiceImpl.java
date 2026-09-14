@@ -3,7 +3,6 @@ package com.kamsan.userservice.service.implementation;
 import com.kamsan.userservice.dto.*;
 import com.kamsan.userservice.enumeration.TicketStatus;
 import com.kamsan.userservice.mapper.TicketMapper;
-import com.kamsan.userservice.model.Ticket;
 import com.kamsan.userservice.repository.TicketQueryRepository;
 import com.kamsan.userservice.service.TicketService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,9 +35,8 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional
-    public TicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO) {
-        Ticket ticket = ticketQueryRepository.insertNewTicket(userPublicId, createTicketDTO, TicketStatus.NEW);
-        return ticketMapper.ticketToTicketDTO(ticket);
+    public UUID createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO) {
+        return ticketQueryRepository.insertNewTicket(userPublicId, createTicketDTO, TicketStatus.NEW);
     }
 
     @Override
@@ -54,12 +52,12 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public List<TaskDTO> getTicketTasks(UUID ticketPublicId) {
-        return List.of();
+        return ticketQueryRepository.getTasksByTicketPublicId(ticketPublicId);
     }
 
     @Override
-    public CommentDTO createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
-        return null;
+    public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
+        return ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
     }
 
     @Override

@@ -62,10 +62,10 @@ public class TicketQuery {
             JOIN priorities p ON p.priority = :priority
             JOIN types typ ON typ.type = :type
             WHERE u.user_public_id = :userPublicId
-            RETURNING *
+            RETURNING ticket_public_id;
             """;
 
-    public static final String SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID = """
+    public static final String SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY = """
             SELECT
                  t.ticket_public_id,
                  a.user_public_id AS assignee_public_id,
@@ -88,7 +88,7 @@ public class TicketQuery {
              AND t.ticket_public_id = :ticketPublicId
             """;
 
-    public static final String SELECT_COMMENTS_BY_TICKET_PUBLIC_ID = """
+    public static final String SELECT_COMMENTS_BY_TICKET_PUBLIC_ID_QUERY = """
             SELECT
                 c.comment_public_id,
                 u.user_public_id,
@@ -104,5 +104,82 @@ public class TicketQuery {
             JOIN users u ON c.user_id = u.user_id
             WHERE t.ticket_public_id = :ticketPublic
             ORDER BY c.created_at DESC
+            """;
+
+    public static final String SELECT_TASKS_BY_TICKET_PUBLIC_ID_QUERY = """
+            SELECT
+                ta.task_public_id,
+                ta.name,
+                ta.description,
+                ta.due_date,
+                ta.updated_at,
+                ta.created_at,
+                s.status,
+                a.user_public_id AS assignee_public_id,
+                a.first_name,
+                a.last_name,
+                a.image_url,
+            FROM tasks ta
+            JOIN tickets t ON t.ticket_id = ta.ticket_id
+            LEFT JOIN users a ON a.user_id = ta.assignee_id
+            JOIN statuses s ON s.status_id = ta.status_id
+            WHERE t.ticket_public_id = :ticketPublic
+            ORDER BY ta.created_at DESC
+            """;
+
+    public static final String INSERT_COMMENT_TICKET_QUERY = """
+            INSERT INTO comments (
+                 comment_public_id,
+                 user_id,
+                 ticket_id,
+                 comment
+                 )
+             SELECT
+                 :commentPublicId,
+                 u.user_id,
+                 t.ticket_id,
+                 :comment
+             FROM users u
+             JOIN tickets t ON t.ticket_public_id = :ticketPublicId
+             WHERE u.user_public_id = :userPublicId
+             RETURNING comment_public_id
+            """;
+
+    public static final String SELECT_FILES_TICKET_QUERY = """
+            SELECT f.*
+            FROM files f
+            JOIN tickets t ON t.ticket_id = f.ticket_id
+            WHERE t.ticket_public_id = :ticketPublicId
+            """;
+
+    public static final String DELETE_FILE_QUERY = """
+            DELETE FROM files
+            WHERE file_public_id = :filePublicId
+            """;
+    public static final String UPDATE_COMMENT_QUERY = """
+            UPDATE comments
+            SET comment = :comment,
+            updated_at = NOW()
+            WHERE comment_public_id = :commentPublicId
+            """;
+    public static final String DELETE_COMMENT_QUERY = """
+            DELETE FROM comments
+            WHERE comment_public_id = :commentPublicId
+            """;
+
+    public static final String UPDATE_TICKET_QUERY = """
+            UPDATE tickets t
+            SET t.title = :title,
+            t.description = :description,
+            t.progress = :progress,
+            t.type_id = typ.type_id,
+            t.priority_id = p.priority_id,
+            t.status_id = s.status_id,
+            t.due_date = :dueDate,
+            t.updated_at = NOW()
+            JOIN statuses s ON s.status = :status
+            JOIN types typ ON typ.type = :type
+            JOIN priorities p ON p.priority = :priority
+            WHERE t.ticket_public_id = :ticketPublicId
             """;
 }

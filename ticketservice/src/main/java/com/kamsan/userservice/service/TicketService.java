@@ -12,7 +12,7 @@ public interface TicketService {
 
     Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
 
-    TicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO);
+    UUID createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO);
 
     TicketDTO getUserTicket(UUID userPublicId, UUID ticketPublicId);
 
@@ -20,7 +20,7 @@ public interface TicketService {
 
     List<TaskDTO> getTicketTasks(UUID ticketPublicId);
 
-    CommentDTO createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
+    UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
 
     CommentDTO updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
 

@@ -1,8 +1,10 @@
 package com.kamsan.userservice.repository;
 
 import com.kamsan.userservice.dto.*;
+import com.kamsan.userservice.enumeration.TicketPriority;
 import com.kamsan.userservice.enumeration.TicketStatus;
-import com.kamsan.userservice.model.Ticket;
+import com.kamsan.userservice.enumeration.TicketType;
+import com.kamsan.userservice.model.Attachment;
 import com.kamsan.userservice.utils.TicketUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -53,7 +55,7 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public Ticket insertNewTicket(UUID userPublicId, CreateTicketDTO request, TicketStatus status) {
+    public UUID insertNewTicket(UUID userPublicId, CreateTicketDTO request, TicketStatus status) {
         return jdbc.sql(INSERT_TICKET_QUERY)
                    .param("ticketPublicId", TicketUtils.randomUUID.get())
                    .param("description", request.description())
@@ -62,12 +64,12 @@ public class TicketQueryRepository {
                    .param("priority", request.priority())
                    .param("status", status.value())
                    .param("userPublicId", userPublicId)
-                   .query(Ticket.class)
+                   .query(UUID.class)
                    .single();
     }
 
     public TicketDTO getTicketByTicketPublicId(UUID userPublicId, UUID ticketPublicId) {
-        return jdbc.sql(SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID)
+        return jdbc.sql(SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .param("userPublicId", userPublicId)
                    .query((rs, rowNum) -> new TicketDTO(
@@ -79,16 +81,16 @@ public class TicketQueryRepository {
                            rs.getString("title"),
                            rs.getString("description"),
                            rs.getInt("progress"),
-                           rs.getString("status"),
-                           rs.getString("priority"),
-                           rs.getString("type"),
+                           rs.getObject("status", TicketStatus.class),
+                           rs.getObject("priority", TicketPriority.class),
+                           rs.getObject("type", TicketType.class),
                            rs.getObject("due_date", OffsetDateTime.class)
                    ))
                    .single();
     }
 
     public List<CommentDTO> getCommentsByTicketPublicId(UUID ticketPublicId) {
-        return jdbc.sql(SELECT_COMMENTS_BY_TICKET_PUBLIC_ID)
+        return jdbc.sql(SELECT_COMMENTS_BY_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query((rs, rowNum) -> new CommentDTO(
                            rs.getObject("created_at", OffsetDateTime.class),
@@ -103,6 +105,75 @@ public class TicketQueryRepository {
                            rs.getString("image_url")
                    ))
                    .list();
+    }
+
+    public List<TaskDTO> getTasksByTicketPublicId(UUID ticketPublicId) {
+        return jdbc.sql(SELECT_TASKS_BY_TICKET_PUBLIC_ID_QUERY)
+                   .param("ticketPublicId", ticketPublicId)
+                   .query((rs, rowNum) -> new TaskDTO(
+                           rs.getObject("task_public_id", UUID.class),
+                           ticketPublicId,
+                           rs.getObject("assignee_public_id", UUID.class),
+                           rs.getString("name"),
+                           rs.getString("description"),
+                           rs.getObject("due_date", OffsetDateTime.class),
+                           rs.getString("status"),
+                           rs.getString("first_name"),
+                           rs.getString("last_name"),
+                           rs.getString("image_url"),
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class)
+                   ))
+                   .list();
+    }
+
+    public UUID insertNewComment(UUID userPublicId, CreateCommentDTO request) {
+        return jdbc.sql(INSERT_COMMENT_TICKET_QUERY)
+                   .param("ticketPublicId", request.ticketPublicId())
+                   .param("userPublicId", userPublicId)
+                   .param("commentPublicId", TicketUtils.randomUUID.get())
+                   .param("comment", request.comment())
+                   .query(UUID.class)
+                   .single();
+    }
+
+    public List<Attachment> getFilesFromTicket(UUID ticketPublicId) {
+        return jdbc.sql(SELECT_FILES_TICKET_QUERY)
+                   .param("ticketPublicId", ticketPublicId)
+                   .query(Attachment.class)
+                   .list();
+    }
+
+    public void deleteFile(UUID filePublicId) {
+        jdbc.sql(DELETE_FILE_QUERY)
+            .param("filePublicId", filePublicId)
+            .update();
+    }
+
+    public void updateComment(UUID commentPublicId, String comment) {
+        jdbc.sql(UPDATE_COMMENT_QUERY)
+            .param("comment", comment)
+            .param("commentPublicId", commentPublicId)
+            .update();
+    }
+
+    public void deleteComment(UUID commentPublicId) {
+        jdbc.sql(DELETE_COMMENT_QUERY)
+            .param("commentPublicId", commentPublicId)
+            .update();
+    }
+
+    public void updateTicket(UpdateTicketDTO request) {
+        jdbc.sql(UPDATE_TICKET_QUERY)
+            .param("ticketPublicId", request.ticketPublicId())
+            .param("title", request.title())
+            .param("description", request.description())
+            .param("type", request.type())
+            .param("status", request.status())
+            .param("priority", request.priority())
+            .param("dueDate", request.dueDate())
+            .param("progress", request.progress())
+            .update();
     }
 
 //    OffsetDateTime createdAt,
