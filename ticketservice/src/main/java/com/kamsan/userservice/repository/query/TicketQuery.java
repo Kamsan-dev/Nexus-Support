@@ -182,4 +182,50 @@ public class TicketQuery {
             JOIN priorities p ON p.priority = :priority
             WHERE t.ticket_public_id = :ticketPublicId
             """;
+
+    public static final String UPDATE_ASSIGNEE_TICKET_QUERY = """
+            UPDATE tickets t
+            t.assignee_id = a.user_id
+            t.updated_at = NOW()
+            LEFT JOIN users a ON a.user_public_id = :assigneePublicId
+            WHERE t.ticket_public_id = :ticketPublicId
+            """;
+
+    public static final String INSERT_TICKET_TASK_QUERY = """
+            WITH inserted AS (
+                INSERT INTO tasks (
+                    task_public_id,
+                    ticket_id,
+                    assignee_id,
+                    name,
+                    description,
+                    status_id
+                )
+                SELECT
+                    :taskPublicId,
+                    t.ticket_id,
+                    a.user_id,
+                    :name,
+                    :description,
+                    s.status_id
+                FROM users a
+                JOIN tickets t ON t.ticket_public_id = :ticketPublicId
+                JOIN statuses s ON s.status = :status
+                WHERE a.user_public_id = :assigneePublicId
+                RETURNING *
+            )
+            SELECT
+                i.name,
+                i.description,
+                s.status,
+                i.due_date,
+                a.first_name,
+                a.last_name,
+                a.image_url,
+                i.created_at,
+                i.updated_at
+            FROM inserted i
+            JOIN statuses s ON s.status_id = i.status_id
+            JOIN users a ON a.user_id = i.assignee_id;
+            """;
 }

@@ -1,5 +1,7 @@
 package com.kamsan.userservice.dto;
 
+import com.kamsan.userservice.enumeration.TicketStatus;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -10,7 +12,7 @@ public record TaskDTO(
         String name,
         String description,
         OffsetDateTime dueDate,
-        String status,
+        TicketStatus status,
         String assigneeFirstName,
         String assigneeLastName,
         String assigneeImageUrl,

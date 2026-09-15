@@ -2,6 +2,7 @@ package com.kamsan.userservice.service;
 
 import com.kamsan.userservice.dto.ReadUserDTO;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -10,6 +11,6 @@ public interface UserService {
 
     ReadUserDTO getAssignee(UUID ticketPublicId);
 
-
+    List<ReadUserDTO> getTechSupports();
 
 }

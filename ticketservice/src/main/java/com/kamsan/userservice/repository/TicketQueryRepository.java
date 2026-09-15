@@ -117,7 +117,7 @@ public class TicketQueryRepository {
                            rs.getString("name"),
                            rs.getString("description"),
                            rs.getObject("due_date", OffsetDateTime.class),
-                           rs.getString("status"),
+                           rs.getObject("status", TicketStatus.class),
                            rs.getString("first_name"),
                            rs.getString("last_name"),
                            rs.getString("image_url"),
@@ -174,6 +174,38 @@ public class TicketQueryRepository {
             .param("dueDate", request.dueDate())
             .param("progress", request.progress())
             .update();
+    }
+
+    public void updateTicket(UUID assigneePublicId, UUID ticketPublicId) {
+        jdbc.sql(UPDATE_ASSIGNEE_TICKET_QUERY)
+            .param("ticketPublicId", ticketPublicId)
+            .param("assigneePublicId", assigneePublicId)
+            .update();
+    }
+
+    public TaskDTO insertNewTask(UUID userPublicId, CreateTaskDTO request) {
+        return jdbc.sql(INSERT_TICKET_TASK_QUERY)
+                   .param("ticketPublicId", request.ticketPublicId())
+                   .param("assigneePublicId", userPublicId)
+                   .param("taskPublicId", TicketUtils.randomUUID.get())
+                   .param("name", request.name())
+                   .param("description", request.description())
+                   .param("status", request.status())
+                   .query((rs, rowNum) -> new TaskDTO(
+                           rs.getObject("task_public_id", UUID.class),
+                           request.ticketPublicId(),
+                           userPublicId,
+                           rs.getString("name"),
+                           rs.getString("description"),
+                           rs.getObject("due_date", OffsetDateTime.class),
+                           rs.getObject("status", TicketStatus.class),
+                           rs.getString("first_name"),
+                           rs.getString("last_name"),
+                           rs.getString("image_url"),
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class)
+                   ))
+                   .single();
     }
 
 //    OffsetDateTime createdAt,

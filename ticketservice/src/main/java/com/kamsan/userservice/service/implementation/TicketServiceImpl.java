@@ -96,16 +96,6 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public ReadUserDTO getAssignee(UUID ticketPublicId) {
-        return null;
-    }
-
-    @Override
-    public List<ReadUserDTO> getTechSupports() {
-        return List.of();
-    }
-
-    @Override
     public ReadUserDTO updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId) {
         return null;
     }

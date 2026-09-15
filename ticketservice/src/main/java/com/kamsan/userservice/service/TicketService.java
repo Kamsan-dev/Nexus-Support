@@ -36,10 +36,6 @@ public interface TicketService {
 
     TicketDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
 
-    ReadUserDTO getAssignee(UUID ticketPublicId);
-
-    List<ReadUserDTO> getTechSupports();
-
     ReadUserDTO updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
 
     TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO);
