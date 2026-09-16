@@ -94,6 +94,10 @@ public class RequestUtils {
         );
     }
 
+    public static <T> T convertResponse(ApiResponse response, Class<T> classType) {
+        return new ObjectMapper().convertValue(response.data(), classType);
+    }
+
     private static Response getErrorResponse(HttpServletRequest request, HttpServletResponse response, Exception exception, HttpStatus httpStatus) {
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setStatus(httpStatus.value());

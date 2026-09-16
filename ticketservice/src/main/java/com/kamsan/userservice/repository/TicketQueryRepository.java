@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 
 import static com.kamsan.userservice.repository.query.TicketQuery.*;
+import static com.kamsan.userservice.utils.QueryUtils.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +25,8 @@ public class TicketQueryRepository {
     private final JdbcClient jdbc;
 
     public List<PageTicketDTO> getTicketsPage(UUID userPublicId, PageTicketRequestDTO request) {
-        return jdbc.sql(SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY)
+        var query = createSelectTicketsQuery(request.status(), request.type(), request.filter());
+        return jdbc.sql(query)
                    .param("size", request.page().getPageSize())
                    .param("offset", request.page().getOffset())
                    .param("status", request.status())
@@ -49,7 +51,8 @@ public class TicketQueryRepository {
     }
 
     public int getNumberOfTickets(UUID userPublicId, PageTicketRequestDTO request) {
-        return jdbc.sql(SELECT_COUNT_TICKET_NUMBER_QUERY)
+        var query = createSelectTotalElementsQuery(request.status(), request.type(), request.filter());
+        return jdbc.sql(query)
                    .param("userPublicId", userPublicId)
                    .query(Integer.class)
                    .single();
@@ -206,6 +209,31 @@ public class TicketQueryRepository {
                            rs.getObject("updated_at", OffsetDateTime.class)
                    ))
                    .single();
+    }
+
+    public List<TicketReportDTO> generateReport(UUID userPublicId, CreateReportDTO request) {
+        var query = createTicketReportQuery(request);
+        return jdbc.sql(query)
+                   .param("userPublicId", userPublicId)
+                   .param("statuses", request.statuses())
+                   .param("types", request.types())
+                   .param("priorities", request.priorities())
+                   .param("filter", request.filter())
+                   .param("fromDate", request.fromDate())
+                   .param("toDate", request.toDate())
+                   .query((rs, rowNum) -> new TicketReportDTO(
+                           rs.getObject("ticket_public_id", UUID.class),
+                           rs.getString("title"),
+                           rs.getString("description"),
+                           rs.getObject("status", TicketStatus.class),
+                           rs.getObject("priority", TicketPriority.class),
+                           rs.getObject("type", TicketType.class),
+                           rs.getObject("due_date", OffsetDateTime.class),
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class)
+                   ))
+                   .list();
+
     }
 
 //    OffsetDateTime createdAt,

@@ -192,7 +192,7 @@ public class TicketQuery {
             """;
 
     public static final String INSERT_TICKET_TASK_QUERY = """
-            WITH inserted AS (
+            WITH task AS (
                 INSERT INTO tasks (
                     task_public_id,
                     ticket_id,
@@ -224,8 +224,28 @@ public class TicketQuery {
                 a.image_url,
                 i.created_at,
                 i.updated_at
-            FROM inserted i
+            FROM task i
             JOIN statuses s ON s.status_id = i.status_id
             JOIN users a ON a.user_id = i.assignee_id;
+            """;
+    
+    public static final String SELECT_TICKET_FOR_REPORT_QUERY = """
+            SELECT
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            WHERE u.user_public_id = :userPublicId
             """;
 }
