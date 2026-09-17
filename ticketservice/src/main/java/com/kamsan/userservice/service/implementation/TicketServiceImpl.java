@@ -28,6 +28,9 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional(readOnly = true)
     public Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request) {
+        
+
+
         List<PageTicketDTO> ticketsPage = ticketQueryRepository.getTicketsPage(userPublicId, request);
         int totalElements = ticketQueryRepository.getNumberOfTickets(userPublicId, request);
         return new PageImpl<>(ticketsPage, request.page(), totalElements);

@@ -29,6 +29,30 @@ public class TicketQuery {
             WHERE u.user_public_id = :userPublicId
             """;
 
+    public static final String SELECT_ALL_TICKETS_QUERY = """
+            SELECT
+                COUNT(DISTINCT(c.comment_id)) AS comment_count,
+                COUNT(DISTINCT(f.file_id)) AS file_count,
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            LEFT JOIN files f ON t.ticket_id = f.ticket_id
+            LEFT JOIN comments c ON t.ticket_id = c.ticket_id
+            WHERE 1 = 1
+            """;
+
     public static final String SELECT_COUNT_TICKET_NUMBER_QUERY = """
             SELECT
                 COUNT(*)
@@ -228,7 +252,7 @@ public class TicketQuery {
             JOIN statuses s ON s.status_id = i.status_id
             JOIN users a ON a.user_id = i.assignee_id;
             """;
-    
+
     public static final String SELECT_TICKET_FOR_REPORT_QUERY = """
             SELECT
                 t.ticket_public_id,

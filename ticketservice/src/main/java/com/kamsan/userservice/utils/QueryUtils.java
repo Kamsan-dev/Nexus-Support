@@ -1,6 +1,10 @@
 package com.kamsan.userservice.utils;
 
 import com.kamsan.userservice.dto.CreateReportDTO;
+import com.kamsan.userservice.enumeration.TicketStatus;
+import com.kamsan.userservice.enumeration.TicketType;
+
+import java.util.UUID;
 
 import static com.kamsan.userservice.repository.query.TicketQuery.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -10,12 +14,18 @@ public class QueryUtils {
 
     public static final String FILTER_TITLE_BY_CRITERIA = " AND t.title ~* :filter";
 
-    public static String createSelectTicketsQuery(String status, String type, String filter) {
-        var query = getStringBuilder(SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY);
-        if (isNotBlank(status)) {
+    public static String createSelectTicketsQuery(TicketStatus status, TicketType type, String filter, UUID userPublicId) {
+        StringBuilder query;
+        if (userPublicId == null) {
+            query = getStringBuilder(SELECT_ALL_TICKETS_QUERY);
+        } else {
+            query = getStringBuilder(SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY);
+        }
+        
+        if (isNotBlank(status.value())) {
             query.append(" AND s.status = :status");
         }
-        if (isNotBlank(type)) {
+        if (isNotBlank(type.toString())) {
             query.append(" AND typ.type = :type");
         }
         if (isNotBlank(filter)) {
@@ -32,12 +42,12 @@ public class QueryUtils {
         return replace(query.toString(), "\\n", "");
     }
 
-    public static String createSelectTotalElementsQuery(String status, String type, String filter) {
+    public static String createSelectTotalElementsQuery(TicketStatus status, TicketType type, String filter) {
         var query = getStringBuilder(SELECT_COUNT_TICKET_NUMBER_QUERY);
-        if (isNotBlank(status)) {
+        if (isNotBlank(status.toString())) {
             query.append(" AND s.status = :status");
         }
-        if (isNotBlank(type)) {
+        if (isNotBlank(type.toString())) {
             query.append(" AND typ.type = :type");
         }
         if (isNotBlank(filter)) {

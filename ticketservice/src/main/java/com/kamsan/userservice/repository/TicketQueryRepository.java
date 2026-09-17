@@ -24,8 +24,33 @@ public class TicketQueryRepository {
 
     private final JdbcClient jdbc;
 
-    public List<PageTicketDTO> getTicketsPage(UUID userPublicId, PageTicketRequestDTO request) {
-        var query = createSelectTicketsQuery(request.status(), request.type(), request.filter());
+    public List<PageTicketDTO> getTicketsPage(PageTicketRequestDTO request) {
+        var query = createSelectTicketsQuery(request.status(), request.type(), request.filter(), null);
+        return jdbc.sql(query)
+                   .param("size", request.page().getPageSize())
+                   .param("offset", request.page().getOffset())
+                   .param("status", request.status())
+                   .param("type", request.type())
+                   .param("filter", request.filter())
+                   .query((rs, rowNum) -> new PageTicketDTO(
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class),
+                           rs.getObject("ticket_public_id", UUID.class),
+                           rs.getString("title"),
+                           rs.getString("description"),
+                           rs.getInt("progress"),
+                           rs.getString("status"),
+                           rs.getString("priority"),
+                           rs.getString("type"),
+                           rs.getObject("due_date", OffsetDateTime.class),
+                           rs.getInt("file_count"),
+                           rs.getInt("comment_count")
+                   ))
+                   .list();
+    }
+
+    public List<PageTicketDTO> getTicketsPageByUserPublicId(UUID userPublicId, PageTicketRequestDTO request) {
+        var query = createSelectTicketsQuery(request.status(), request.type(), request.filter(), userPublicId);
         return jdbc.sql(query)
                    .param("size", request.page().getPageSize())
                    .param("offset", request.page().getOffset())

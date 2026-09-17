@@ -1,8 +1,12 @@
 package com.kamsan.userservice.resource;
 
 import com.kamsan.userservice.domain.ApiResponse;
-import com.kamsan.userservice.domain.UserProperties;
+import com.kamsan.userservice.dto.PageTicketDTO;
+import com.kamsan.userservice.dto.PageTicketRequestDTO;
+import com.kamsan.userservice.dto.ReadUserDTO;
+import com.kamsan.userservice.dto.TicketUserDTO;
 import com.kamsan.userservice.service.implementation.TicketServiceImpl;
+import com.kamsan.userservice.service.implementation.UserServiceImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -30,11 +34,21 @@ import static com.kamsan.userservice.utils.RequestUtils.getResponse;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user")
-public class UserResource {
+@RequestMapping("/ticket")
+public class TicketResource {
 
-    private final TicketServiceImpl userService;
-    private final UserProperties userProperties;
+    private final UserServiceImpl userService;
+    private final TicketServiceImpl ticketService;
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<PageTicketDTO>>> getTickets(@NotNull Authentication authentication, @RequestBody PageTicketRequestDTO pageTicketRequestDTO) {
+        Page<PageTicketDTO> tickets = ticketService.getTickets(UUID.fromString(authentication.getName()),
+                pageTicketRequestDTO);
+        return ResponseEntity.ok().body(getResponse(
+                tickets,
+                "Tickets retrieved.",
+                HttpStatus.OK));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid CreateUserDTO createUserDTO) {
