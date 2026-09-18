@@ -45,6 +45,8 @@ public interface UserService {
 
     List<DeviceDTO> getDevices(UUID userPublicId);
 
+    List<TicketUserDTO> getTechSupports();
+
     /**
      * Admin
      **/

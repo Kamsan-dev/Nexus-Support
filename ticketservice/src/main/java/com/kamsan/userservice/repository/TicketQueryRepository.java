@@ -24,7 +24,7 @@ public class TicketQueryRepository {
 
     private final JdbcClient jdbc;
 
-    public List<PageTicketDTO> getTicketsPage(PageTicketRequestDTO request) {
+    public List<PageTicketDTO> getTickets(PageTicketRequestDTO request) {
         var query = createSelectTicketsQuery(request.status(), request.type(), request.filter(), null);
         return jdbc.sql(query)
                    .param("size", request.page().getPageSize())
@@ -49,7 +49,7 @@ public class TicketQueryRepository {
                    .list();
     }
 
-    public List<PageTicketDTO> getTicketsPageByUserPublicId(UUID userPublicId, PageTicketRequestDTO request) {
+    public List<PageTicketDTO> getUserTickets(UUID userPublicId, PageTicketRequestDTO request) {
         var query = createSelectTicketsQuery(request.status(), request.type(), request.filter(), userPublicId);
         return jdbc.sql(query)
                    .param("size", request.page().getPageSize())
@@ -76,7 +76,7 @@ public class TicketQueryRepository {
     }
 
     public int getNumberOfTickets(UUID userPublicId, PageTicketRequestDTO request) {
-        var query = createSelectTotalElementsQuery(request.status(), request.type(), request.filter());
+        var query = createSelectTotalElementsQuery(request.status(), request.type(), request.filter(), userPublicId);
         return jdbc.sql(query)
                    .param("userPublicId", userPublicId)
                    .query(Integer.class)
@@ -96,11 +96,11 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public TicketDTO getTicketByTicketPublicId(UUID userPublicId, UUID ticketPublicId) {
+    public TicketDetailsDTO getTicket(UUID userPublicId, UUID ticketPublicId) {
         return jdbc.sql(SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .param("userPublicId", userPublicId)
-                   .query((rs, rowNum) -> new TicketDTO(
+                   .query((rs, rowNum) -> new TicketDetailsDTO(
                            rs.getObject("created_at", OffsetDateTime.class),
                            rs.getObject("updated_at", OffsetDateTime.class),
                            rs.getObject("ticket_public_id", UUID.class),
@@ -117,7 +117,7 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public List<CommentDTO> getCommentsByTicketPublicId(UUID ticketPublicId) {
+    public List<CommentDTO> getCommentsForTicket(UUID ticketPublicId) {
         return jdbc.sql(SELECT_COMMENTS_BY_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query((rs, rowNum) -> new CommentDTO(
@@ -135,7 +135,7 @@ public class TicketQueryRepository {
                    .list();
     }
 
-    public List<TaskDTO> getTasksByTicketPublicId(UUID ticketPublicId) {
+    public List<TaskDTO> getTasksForTicket(UUID ticketPublicId) {
         return jdbc.sql(SELECT_TASKS_BY_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query((rs, rowNum) -> new TaskDTO(
@@ -165,7 +165,19 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public List<Attachment> getFilesFromTicket(UUID ticketPublicId) {
+    public void insertNewFile(UUID ticketPublicId, AttachmentDTO request) {
+        jdbc.sql(INSERT_FILE_TICKET_QUERY)
+            .param("ticketPublicId", ticketPublicId)
+            .param("filePublicId", TicketUtils.randomUUID.get())
+            .param("extension", request.extension())
+            .param("formattedSize", request.formattedSize())
+            .param("name", request.name())
+            .param("size", request.size())
+            .param("uri", request.uri())
+            .update();
+    }
+
+    public List<Attachment> getFilesForTicket(UUID ticketPublicId) {
         return jdbc.sql(SELECT_FILES_TICKET_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query(Attachment.class)

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.*;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.OffsetDateTime;
@@ -94,8 +95,8 @@ public class RequestUtils {
         );
     }
 
-    public static <T> T convertResponse(ApiResponse response, Class<T> classType) {
-        return new ObjectMapper().convertValue(response.data(), classType);
+    public static <T> T convertResponse(ApiResponse response, TypeReference<T> typeReference) {
+        return new ObjectMapper().convertValue(response.data(), typeReference);
     }
 
     private static Response getErrorResponse(HttpServletRequest request, HttpServletResponse response, Exception exception, HttpStatus httpStatus) {

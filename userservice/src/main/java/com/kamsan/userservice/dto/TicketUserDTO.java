@@ -6,5 +6,6 @@ public record TicketUserDTO(UUID userPublicId,
                             String email,
                             String firstName,
                             String lastName,
-                            String imageUrl) {
+                            String imageUrl,
+                            String role) {
 }

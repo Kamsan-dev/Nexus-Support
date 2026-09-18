@@ -12,6 +12,6 @@ public interface UserService {
 
     TicketUserDTO getAssignee(UUID ticketPublicId);
 
-    List<ReadUserDTO> getTechSupports();
+    List<TicketUserDTO> getTechSupports();
 
 }

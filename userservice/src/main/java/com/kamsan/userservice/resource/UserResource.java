@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -57,7 +58,6 @@ public class UserResource {
 
     @PatchMapping("/mfa/enable")
     public ResponseEntity<ApiResponse<ReadUserDTO>> enableMfa(@NotNull Authentication authentication) {
-        authentication.get
         ReadUserDTO userDTO = userService.enableMfa(UUID.fromString(authentication.getName()));
         return ResponseEntity.ok().body(getResponse(
                 userDTO,
@@ -98,6 +98,14 @@ public class UserResource {
         var assignee = userService.getAssignee(UUID.fromString(ticketPublicId));
         return ResponseEntity.ok().body(getResponse(
                 assignee,
+                null,
+                HttpStatus.OK));
+    }
+
+    @GetMapping("/list/tech-supports")
+    public ResponseEntity<ApiResponse<List<TicketUserDTO>>> getAllTechSupports(@NonNull Authentication authentication) {
+        return ResponseEntity.ok().body(getResponse(
+                userService.getTechSupports(),
                 null,
                 HttpStatus.OK));
     }

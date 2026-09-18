@@ -3,6 +3,7 @@ package com.kamsan.userservice.service;
 import com.kamsan.userservice.dto.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -12,9 +13,9 @@ public interface TicketService {
 
     Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
 
-    UUID createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO);
+    UUID createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO, List<MultipartFile> files);
 
-    TicketDTO getUserTicket(UUID userPublicId, UUID ticketPublicId);
+    TicketDetailsDTO getUserTicket(UUID userPublicId, UUID ticketPublicId);
 
     List<CommentDTO> getTicketComments(UUID ticketPublicId);
 
@@ -28,13 +29,11 @@ public interface TicketService {
 
     List<AttachmentDTO> getTicketFiles(UUID ticketPublicId);
 
-    List<AttachmentDTO> uploadFiles(UUID userPublicId, UploadTicketFilesDTO uploadTicketFilesDTO);
-
     void deleteFile(UUID userPublicId, UUID filePublicId);
 
     Path downloadFile(String name, UUID filePublicId);
 
-    TicketDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
+    TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
 
     ReadUserDTO updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
 
@@ -42,7 +41,7 @@ public interface TicketService {
 
     ReadUserDTO getTicketUser(UUID ticketPublicId);
 
-    List<TicketDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
+    List<TicketDetailsDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
 
     void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO);
 }

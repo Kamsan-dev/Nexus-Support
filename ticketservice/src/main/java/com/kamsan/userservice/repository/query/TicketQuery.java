@@ -61,7 +61,6 @@ public class TicketQuery {
                 JOIN statuses s ON s.status_id = t.status_id
                 JOIN types typ ON typ.type_id = t.type_id
                 JOIN priorities pr ON pr.priority_id = t.priority_id
-            WHERE u.user_public_id = :userPublicId
             """;
 
     public static final String INSERT_TICKET_QUERY = """
@@ -167,6 +166,28 @@ public class TicketQuery {
              JOIN tickets t ON t.ticket_public_id = :ticketPublicId
              WHERE u.user_public_id = :userPublicId
              RETURNING comment_public_id
+            """;
+
+    public static final String INSERT_FILE_TICKET_QUERY = """
+            INSERT INTO files f (
+                file_public_id,
+                ticket_id,
+                extension,
+                formatted_size,
+                name,
+                size,
+                uri
+            )
+            SELECT
+                :filePublicId,
+                t.ticket_id,
+                :extension,
+                :formattedSize,
+                :name,
+                :size,
+                :uri
+            FROM tickets t
+            JOIN tickets t ON t.ticket_public_id = :ticketPublicId
             """;
 
     public static final String SELECT_FILES_TICKET_QUERY = """

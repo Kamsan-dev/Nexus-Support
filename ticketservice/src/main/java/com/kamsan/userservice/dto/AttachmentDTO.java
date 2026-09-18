@@ -1,4 +1,13 @@
 package com.kamsan.userservice.dto;
 
-public record AttachmentDTO() {
+import java.util.UUID;
+
+public record AttachmentDTO(
+        UUID ticketPublicId,
+        String name,
+        Long size,
+        String formattedSize,
+        String extension,
+        String uri
+) {
 }

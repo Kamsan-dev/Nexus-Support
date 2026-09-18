@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder encoder;
     private final ApplicationEventPublisher publisher;
-    
+
     @Override
     @Transactional(readOnly = true)
     public ReadUserDTO getUserByEmail(String email) {
@@ -274,7 +274,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public TicketUserDTO getAssignee(UUID ticketPublicId) {
-        return userQueryRepository.getAssignee(ticketPublicId);
+        return userQueryRepository.getAssigneeForTicket(ticketPublicId);
     }
 
     @Override
@@ -290,6 +290,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<DeviceDTO> getDevices(UUID userPublicId) {
         return userQueryRepository.getUserDevices(userPublicId);
+    }
+
+    @Override
+    public List<TicketUserDTO> getTechSupports() {
+        return userQueryRepository.getTechSupports();
     }
 
     @Override

@@ -47,7 +47,7 @@ public class UserQueryRepository {
                    .single();
     }
 
-    public TicketUserDTO getAssignee(UUID ticketPublicId) {
+    public TicketUserDTO getAssigneeForTicket(UUID ticketPublicId) {
         return jdbc.sql(SELECT_TICKET_ASSIGNEE_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query((rs, rowNum) -> new TicketUserDTO(
@@ -55,9 +55,23 @@ public class UserQueryRepository {
                            rs.getString("email"),
                            rs.getString("first_name"),
                            rs.getString("last_name"),
-                           rs.getString("image_url")
+                           rs.getString("image_url"),
+                           rs.getString("name")
                    ))
                    .single();
+    }
+
+    public List<TicketUserDTO> getTechSupports() {
+        return jdbc.sql(SELECT_TECH_SUPPORTS_QUERY)
+                   .query((rs, rowNum) -> new TicketUserDTO(
+                           rs.getObject("user_public_id", UUID.class),
+                           rs.getString("email"),
+                           rs.getString("first_name"),
+                           rs.getString("last_name"),
+                           rs.getString("image_url"),
+                           rs.getString("name")
+                   ))
+                   .list();
     }
 
     public List<DeviceDTO> getUserDevices(UUID userPublicId) {

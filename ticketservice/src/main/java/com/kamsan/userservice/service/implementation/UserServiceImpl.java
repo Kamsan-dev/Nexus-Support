@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import tools.jackson.core.type.TypeReference;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,8 @@ public class UserServiceImpl implements UserService {
                                  .retrieve()
                                  .body(ApiResponse.class);
         if (response != null) {
-            return convertResponse(response, ReadUserDTO.class);
+            return convertResponse(response, new TypeReference<>() {
+            });
         } else throw new ApiException(String.format("Unable to retrieve user by public id %s", userPublicId));
     }
 
@@ -49,13 +51,21 @@ public class UserServiceImpl implements UserService {
                                  .retrieve()
                                  .body(ApiResponse.class);
         if (response != null) {
-            return convertResponse(response, TicketUserDTO.class);
+            return convertResponse(response, new TypeReference<>() {
+            });
         } else throw new ApiException(String.format("Unable to retrieve assignee for ticket with public id %s",
                 ticketPublicId));
     }
 
     @Override
-    public List<ReadUserDTO> getTechSupports() {
-        return List.of();
+    public List<TicketUserDTO> getTechSupports() {
+        var response = restClient.get()
+                                 .uri("/user/list/tech-supports")
+                                 .retrieve()
+                                 .body(ApiResponse.class);
+        if (response != null) {
+            return convertResponse(response, new TypeReference<>() {
+            });
+        } else throw new ApiException("Unable to retrieve the technician supports.");
     }
 }

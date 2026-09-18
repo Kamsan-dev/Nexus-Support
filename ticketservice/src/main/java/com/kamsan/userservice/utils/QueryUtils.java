@@ -21,7 +21,7 @@ public class QueryUtils {
         } else {
             query = getStringBuilder(SELECT_TICKETS_BY_ISSUER_PUBLIC_ID_QUERY);
         }
-        
+
         if (isNotBlank(status.value())) {
             query.append(" AND s.status = :status");
         }
@@ -42,8 +42,15 @@ public class QueryUtils {
         return replace(query.toString(), "\\n", "");
     }
 
-    public static String createSelectTotalElementsQuery(TicketStatus status, TicketType type, String filter) {
+    public static String createSelectTotalElementsQuery(TicketStatus status, TicketType type, String filter, UUID userPublicId) {
         var query = getStringBuilder(SELECT_COUNT_TICKET_NUMBER_QUERY);
+
+        if (userPublicId == null) {
+            query.append(" WHERE 1 = 1");
+        } else {
+            query.append(" WHERE u.user_public_id = :userPublicId");
+        }
+
         if (isNotBlank(status.toString())) {
             query.append(" AND s.status = :status");
         }

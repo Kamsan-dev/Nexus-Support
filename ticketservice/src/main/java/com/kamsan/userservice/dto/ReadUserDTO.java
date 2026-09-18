@@ -1,5 +1,7 @@
 package com.kamsan.userservice.dto;
 
+import com.kamsan.userservice.enumeration.Role;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -17,7 +19,7 @@ public record ReadUserDTO(UUID userPublicId,
                           OffsetDateTime lastLogin,
                           OffsetDateTime createdAt,
                           OffsetDateTime updatedAt,
-                          String role,
+                          Role role,
                           String authorities,
                           boolean isAccountExpired,
                           boolean isAccountLocked,
