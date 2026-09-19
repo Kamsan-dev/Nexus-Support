@@ -1,5 +1,5 @@
 package com.kamsan.userservice.enumeration;
 
 public enum EventType {
-    TICKET_CREATED
+    TICKET_CREATED, COMMENT_CREATED
 }

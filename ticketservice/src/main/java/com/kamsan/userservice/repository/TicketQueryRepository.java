@@ -190,37 +190,40 @@ public class TicketQueryRepository {
             .update();
     }
 
-    public void updateComment(UUID commentPublicId, String comment) {
-        jdbc.sql(UPDATE_COMMENT_QUERY)
-            .param("comment", comment)
-            .param("commentPublicId", commentPublicId)
-            .update();
+    public int updateComment(UUID userPublicId, UUID commentPublicId, String comment) {
+        return jdbc.sql(UPDATE_COMMENT_QUERY)
+                   .param("commentPublicId", commentPublicId)
+                   .param("userPublicId", userPublicId)
+                   .param("comment", comment)
+                   .update();
     }
 
-    public void deleteComment(UUID commentPublicId) {
-        jdbc.sql(DELETE_COMMENT_QUERY)
-            .param("commentPublicId", commentPublicId)
-            .update();
+    public int deleteComment(UUID userPublicId, UUID commentPublicId) {
+        return jdbc.sql(DELETE_COMMENT_QUERY)
+                   .param("userPublicId", userPublicId)
+                   .param("commentPublicId", commentPublicId)
+                   .update();
     }
 
-    public void updateTicket(UpdateTicketDTO request) {
-        jdbc.sql(UPDATE_TICKET_QUERY)
-            .param("ticketPublicId", request.ticketPublicId())
-            .param("title", request.title())
-            .param("description", request.description())
-            .param("type", request.type())
-            .param("status", request.status())
-            .param("priority", request.priority())
-            .param("dueDate", request.dueDate())
-            .param("progress", request.progress())
-            .update();
+    public int updateTicket(UUID userPublicId, UpdateTicketDTO request) {
+        return jdbc.sql(UPDATE_TICKET_QUERY)
+                   .param("ticketPublicId", request.ticketPublicId())
+                   .param("title", request.title())
+                   .param("description", request.description())
+                   .param("type", request.type())
+                   .param("status", request.status())
+                   .param("priority", request.priority())
+                   .param("dueDate", request.dueDate())
+                   .param("progress", request.progress())
+                   .param("userPublicId", userPublicId)
+                   .update();
     }
 
-    public void updateTicket(UUID assigneePublicId, UUID ticketPublicId) {
-        jdbc.sql(UPDATE_ASSIGNEE_TICKET_QUERY)
-            .param("ticketPublicId", ticketPublicId)
-            .param("assigneePublicId", assigneePublicId)
-            .update();
+    public int updateAssigneeForTicket(UUID assigneePublicId, UUID ticketPublicId) {
+        return jdbc.sql(UPDATE_ASSIGNEE_TICKET_QUERY)
+                   .param("ticketPublicId", ticketPublicId)
+                   .param("assigneePublicId", assigneePublicId)
+                   .update();
     }
 
     public TaskDTO insertNewTask(UUID userPublicId, CreateTaskDTO request) {
@@ -288,4 +291,6 @@ public class TicketQueryRepository {
 
     private final BiFunction<Integer, Integer, Integer> getOffset = (page, size) -> page * size;
 
+    public void updateComment(org.hibernate.validator.constraints.UUID uuid, String comment) {
+    }
 }

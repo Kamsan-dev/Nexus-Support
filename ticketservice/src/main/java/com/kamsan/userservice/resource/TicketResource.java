@@ -35,7 +35,8 @@ public class TicketResource {
         return ResponseEntity.ok().body(getResponse(
                 tickets,
                 "Tickets retrieved.",
-                HttpStatus.OK));
+                HttpStatus.OK
+        ));
     }
 
     @PostMapping("/create")
@@ -48,7 +49,8 @@ public class TicketResource {
         return ResponseEntity.created(getUri()).body(getResponse(
                 ticketPublicId,
                 "Ticket created successfully.",
-                HttpStatus.CREATED));
+                HttpStatus.CREATED
+        ));
     }
 
     @GetMapping("/{ticketPublicId}")
@@ -72,7 +74,64 @@ public class TicketResource {
                         assignee,
                         connectedUser),
                 "Ticket retrieved.",
-                HttpStatus.OK));
+                HttpStatus.OK
+        ));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<Void>> updateTicket(@NotNull Authentication authentication,
+                                                          @RequestBody @Valid UpdateTicketDTO updateTicketDTO) {
+        this.ticketService.updateTicket(UUID.fromString(authentication.getName()), updateTicketDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Ticket updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PatchMapping("/update/assignee")
+    public ResponseEntity<ApiResponse<Void>> updateTicket(@NotNull Authentication authentication,
+                                                          @RequestParam("assigneePublicId") UUID assigneePublicId,
+                                                          @RequestParam("ticketPublicId") UUID ticketPublicId) {
+        this.ticketService.updateAssignee(UUID.fromString(authentication.getName()), assigneePublicId, ticketPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                String.format("Assignee of ticket %s updated successfully", ticketPublicId),
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping("/comment/")
+    ResponseEntity<ApiResponse<UUID>> createComment(@NotNull Authentication authentication,
+                                                    @RequestBody CreateCommentDTO createCommentDTO) {
+        UUID comment = ticketService.createComment(UUID.fromString(authentication.getName()), createCommentDTO);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                comment,
+                "Comment added successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @PatchMapping("/comment/update")
+    public ResponseEntity<ApiResponse<Void>> updateComment(@NotNull Authentication authentication,
+                                                           @RequestBody @Valid UpdateCommentDTO updateCommentDTO) {
+        this.ticketService.updateComment(UUID.fromString(authentication.getName()), updateCommentDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Comment updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @DeleteMapping("/comment/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteComment(@NotNull Authentication authentication,
+                                                           @RequestParam("commentPublicId") UUID commentPublicId) {
+        this.ticketService.deleteComment(UUID.fromString(authentication.getName()), commentPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Comment deleted successfully.",
+                HttpStatus.OK
+        ));
     }
 
     private URI getUri() {

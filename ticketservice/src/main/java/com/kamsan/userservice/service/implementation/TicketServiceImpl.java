@@ -9,6 +9,7 @@ import com.kamsan.userservice.model.Attachment;
 import com.kamsan.userservice.repository.TicketQueryRepository;
 import com.kamsan.userservice.service.TicketService;
 import com.kamsan.userservice.service.UserService;
+import com.kamsan.userservice.sharedkernel.exception.ApiException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
+import static com.kamsan.userservice.enumeration.EventType.COMMENT_CREATED;
 import static com.kamsan.userservice.enumeration.EventType.TICKET_CREATED;
 import static com.kamsan.userservice.utils.TicketUtils.getFileUri;
 import static com.kamsan.userservice.utils.UserUtils.hasElevatedPermissions;
@@ -80,10 +84,17 @@ public class TicketServiceImpl implements TicketService {
                             "ticketNumber", ticketPublicId,
                             "name", capitalizeFully(user.firstName()),
                             "email", user.email())));
-
         }
-
         return ticketPublicId;
+    }
+
+    @Override
+    public void updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO) {
+        if (!updateTicketDTO.issuerPublicId().equals(userPublicId)) {
+            throw new ApiException("You can not update a ticket that does not belong to you.");
+        }
+        int update = this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO);
+        if (update == 0) throw new ApiException("Ticket not found or not authorized");
     }
 
     @Override
@@ -103,24 +114,53 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
-        return ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
+    public List<AttachmentDTO> getTicketFiles(UUID ticketPublicId) {
+        List<Attachment> filesForTicket = ticketQueryRepository.getFilesForTicket(ticketPublicId);
+        return filesForTicket.stream().map(ticketMapper::attachmentToAttachmentDTO).toList();
     }
 
     @Override
-    public CommentDTO updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO) {
-        return null;
+    @Transactional
+    public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
+        TicketDetailsDTO ticket = ticketQueryRepository.getTicket(userPublicId, createCommentDTO.ticketPublicId());
+        ReadUserDTO user = userService.getUserByUUID(userPublicId);
+
+        // Only an elevated user or the issuer of the given ticket can post a comment
+        if (!hasElevatedPermissions(user.role()) || !userPublicId.equals(ticket.issuerPublicId())) {
+            throw new ApiException("Insufficient permissions.");
+        }
+        UUID commentPublicId = ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
+        if (!Objects.equals(userPublicId, ticket.issuerPublicId())) {
+            publisher.publishEvent(new Event(COMMENT_CREATED, Map.of(
+                    "date", shortDate(ticket.createdAt()),
+                    "priority", ticket.priority(),
+                    "ticketTitle", ticket.title(),
+                    "comment", createCommentDTO.comment(),
+                    "ticketNumber", ticket.ticketPublicId(),
+                    "commentOwner", capitalizeFully(user.firstName()),
+                    "email", user.email()
+            )
+            ));
+        }
+        return commentPublicId;
+    }
+
+    @Override
+    @Transactional
+    public void updateComment(UUID connectedUser, UpdateCommentDTO updateCommentDTO) {
+        if (!updateCommentDTO.ownerCommentPublicId().equals(connectedUser)) {
+            throw new ApiException("You can not update a comment that does not belong to you.");
+        }
+        int update = ticketQueryRepository.updateComment(connectedUser,
+                updateCommentDTO.commentPublicId(),
+                updateCommentDTO.comment());
+        if (update == 0) throw new ApiException("Comment not found or not authorized");
     }
 
     @Override
     public void deleteComment(UUID userPublicId, UUID commentPublicId) {
-
-    }
-
-    @Override
-    public List<AttachmentDTO> getTicketFiles(UUID ticketPublicId) {
-        List<Attachment> filesForTicket = ticketQueryRepository.getFilesForTicket(ticketPublicId);
-        return filesForTicket.stream().map(ticketMapper::attachmentToAttachmentDTO).toList();
+        int update = ticketQueryRepository.deleteComment(userPublicId, commentPublicId);
+        if (update == 0) throw new ApiException("Comment not found or not authorized");
     }
 
     public void saveTicketFile(UUID ticketPublicId, AttachmentDTO attachmentDTO) {
@@ -138,13 +178,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO) {
-        return null;
-    }
-
-    @Override
-    public ReadUserDTO updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId) {
-        return null;
+    public void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId) {
+        ReadUserDTO connectedUser = userService.getUserByUUID(userPublicId);
+        if (!hasElevatedPermissions(connectedUser.role())) {
+            throw new ApiException("Insufficient permissions.");
+        }
+        int update = ticketQueryRepository.updateAssigneeForTicket(assigneePublicId, ticketPublicId);
+        if (update == 0) throw new ApiException("Assignee or Ticket not found.");
     }
 
     @Override
@@ -165,5 +205,9 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO) {
 
+    }
+
+    private Object shortDate(OffsetDateTime offsetDateTime) {
+        return null;
     }
 }

@@ -23,7 +23,7 @@ public interface TicketService {
 
     UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
 
-    CommentDTO updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
+    void updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
 
     void deleteComment(UUID userPublicId, UUID commentPublicId);
 
@@ -33,9 +33,9 @@ public interface TicketService {
 
     Path downloadFile(String name, UUID filePublicId);
 
-    TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
+    void updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
 
-    ReadUserDTO updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
+    void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
 
     TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO);
 

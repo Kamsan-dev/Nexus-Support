@@ -1,4 +1,9 @@
 package com.kamsan.userservice.dto;
 
-public record UpdateCommentDTO() {
+import java.util.UUID;
+
+public record UpdateCommentDTO(
+        UUID ownerCommentPublicId,
+        UUID commentPublicId,
+        String comment) {
 }

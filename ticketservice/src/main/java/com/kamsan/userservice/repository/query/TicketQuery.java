@@ -202,14 +202,20 @@ public class TicketQuery {
             WHERE file_public_id = :filePublicId
             """;
     public static final String UPDATE_COMMENT_QUERY = """
-            UPDATE comments
+            UPDATE comments c
             SET comment = :comment,
             updated_at = NOW()
-            WHERE comment_public_id = :commentPublicId
+            FROM users u
+            WHERE c.comment_public_id = :commentPublicId
+            AND u.user_id = c.user_id
+            AND u.user_public_id = :userPublicId
             """;
     public static final String DELETE_COMMENT_QUERY = """
-            DELETE FROM comments
-            WHERE comment_public_id = :commentPublicId
+            DELETE FROM comments c
+            USING users u
+            WHERE c.comment_public_id = :commentPublicId
+            AND c.user_id = u.user_id
+            AND u.user_public_id = :userPublicId
             """;
 
     public static final String UPDATE_TICKET_QUERY = """
@@ -222,10 +228,13 @@ public class TicketQuery {
             t.status_id = s.status_id,
             t.due_date = :dueDate,
             t.updated_at = NOW()
+            FROM users u
             JOIN statuses s ON s.status = :status
             JOIN types typ ON typ.type = :type
             JOIN priorities p ON p.priority = :priority
             WHERE t.ticket_public_id = :ticketPublicId
+            AND u.user_id = t.issuer_id
+            AND u.user_public_id = :userPublicId
             """;
 
     public static final String UPDATE_ASSIGNEE_TICKET_QUERY = """
