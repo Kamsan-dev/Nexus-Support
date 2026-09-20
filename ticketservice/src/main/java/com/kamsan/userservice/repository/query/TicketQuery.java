@@ -269,6 +269,7 @@ public class TicketQuery {
                 RETURNING *
             )
             SELECT
+                i.task_public_id,
                 i.name,
                 i.description,
                 s.status,
@@ -301,5 +302,34 @@ public class TicketQuery {
             JOIN types typ ON typ.type_id = t.type_id
             JOIN priorities pr ON pr.priority_id = t.priority_id
             WHERE u.user_public_id = :userPublicId
+            """;
+
+    public static final String TICKET_EXISTS_QUERY = """
+            SELECT EXISTS (
+                SELECT 1
+                FROM tickets
+                WHERE ticket_public_id = :ticketPublicId
+            )
+            """;
+
+    public static final String UPDATE_TASK_QUERY = """
+            UPDATE tasks t
+            SET t.description = :description,
+            t.name = :name,
+            t.status_id = s.status_id,
+            t.updated_at = NOW()
+            FROM users u
+            JOIN statuses s ON s.stasus = :status
+            WHERE t.task_public_id = :taskPublicId
+            AND u.user_id = t.assignee_id
+            AND u.user_public_id = :userPublicId
+            """;
+
+    public static final String DELETE_TASK_QUERY = """
+            DELETE FROM tasks t
+            USING users u
+            WHERE t.task_public_id = :taskPublicId
+            AND t.assignee_id = u.user_id
+            AND u.user_public_id = :userPublicId
             """;
 }

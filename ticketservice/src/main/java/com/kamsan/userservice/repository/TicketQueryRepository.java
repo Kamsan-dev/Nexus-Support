@@ -251,6 +251,23 @@ public class TicketQueryRepository {
                    .single();
     }
 
+    public int updateTask(UUID userPublicId, UpdateTaskDTO request) {
+        return jdbc.sql(UPDATE_TASK_QUERY)
+                   .param("taskPublicId", request.taskPublicId())
+                   .param("userPublicId", userPublicId)
+                   .param("name", request.name())
+                   .param("description", request.description())
+                   .param("status", request.status())
+                   .update();
+    }
+
+    public int deleteTask(UUID userPublicId, UUID taskPublicId) {
+        return jdbc.sql(DELETE_TASK_QUERY)
+                   .param("userPublicId", userPublicId)
+                   .param("taskPublicId", taskPublicId)
+                   .update();
+    }
+
     public List<TicketReportDTO> generateReport(UUID userPublicId, CreateReportDTO request) {
         var query = createTicketReportQuery(request);
         return jdbc.sql(query)

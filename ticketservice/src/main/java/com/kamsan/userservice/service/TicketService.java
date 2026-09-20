@@ -37,7 +37,11 @@ public interface TicketService {
 
     void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
 
-    TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO);
+    UUID createTask(UUID userPublicId, CreateTaskDTO createTaskDTO);
+
+    void updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO);
+
+    void deleteTask(UUID userPublicId, UUID taskPublicId);
 
     ReadUserDTO getTicketUser(UUID ticketPublicId);
 

@@ -134,6 +134,39 @@ public class TicketResource {
         ));
     }
 
+    @PutMapping("/task/")
+    ResponseEntity<ApiResponse<UUID>> createTask(@NotNull Authentication authentication,
+                                                 @RequestBody CreateTaskDTO createTaskDTO) {
+        UUID task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                task,
+                "Task added successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @PutMapping("/task/update")
+    public ResponseEntity<ApiResponse<Void>> updateTask(@NotNull Authentication authentication,
+                                                        @RequestBody @Valid UpdateTaskDTO updateTaskDTO) {
+        this.ticketService.updateTask(UUID.fromString(authentication.getName()), updateTaskDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Task updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @DeleteMapping("/task/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteTask(@NotNull Authentication authentication,
+                                                        @RequestParam("taskPublicId") UUID taskPublicId) {
+        this.ticketService.deleteTask(UUID.fromString(authentication.getName()), taskPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Task deleted successfully.",
+                HttpStatus.OK
+        ));
+    }
+
     private URI getUri() {
         return URI.create("/ticket/<ticketPublicId>");
     }

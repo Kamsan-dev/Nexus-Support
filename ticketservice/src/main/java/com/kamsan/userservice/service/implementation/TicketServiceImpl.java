@@ -188,8 +188,29 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO) {
-        return null;
+    public UUID createTask(UUID userPublicId, CreateTaskDTO createTaskDTO) {
+        var ticket = ticketQueryRepository.getTicket(userPublicId, createTaskDTO.ticketPublicId());
+        var user = userService.getUserByUUID(userPublicId);
+        if (!hasElevatedPermissions(user.role()) || !ticket.issuerPublicId().equals(userPublicId)) {
+            throw new ApiException("Insufficient permissions.");
+        }
+        TaskDTO taskDTO = ticketQueryRepository.insertNewTask(userPublicId, createTaskDTO);
+        return taskDTO.taskPublicId();
+    }
+
+    @Override
+    public void updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO) {
+        if (!updateTaskDTO.assigneePublicId().equals(userPublicId)) {
+            throw new ApiException("Insufficient permissions.");
+        }
+        int update = ticketQueryRepository.updateTask(userPublicId, updateTaskDTO);
+        if (update == 0) throw new ApiException("Assignee or Task not found.");
+    }
+
+    @Override
+    public void deleteTask(UUID userPublicId, UUID taskPublicId) {
+        int update = ticketQueryRepository.deleteTask(userPublicId, taskPublicId);
+        if (update == 0) throw new ApiException("Task not found or not authorized");
     }
 
     @Override
