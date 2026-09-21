@@ -111,6 +111,29 @@ public class TicketQuery {
              AND t.ticket_public_id = :ticketPublicId
             """;
 
+    public static final String SELECT_TICKET_BY_PUBLIC_ID_QUERY = """
+            SELECT
+                 t.ticket_public_id,
+                 u.user_public_id AS issuer_public_id,
+                 a.user_public_id AS assignee_public_id,
+                 t.title,
+                 t.description,
+                 t.progress,
+                 t.due_date,
+                 t.created_at,
+                 t.updated_at,
+                 s.status,
+                 typ.type,
+                 pr.priority
+             FROM tickets t
+             JOIN users u ON u.user_id = t.issuer_id
+             LEFT JOIN users a ON a.user_id = t.assignee_id
+             JOIN statuses s ON s.status_id = t.status_id
+             JOIN types typ ON typ.type_id = t.type_id
+             JOIN priorities pr ON pr.priority_id = t.priority_id
+             AND t.ticket_public_id = :ticketPublicId
+            """;
+
     public static final String SELECT_COMMENTS_BY_TICKET_PUBLIC_ID_QUERY = """
             SELECT
                 c.comment_public_id,

@@ -1,5 +1,6 @@
 package com.kamsan.userservice.service.implementation;
 
+import com.kamsan.userservice.domain.TicketProperties;
 import com.kamsan.userservice.dto.*;
 import com.kamsan.userservice.enumeration.Role;
 import com.kamsan.userservice.enumeration.TicketStatus;
@@ -20,20 +21,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.kamsan.userservice.enumeration.EventType.COMMENT_CREATED;
-import static com.kamsan.userservice.enumeration.EventType.TICKET_CREATED;
+import static com.kamsan.userservice.enumeration.EventType.*;
+import static com.kamsan.userservice.utils.DateFormatter.shortDate;
 import static com.kamsan.userservice.utils.TicketUtils.getFileUri;
 import static com.kamsan.userservice.utils.UserUtils.hasElevatedPermissions;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.io.FileUtils.byteCountToDisplaySize;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static org.springframework.util.StringUtils.cleanPath;
 
 @Service
 @AllArgsConstructor
@@ -44,6 +46,7 @@ public class TicketServiceImpl implements TicketService {
     private final UserService userService;
     private final ApplicationEventPublisher publisher;
     private final TicketMapper ticketMapper;
+    private final TicketProperties ticketProperties;
 
     @Override
     @Transactional(readOnly = true)
@@ -100,7 +103,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional(readOnly = true)
     public TicketDetailsDTO getUserTicket(UUID userPublicId, UUID ticketPublicId) {
-        return ticketQueryRepository.getTicket(userPublicId, ticketPublicId);
+        return ticketQueryRepository.findByUserPublicIdAndTicketPublicId(userPublicId, ticketPublicId);
     }
 
     @Override
@@ -122,7 +125,8 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional
     public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
-        TicketDetailsDTO ticket = ticketQueryRepository.getTicket(userPublicId, createCommentDTO.ticketPublicId());
+        TicketDetailsDTO ticket = ticketQueryRepository.findByUserPublicIdAndTicketPublicId(userPublicId,
+                createCommentDTO.ticketPublicId());
         ReadUserDTO user = userService.getUserByUUID(userPublicId);
 
         // Only an elevated user or the issuer of the given ticket can post a comment
@@ -178,6 +182,57 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public List<AttachmentDTO> uploadFiles(UUID userPublicId, UUID ticketPublicId, List<MultipartFile> files) {
+        try {
+            var fileList = new ArrayList<AttachmentDTO>();
+            if (files != null && !files.isEmpty()) {
+                var user = userService.getUserByUUID(userPublicId);
+                TicketDetailsDTO ticket = ticketQueryRepository.findByTicketPublicId(ticketPublicId);
+                if (!hasElevatedPermissions(user.role()) || !ticket.issuerPublicId().equals(userPublicId)) {
+                    throw new ApiException("Insufficient permissions.");
+                }
+                for (MultipartFile file : files) {
+                    AttachmentDTO attachment = new AttachmentDTO(
+                            ticket.ticketPublicId(),
+                            file.getOriginalFilename(),
+                            file.getSize(),
+                            byteCountToDisplaySize(file.getSize()),
+                            getExtension(file.getOriginalFilename()),
+                            getFileUri(file.getOriginalFilename()));
+
+                    saveTicketFile(ticket.ticketPublicId(), attachment);
+                    var filename = cleanPath(file.getOriginalFilename());
+                    var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
+                                                   .toAbsolutePath()
+                                                   .normalize();
+                    log.info("file storage URI : {}", fileStorageLocation);
+                    Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+                    fileList.add(attachment);
+                }
+
+                if (!ticket.issuerPublicId().equals(userPublicId)) {
+                    var filenames = fileList.stream()
+                                            .map(AttachmentDTO::name)
+                                            .collect(Collectors.joining(", "));
+                    publisher.publishEvent(new Event(FILE_UPLOADED, Map.of(
+                            "date", shortDate(ticket.updatedAt()),
+                            "priority", ticket.priority(),
+                            "ticketTitle", ticket.title(),
+                            "files", filenames,
+                            "name", capitalizeFully(user.firstName()),
+                            "ticketNumber", ticket.ticketPublicId(),
+                            "email", user.email()
+                    )
+                    ));
+                }
+            }
+            return fileList;
+        } catch (Exception e) {
+            throw new ApiException("An error occurred. Unable to upload files.");
+        }
+    }
+
+    @Override
     public void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId) {
         ReadUserDTO connectedUser = userService.getUserByUUID(userPublicId);
         if (!hasElevatedPermissions(connectedUser.role())) {
@@ -189,7 +244,8 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public UUID createTask(UUID userPublicId, CreateTaskDTO createTaskDTO) {
-        var ticket = ticketQueryRepository.getTicket(userPublicId, createTaskDTO.ticketPublicId());
+        var ticket = ticketQueryRepository.findByUserPublicIdAndTicketPublicId(userPublicId,
+                createTaskDTO.ticketPublicId());
         var user = userService.getUserByUUID(userPublicId);
         if (!hasElevatedPermissions(user.role()) || !ticket.issuerPublicId().equals(userPublicId)) {
             throw new ApiException("Insufficient permissions.");
@@ -226,9 +282,5 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO) {
 
-    }
-
-    private Object shortDate(OffsetDateTime offsetDateTime) {
-        return null;
     }
 }

@@ -167,6 +167,18 @@ public class TicketResource {
         ));
     }
 
+    @PostMapping("/file/upload")
+    ResponseEntity<ApiResponse<UUID>> uploadFile(@NotNull Authentication authentication,
+                                                 @RequestParam("ticketPublicId") UUID ticketPublicId,
+                                                 @RequestParam("files") List<MultipartFile> files) {
+        ticketService.uploadFiles(UUID.fromString(authentication.getName()), ticketPublicId, files);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                null,
+                "Files uploaded successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
     private URI getUri() {
         return URI.create("/ticket/<ticketPublicId>");
     }

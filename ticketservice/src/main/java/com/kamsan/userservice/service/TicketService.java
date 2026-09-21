@@ -33,6 +33,8 @@ public interface TicketService {
 
     Path downloadFile(String name, UUID filePublicId);
 
+    List<AttachmentDTO> uploadFiles(UUID userPublicId, UUID ticketPublicId, List<MultipartFile> files);
+
     void updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
 
     void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);

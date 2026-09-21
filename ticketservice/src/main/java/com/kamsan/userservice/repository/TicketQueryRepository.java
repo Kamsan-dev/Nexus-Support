@@ -96,7 +96,7 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public TicketDetailsDTO getTicket(UUID userPublicId, UUID ticketPublicId) {
+    public TicketDetailsDTO findByUserPublicIdAndTicketPublicId(UUID userPublicId, UUID ticketPublicId) {
         return jdbc.sql(SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .param("userPublicId", userPublicId)
@@ -105,6 +105,26 @@ public class TicketQueryRepository {
                            rs.getObject("updated_at", OffsetDateTime.class),
                            rs.getObject("ticket_public_id", UUID.class),
                            userPublicId,
+                           rs.getObject("assignee_public_id", UUID.class),
+                           rs.getString("title"),
+                           rs.getString("description"),
+                           rs.getInt("progress"),
+                           rs.getObject("status", TicketStatus.class),
+                           rs.getObject("priority", TicketPriority.class),
+                           rs.getObject("type", TicketType.class),
+                           rs.getObject("due_date", OffsetDateTime.class)
+                   ))
+                   .single();
+    }
+
+    public TicketDetailsDTO findByTicketPublicId(UUID ticketPublicId) {
+        return jdbc.sql(SELECT_TICKET_BY_PUBLIC_ID_QUERY)
+                   .param("ticketPublicId", ticketPublicId)
+                   .query((rs, rowNum) -> new TicketDetailsDTO(
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class),
+                           rs.getObject("ticket_public_id", UUID.class),
+                           rs.getObject("issuer_public_id", UUID.class),
                            rs.getObject("assignee_public_id", UUID.class),
                            rs.getString("title"),
                            rs.getString("description"),

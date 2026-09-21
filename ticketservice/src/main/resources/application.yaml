@@ -43,8 +43,12 @@ eureka:
 ui:
   app:
     url: ${UI_APP_URL}
+
 userservice:
   uri: ${USERSERVICE_APP_URL}
 
 jwks:
   uri: ${JWKS_URI}
+
+ticket:
+  files-directory: ${FILES_URI}
