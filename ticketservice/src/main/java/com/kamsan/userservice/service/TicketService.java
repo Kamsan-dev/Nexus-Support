@@ -47,7 +47,7 @@ public interface TicketService {
 
     ReadUserDTO getTicketUser(UUID ticketPublicId);
 
-    List<TicketDetailsDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
+    List<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
 
     void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO);
 }

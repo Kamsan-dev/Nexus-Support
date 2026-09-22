@@ -199,7 +199,7 @@ public class UserResource {
      * ADMIN
      **/
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN'")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
     @PutMapping("/{userPublicId}/role")
     public ResponseEntity<ApiResponse<ReadUserDTO>> updateRole(@NotNull Authentication authentication, @PathVariable("userPublicId") String userPublicId,
                                                                @RequestBody @NotNull @NotEmpty String rolePublicId) {
@@ -210,7 +210,7 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN'")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
     @PatchMapping("/{userPublicId}/account/expired")
     public ResponseEntity<ApiResponse<ReadUserDTO>> toggleAccountExpired(@NotNull Authentication authentication, @PathVariable("userPublicId") String userPublicId) {
         ReadUserDTO user = userService.toggleAccountExpired(UUID.fromString(userPublicId));
@@ -220,7 +220,7 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN'")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
     @PatchMapping("/{userPublicId}/account/locked")
     public ResponseEntity<ApiResponse<ReadUserDTO>> toggleAccountLocked(@NotNull Authentication authentication, @PathVariable("userPublicId") String userPublicId) {
         ReadUserDTO user = userService.toggleAccountLocked(UUID.fromString(userPublicId));
@@ -230,7 +230,7 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN'")
+    @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
     @PatchMapping("/{userPublicId}/account/enabled")
     public ResponseEntity<ApiResponse<ReadUserDTO>> toggleAccountEnabled(@NotNull Authentication authentication, @PathVariable("userPublicId") String userPublicId) {
         ReadUserDTO user = userService.toggleAccountEnabled(UUID.fromString(userPublicId));

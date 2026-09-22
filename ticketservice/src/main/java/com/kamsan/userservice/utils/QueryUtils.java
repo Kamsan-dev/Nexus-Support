@@ -64,8 +64,36 @@ public class QueryUtils {
         return replace(query.toString(), "\\n", "");
     }
 
+    public static final String createUserTicketReportQuery(CreateReportDTO request) {
+        var query = getStringBuilder(SELECT_USER_TICKETS_FOR_REPORT_QUERY);
+
+        if (isNotBlank(request.fromDate().toString())) {
+            query.append(" AND t.created_at >= :fromDate");
+        }
+
+        if (isNotBlank(request.toDate().toString())) {
+            query.append(" AND t.created_at <= :toDate");
+        }
+        if (!request.statuses().isEmpty()) {
+            query.append(" AND s.status IN (:statuses)");
+        }
+        if (!request.types().isEmpty()) {
+            query.append(" AND typ.type IN (:types)");
+        }
+        if (!request.priorities().isEmpty()) {
+            query.append(" AND p.priority IN (:priorities)");
+        }
+        if (isNotBlank(request.filter())) {
+            query.append(FILTER_TITLE_BY_CRITERIA);
+        }
+
+        query.append(" ORDER BY t.created_at DESC");
+
+        return replace(query.toString(), "\\n", "");
+    }
+
     public static final String createTicketReportQuery(CreateReportDTO request) {
-        var query = getStringBuilder(SELECT_TICKET_FOR_REPORT_QUERY);
+        var query = getStringBuilder(SELECT_TICKETS_FOR_REPORT_QUERY);
 
         if (isNotBlank(request.fromDate().toString())) {
             query.append(" AND t.created_at >= :fromDate");

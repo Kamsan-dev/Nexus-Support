@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiFunction;
 
 import static com.kamsan.userservice.repository.query.TicketQuery.*;
 import static com.kamsan.userservice.utils.QueryUtils.*;
@@ -204,10 +203,18 @@ public class TicketQueryRepository {
                    .list();
     }
 
-    public void deleteFile(UUID filePublicId) {
-        jdbc.sql(DELETE_FILE_QUERY)
-            .param("filePublicId", filePublicId)
-            .update();
+    public Attachment findFileByPublicId(UUID filePublicId) {
+        return jdbc.sql(SELECT_FILES_TICKET_QUERY)
+                   .param("filePublicId", filePublicId)
+                   .query(Attachment.class)
+                   .single();
+    }
+
+    public int deleteFile(UUID userPublicId, UUID filePublicId) {
+        return jdbc.sql(DELETE_FILE_QUERY)
+                   .param("filePublicId", filePublicId)
+                   .param("userPublicId", userPublicId)
+                   .update();
     }
 
     public int updateComment(UUID userPublicId, UUID commentPublicId, String comment) {
@@ -288,8 +295,8 @@ public class TicketQueryRepository {
                    .update();
     }
 
-    public List<TicketReportDTO> generateReport(UUID userPublicId, CreateReportDTO request) {
-        var query = createTicketReportQuery(request);
+    public List<TicketReportDTO> generateReportForUser(UUID userPublicId, CreateReportDTO request) {
+        var query = createUserTicketReportQuery(request);
         return jdbc.sql(query)
                    .param("userPublicId", userPublicId)
                    .param("statuses", request.statuses())
@@ -313,21 +320,27 @@ public class TicketQueryRepository {
 
     }
 
-//    OffsetDateTime createdAt,
-//    OffsetDateTime updatedAt,
-//    UUID ticketPublicId,
-//    Long issuerPublicId,
-//    Long assigneePublicId,
-//    String title,
-//    String description,
-//    int progress,
-//    String status,
-//    String priority,
-//    String typeId,
-//    OffsetDateTime dueDate
+    public List<TicketReportDTO> generateReport(CreateReportDTO request) {
+        var query = createTicketReportQuery(request);
+        return jdbc.sql(query)
+                   .param("statuses", request.statuses())
+                   .param("types", request.types())
+                   .param("priorities", request.priorities())
+                   .param("filter", request.filter())
+                   .param("fromDate", request.fromDate())
+                   .param("toDate", request.toDate())
+                   .query((rs, rowNum) -> new TicketReportDTO(
+                           rs.getObject("ticket_public_id", UUID.class),
+                           rs.getString("title"),
+                           rs.getString("description"),
+                           rs.getObject("status", TicketStatus.class),
+                           rs.getObject("priority", TicketPriority.class),
+                           rs.getObject("type", TicketType.class),
+                           rs.getObject("due_date", OffsetDateTime.class),
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class)
+                   ))
+                   .list();
 
-    private final BiFunction<Integer, Integer, Integer> getOffset = (page, size) -> page * size;
-
-    public void updateComment(org.hibernate.validator.constraints.UUID uuid, String comment) {
     }
 }

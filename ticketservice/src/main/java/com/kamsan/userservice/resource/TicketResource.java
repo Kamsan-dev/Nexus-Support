@@ -4,20 +4,28 @@ import com.kamsan.userservice.domain.ApiResponse;
 import com.kamsan.userservice.dto.*;
 import com.kamsan.userservice.service.TicketService;
 import com.kamsan.userservice.service.UserService;
+import com.kamsan.userservice.service.implementation.TicketReportPdfService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
+import static com.kamsan.userservice.constants.Constants.FILE_NAME_HEADER;
 import static com.kamsan.userservice.utils.RequestUtils.getResponse;
 
 @RestController
@@ -27,8 +35,9 @@ public class TicketResource {
 
     private final UserService userService;
     private final TicketService ticketService;
+    private final TicketReportPdfService ticketReportPdfService;
 
-    @GetMapping("/list")
+    @PostMapping("/list")
     public ResponseEntity<ApiResponse<Page<PageTicketDTO>>> getTickets(@NotNull Authentication authentication, @RequestBody PageTicketRequestDTO pageTicketRequestDTO) {
         Page<PageTicketDTO> tickets = ticketService.getTickets(UUID.fromString(authentication.getName()),
                 pageTicketRequestDTO);
@@ -89,10 +98,11 @@ public class TicketResource {
         ));
     }
 
+    @PreAuthorize("hasAuthority('ticket:assignee')")
     @PatchMapping("/update/assignee")
-    public ResponseEntity<ApiResponse<Void>> updateTicket(@NotNull Authentication authentication,
-                                                          @RequestParam("assigneePublicId") UUID assigneePublicId,
-                                                          @RequestParam("ticketPublicId") UUID ticketPublicId) {
+    public ResponseEntity<ApiResponse<Void>> updateAssignee(@NotNull Authentication authentication,
+                                                            @RequestParam("assigneePublicId") UUID assigneePublicId,
+                                                            @RequestParam("ticketPublicId") UUID ticketPublicId) {
         this.ticketService.updateAssignee(UUID.fromString(authentication.getName()), assigneePublicId, ticketPublicId);
         return ResponseEntity.ok().body(getResponse(
                 null,
@@ -134,6 +144,7 @@ public class TicketResource {
         ));
     }
 
+    @PreAuthorize("hasAuthority('task:create')")
     @PutMapping("/task/")
     ResponseEntity<ApiResponse<UUID>> createTask(@NotNull Authentication authentication,
                                                  @RequestBody CreateTaskDTO createTaskDTO) {
@@ -145,6 +156,7 @@ public class TicketResource {
         ));
     }
 
+    @PreAuthorize("hasAuthority('task:update')")
     @PutMapping("/task/update")
     public ResponseEntity<ApiResponse<Void>> updateTask(@NotNull Authentication authentication,
                                                         @RequestBody @Valid UpdateTaskDTO updateTaskDTO) {
@@ -156,6 +168,7 @@ public class TicketResource {
         ));
     }
 
+    @PreAuthorize("hasAuthority('task:delete')")
     @DeleteMapping("/task/delete")
     public ResponseEntity<ApiResponse<Void>> deleteTask(@NotNull Authentication authentication,
                                                         @RequestParam("taskPublicId") UUID taskPublicId) {
@@ -177,6 +190,59 @@ public class TicketResource {
                 "Files uploaded successfully.",
                 HttpStatus.CREATED
         ));
+    }
+
+    @DeleteMapping("/file/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteFile(@NotNull Authentication authentication,
+                                                        @RequestParam("filePublicId") UUID filePublicId) {
+        this.ticketService.deleteFile(UUID.fromString(authentication.getName()), filePublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "File deleted successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @GetMapping("/file/download/{filePublicId}")
+    public ResponseEntity<UrlResource> downloadFile(@NotNull Authentication authentication,
+                                                    @PathVariable("filePublicId") UUID filePublicId) throws IOException {
+        var path = this.ticketService.downloadFile(filePublicId);
+        var resource = new UrlResource(path.toUri());
+        var headers = new HttpHeaders();
+        headers.add(FILE_NAME_HEADER, resource.getFilename());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                String.format("attachment;%s=%s", FILE_NAME_HEADER, resource.getFilename()));
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(path)))
+                             .headers(headers).body(resource);
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<ApiResponse<List<TicketReportDTO>>> generateReport(@NotNull Authentication authentication,
+                                                                             @RequestBody @Valid CreateReportDTO createReportDTO) {
+        List<TicketReportDTO> report = ticketService.report(UUID.fromString(authentication.getName()), createReportDTO);
+        return ResponseEntity.ok().body(getResponse(
+                report,
+                "Report generated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
+                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
+
+        List<TicketReportDTO> tickets = ticketService.report(UUID.fromString(authentication.getName()),
+                createReportDTO);
+        ticketReportPdfService.generateReport(tickets);
+        byte[] pdf = ticketReportPdfService.generateReport(tickets);
+
+        return ResponseEntity.ok()
+                             .contentType(MediaType.APPLICATION_PDF)
+                             .header(
+                                     HttpHeaders.CONTENT_DISPOSITION,
+                                     "attachment; filename=\"tickets-report.pdf\""
+                             )
+                             .body(pdf);
     }
 
     private URI getUri() {

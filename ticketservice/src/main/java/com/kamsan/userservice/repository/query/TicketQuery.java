@@ -220,6 +220,12 @@ public class TicketQuery {
             WHERE t.ticket_public_id = :ticketPublicId
             """;
 
+    public static final String SELECT_FILE_QUERY = """
+            SELECT f.*
+            FROM files f
+            WHERE f.file_public_id = :filePublicId
+            """;
+
     public static final String DELETE_FILE_QUERY = """
             DELETE FROM files
             WHERE file_public_id = :filePublicId
@@ -307,7 +313,7 @@ public class TicketQuery {
             JOIN users a ON a.user_id = i.assignee_id;
             """;
 
-    public static final String SELECT_TICKET_FOR_REPORT_QUERY = """
+    public static final String SELECT_USER_TICKETS_FOR_REPORT_QUERY = """
             SELECT
                 t.ticket_public_id,
                 t.title,
@@ -325,6 +331,26 @@ public class TicketQuery {
             JOIN types typ ON typ.type_id = t.type_id
             JOIN priorities pr ON pr.priority_id = t.priority_id
             WHERE u.user_public_id = :userPublicId
+            """;
+
+    public static final String SELECT_TICKETS_FOR_REPORT_QUERY = """
+            SELECT
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            WHERE 1 = 1
             """;
 
     public static final String TICKET_EXISTS_QUERY = """
