@@ -31,7 +31,7 @@ public interface TicketService {
 
     void deleteFile(UUID userPublicId, UUID filePublicId);
 
-    Path downloadFile(String name, UUID filePublicId);
+    Path downloadFile(UUID filePublicId);
 
     List<AttachmentDTO> uploadFiles(UUID userPublicId, UUID ticketPublicId, List<MultipartFile> files);
 

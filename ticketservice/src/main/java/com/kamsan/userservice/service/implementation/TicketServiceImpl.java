@@ -1,10 +1,10 @@
 package com.kamsan.userservice.service.implementation;
 
-import com.kamsan.userservice.domain.TicketProperties;
 import com.kamsan.userservice.dto.*;
 import com.kamsan.userservice.enumeration.Role;
 import com.kamsan.userservice.enumeration.TicketStatus;
 import com.kamsan.userservice.event.Event;
+import com.kamsan.userservice.infrastructure.config.TicketProperties;
 import com.kamsan.userservice.mapper.TicketMapper;
 import com.kamsan.userservice.model.Attachment;
 import com.kamsan.userservice.repository.TicketQueryRepository;
@@ -184,7 +184,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Path downloadFile(String name, UUID filePublicId) {
+    public Path downloadFile(UUID filePublicId) {
         try {
             var attachment = ticketQueryRepository.findFileByPublicId(filePublicId);
             var filePath = Paths.get(ticketProperties.filesDirectory())
@@ -306,7 +306,6 @@ public class TicketServiceImpl implements TicketService {
         List<TicketReportDTO> ticketReportDTO = isRegularUser
                 ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
                 : ticketQueryRepository.generateReport(createReportDTO);
-
 
     }
 }
