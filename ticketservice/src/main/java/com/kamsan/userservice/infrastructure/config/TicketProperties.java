@@ -1,4 +1,4 @@
-package com.kamsan.userservice.domain;
+package com.kamsan.userservice.infrastructure.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

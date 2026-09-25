@@ -210,7 +210,7 @@ public class TicketQuery {
                 :size,
                 :uri
             FROM tickets t
-            JOIN tickets t ON t.ticket_public_id = :ticketPublicId
+            WHERE t.ticket_public_id = :ticketPublicId
             """;
 
     public static final String SELECT_FILES_TICKET_QUERY = """

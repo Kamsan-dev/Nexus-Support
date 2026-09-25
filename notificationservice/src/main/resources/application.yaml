@@ -1,0 +1,93 @@
+spring:
+  application:
+    name: NOTIFICATIONSERVICE
+
+  cloud:
+    discovery:
+      enabled: true
+
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: true
+
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_SERVER_URL}
+    template:
+      default-topic: NOTIFICATION_TOPIC
+    consumer:
+      group-id: topicgroupid
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping:
+                Notification: com.kamsan.notificationservice.domain.Notification
+
+  thymeleaf:
+    suffix: .html
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+    default-encoding: utf-8
+    verify:
+      host: ${VERIFY_EMAIL_HOST}
+
+server:
+  port: ${SERVER_PORT}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://${USER_NAME}:${PASSWORD}@localhost:5002/eureka/
+      register-with-eureka: true
+
+ui:
+  app:
+    url: ${UI_APP_URL}
+
+jwks:
+  uri: ${JWKS_URI}
+
+user:
+  images-folder: ${IMAGES_URI}
