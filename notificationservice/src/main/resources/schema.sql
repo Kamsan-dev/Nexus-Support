@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS ticket_status_history (
 CREATE TABLE IF NOT EXISTS messages (
     message_id BIGSERIAL PRIMARY KEY,
     message_public_id UUID NOT NULL UNIQUE,
-    conversation_id VARCHAR(40) NOT NULL,
+    conversation_id UUID NOT NULL,
     subject VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
     sender_id BIGINT NOT NULL,

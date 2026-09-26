@@ -16,8 +16,8 @@ import java.util.UUID;
 @Table(name = "messages")
 public class Message {
     private Long messageId;
-    private UUID message_public_id;
-    private String conversationId;
+    private UUID messagePublicId;
+    private UUID conversationId;
     private String subject;
     private String content;
     private Long senderId;
