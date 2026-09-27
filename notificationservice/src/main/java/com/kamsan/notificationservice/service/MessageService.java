@@ -12,10 +12,6 @@ public interface MessageService {
 
     List<MessageDTO> getMessages(UUID authenticatedUser);
 
-    List<MessageDTO> getConversation(UUID authenticatedUser, String conversationId);
-
-    String getMessageStatus(UUID authenticatedUser, Long messageId);
-
-    String updateMessageStatus(UUID authenticatedUser, Long messageId, String status);
+    List<MessageDTO> getConversation(UUID authenticatedUser, UUID conversationId);
 
 }

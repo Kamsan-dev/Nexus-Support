@@ -47,7 +47,7 @@ public class MessageQueryRepository {
                    .list();
     }
 
-    public List<MessageDTO> findMessagesByConversationId(UUID authenticatedUser, String conversationId) {
+    public List<MessageDTO> findMessagesByConversationId(UUID authenticatedUser, UUID conversationId) {
         return jdbc.sql(SELECT_MESSAGES_BY_CONVERSATION_ID_QUERY)
                    .param("userPublicId", authenticatedUser)
                    .param("conversationId", conversationId)

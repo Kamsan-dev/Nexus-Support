@@ -39,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> getConversation(UUID authenticatedUser, String conversationId) {
+    public List<MessageDTO> getConversation(UUID authenticatedUser, UUID conversationId) {
         List<MessageDTO> messages = messageQueryRepository.findMessagesByConversationId(
                 authenticatedUser,
                 conversationId);
@@ -51,13 +51,11 @@ public class MessageServiceImpl implements MessageService {
         return messages;
     }
 
-    @Override
-    public String getMessageStatus(UUID authenticatedUser, Long messageId) {
+    private String getMessageStatus(UUID authenticatedUser, Long messageId) {
         return "";
     }
 
-    @Override
-    public String updateMessageStatus(UUID authenticatedUser, Long messageId, String status) {
+    private String updateMessageStatus(UUID authenticatedUser, Long messageId, String status) {
         if (!status.equals("READ") && !status.equals("UNREAD"))
             throw new ApiException("Unable to update message status");
         int update = messageQueryRepository.updateMessageStatus(authenticatedUser, messageId, status);
