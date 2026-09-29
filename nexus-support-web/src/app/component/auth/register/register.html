@@ -1,0 +1,137 @@
+<div class="container mx-auto pt-10">
+  <div class="mt-4 flex flex-col items-center">
+    <img
+      class="size-20 rounded-md bg-gray-400 p-3"
+      src="https://cdn-icons-png.flaticon.com/512/9732/9732800.png"
+      alt="Your Company"
+      width="80"
+      height="80"
+    />
+    <h2 class="mt-5 text-xl font-semibold text-gray-800">Create a new account</h2>
+  </div>
+  <div class="mt-4 flex flex-col items-center mx-auto max-w-[500px]">
+    <div class="p-4 rounded-lg bg-white w-full border border-gray-200">
+      <div class="flex items-center p-4 mb-4 text-green-800 rounded-lg bg-green-50">
+        <p class="text-sm font-medium">message here</p>
+        <button
+          type="button"
+          class="ms-auto -mx-1.5 -my-1.5 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8"
+          aria-label="Close"
+        >
+          <fa-icon [icon]="'xmark'" class="fa-fw" />
+        </button>
+      </div>
+      <div class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50">
+        <p class="text-sm font-medium">message here</p>
+        <button
+          type="button"
+          class="ms-auto -mx-1.5 -my-1.5 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8"
+          aria-label="Close"
+        >
+          <fa-icon [icon]="'xmark'" class="fa-fw" />
+        </button>
+      </div>
+      <form class="">
+        <div class="space-y-6">
+          <div>
+            <label for="firstName" class="mb-2 text-sm font-medium text-gray-800">First name</label>
+            <input
+              type="text"
+              name="firstName"
+              id="firstName"
+              placeholder="First name"
+              required
+              class="border border-gray-200 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            />
+            <div class="mt-2 font-normal text-red-500">First name is required</div>
+          </div>
+          <div>
+            <label for="lastName" class="mb-2 text-sm font-medium text-gray-800">Last name</label>
+            <input
+              tpe="text"
+              name="lastName"
+              id="lastName"
+              placeholder="Last name"
+              required
+              class="border border border-gray-200 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            />
+            <div class="mt-2 font-normal text-red-500">Last name is required</div>
+          </div>
+          <div>
+            <label for="email" class="mb-2 text-sm font-medium text-gray-800">Email address</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Email address"
+              required
+              email
+              class="border border border-gray-200 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            />
+            <div class="mt-2 font-normal text-red-500">Email is required</div>
+            <div class="mt-2 font-normal text-red-500">Email format is invalid</div>
+          </div>
+          <div>
+            <label for="username" class="mb-2 text-sm font-medium text-gray-800">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              placeholder="Username"
+              required
+              pattern="^[a-zA-Z0-9]+$"
+              minlength="4"
+              class="border border border-gray-200 text-gray-900 text-sm rounded-lg w-full p-2.5"
+            />
+            <div class="mt-2 font-normal text-red-500">Username is required</div>
+            <div class="mt-2 font-normal text-red-500">
+              Username can only have letters and numbers
+            </div>
+          </div>
+          <div>
+            <label for="password" class="mb-2 text-sm font-medium text-gray-800">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              password
+              minlength="6"
+              class="border border border-gray-200 text-gray-800 text-sm rounded-lg w-full p-2.5"
+              required
+            />
+            <div class="mt-2 font-normal text-red-500">Password is required</div>
+            <div class="mt-2 font-normal text-red-500">Password is too short</div>
+          </div>
+          <button
+            type="submit"
+            class="disabled:bg-gray-300 w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Create account
+          </button>
+        </div>
+      </form>
+      <div class="mt-4">
+        <a
+          href="http://localhost:3000/resetpassword"
+          class="mt-4 text-base text-blue-600 hover:underline"
+          >Forgot Password?</a
+        >
+        <div class="mt-3 flex items-center justify-between">
+          <a
+            href="http://localhost:8080/oauth2/authorize?response_type=code&client_id=client&scope=openid&redirect_uri=http://localhost:3000&code_challenge_method=S256&code_challenge=PWlAu3anniGd9FmIdI0nSnIW7y0Mburm2Az_NsIginA"
+            class="bg-blue-600 hover:bg-blue-700 p-2 rounded-md text-white text-sm"
+            >Log In</a
+          >
+          <a
+            [routerLink]="['/']"
+            class="inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 p-2 rounded-md text-white text-sm"
+          >
+            Back to home
+            <fa-icon [icon]="'chevron-right'" class="fa-fw"></fa-icon>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
