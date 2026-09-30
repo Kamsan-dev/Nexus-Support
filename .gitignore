@@ -36,7 +36,7 @@ $RECYCLE.BIN/
 .springBeans
 
 # === Java / Maven / Spring Boot ===
-/backend/target/
+**/target/
 dependency-reduced-pom.xml
 pom.xml.tag
 pom.xml.releaseBackup
@@ -45,24 +45,20 @@ pom.xml.next
 release.properties
 buildNumber.properties
 .mvn/timing.properties
-/backend/.mvn/wrapper/maven-wrapper.jar
+**/mvn/wrapper/maven-wrapper.jar
 
-# Application config
-/backend/application.yml
-/backend/application.properties
-/backend/application-*.yml
-/backend/application-*.properties
 
 # === Angular / Node.js ===
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.angular/
-/frontend/.angular/cache/
-/frontend/.env
-/frontend/package-lock.json
-/frontend/yarn.lock
-/frontend/.output/
-/frontend/src/environments/
+**/node_modules/
+**/dist/
+**/.angular/
+**/.angular/cache/
+**/.env
+**/package-lock.json
+/nexus-support-web/package-lock.json
+**/yarn.lock
+**/.output/
+**/src/environments/
 
 # === OS-specific ===
 [Dd]esktop.ini

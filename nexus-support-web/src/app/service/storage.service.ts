@@ -5,7 +5,7 @@ export const CLIENT_STORAGE = new InjectionToken<Storage>('CLIENT_STORAGE', {
   factory: () => localStorage,
 });
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class StorageService {
   private readonly storage = inject(CLIENT_STORAGE);
 
