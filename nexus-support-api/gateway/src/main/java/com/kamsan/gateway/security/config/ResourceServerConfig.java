@@ -58,9 +58,12 @@ public class ResourceServerConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         var corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(List.of("http://securedoc.com",
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://securedoc.com",
                 "http://localhost:3000",
-                "http://localhost:4200"));
+                "http://localhost:4200",
+                "http://127.0.0.1:4200",
+                "http://127.0.0.1:3000"));
         corsConfiguration.setAllowedHeaders(Arrays.asList(ORIGIN,
                 ACCESS_CONTROL_ALLOW_ORIGIN,
                 CONTENT_TYPE,
@@ -87,7 +90,7 @@ public class ResourceServerConfig {
                 OPTIONS.name()));
         corsConfiguration.setMaxAge(3600L);
         var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/", corsConfiguration);
+        source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
 }

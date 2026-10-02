@@ -16,7 +16,6 @@ public interface UserMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(UpdateUserDTO updateUserDTO, @MappingTarget User user);
 
-    @Mapping(target = "password", ignore = true)
     User createUserDTOToUser(CreateUserDTO createUserDTO);
 
     CredentialDTO credentialToCredentialDTO(Credential credential);

@@ -24,6 +24,20 @@ spring:
         default_schema: public
         format_sql: true
 
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_SERVER_URL}
+    template:
+      default-topic: NOTIFICATION_TOPIC
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: "Notification:com.kamsan.userservice.domain.Notification"
+
 server:
   port: ${SERVER_PORT}
 

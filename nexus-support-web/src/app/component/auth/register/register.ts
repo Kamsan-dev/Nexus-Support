@@ -54,11 +54,11 @@ export class Register {
   private initRegisterForm(): void {
     this.registerForm = this.fb.nonNullable.group(
       {
-        email: ['', [Validators.required, Validators.email]],
+        email: ['john.doe@gmail.com', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmPassword: ['', Validators.required],
-        firstName: [''],
-        lastName: ['', Validators.required],
+        firstName: ['john'],
+        lastName: ['Doe', Validators.required],
       },
       {
         validators: [Validation.match('password', 'confirmPassword')],
@@ -76,8 +76,6 @@ export class Register {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          this.registerForm.reset;
-          this.registerForm.markAsPristine();
           this.state().loading = false;
         }),
       )
@@ -85,9 +83,11 @@ export class Register {
         next: (response: ApiResponse<null>) => {
           this.state().message = response.message;
           this.toastService.success('Success !');
+          this.registerForm.reset;
+          this.registerForm.markAsPristine();
         },
         error: (error: HttpErrorResponse) => {
-          console.log(error);
+          this.toastService.error(error.error.detail);
         },
       });
   }

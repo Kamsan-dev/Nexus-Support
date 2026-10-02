@@ -47,13 +47,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Procedure(procedureName = "public.create_user")
     void createUser(
-            @Param("p_email") String email,
-            @Param("p_password") String password,
+            @Param("p_public_id") UUID userPublicId,
             @Param("p_first_name") String firstName,
             @Param("p_last_name") String lastName,
+            @Param("p_email") String email,
             @Param("p_username") String username,
-            @Param("p_public_id") String userPublicId,
-            @Param("p_credential_public_id") String credentialPublicId,
+            @Param("p_password") String password,
+            @Param("p_credential_public_id") UUID credentialPublicId,
             @Param("p_token") String token,
             @Param("p_member_id") String memberId
     );

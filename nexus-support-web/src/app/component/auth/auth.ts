@@ -10,10 +10,4 @@ import { fontAwesomeIcons } from '../../shared/icons/font-awesome-icon';
   styleUrl: './auth.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Auth implements OnInit {
-  private faIconLibrary: FaIconLibrary = inject(FaIconLibrary);
-
-  ngOnInit(): void {
-    this.faIconLibrary.addIcons(...fontAwesomeIcons);
-  }
-}
+export class Auth {}

@@ -115,13 +115,14 @@ public class UserServiceImpl implements UserService {
         UUID credentialPublicId = randomUUID.get();
         UUID token = randomUUID.get();
 
-        userRepository.createUser(newUser.getEmail(),
-                newUser.getPassword(),
+        log.info("password registered user : {}", newUser.getPassword());
+        userRepository.createUser(newUser.getUserPublicId(),
                 newUser.getFirstName(),
                 newUser.getLastName(),
+                newUser.getEmail(),
                 newUser.getUsername(),
-                newUser.getUserPublicId().toString(),
-                credentialPublicId.toString(),
+               encoder.encode(newUser.getPassword()),
+                credentialPublicId,
                 token.toString(),
                 newUser.getMemberId());
         return token.toString();
