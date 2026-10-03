@@ -3,7 +3,7 @@ package com.kamsan.userservice.resource;
 import com.kamsan.userservice.domain.ApiResponse;
 import com.kamsan.userservice.domain.UserProperties;
 import com.kamsan.userservice.dto.*;
-import com.kamsan.userservice.service.implementation.UserServiceImpl;
+import com.kamsan.userservice.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -35,20 +35,20 @@ import static com.kamsan.userservice.utils.RequestUtils.getResponse;
 @RequestMapping("/user")
 public class UserResource {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final UserProperties userProperties;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody @Valid CreateUserDTO createUserDTO) {
-        this.userService.createUser(createUserDTO);
-        return ResponseEntity.created(getUri()).body(getResponse(
+        UUID userUUID = this.userService.createUser(createUserDTO);
+        return ResponseEntity.created(getUri(userUUID)).body(getResponse(
                 null,
                 "Account created. Check your email to enable your account.",
                 HttpStatus.CREATED));
     }
 
-    @GetMapping("/verify/account")
-    public ResponseEntity<ApiResponse<Void>> verifyAccount(@RequestParam("token") String token) {
+    @PostMapping("/verify/account")
+    public ResponseEntity<ApiResponse<Void>> verifyAccount(@RequestParam("") String token) {
         userService.verifyAccount(token);
         return ResponseEntity.ok().body(getResponse(
                 null,
@@ -240,8 +240,8 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    private URI getUri() {
-        return URI.create("/profile/<userId>");
+    private URI getUri(UUID userPublicId) {
+        return URI.create("/profile/"+userPublicId);
     }
 
 }

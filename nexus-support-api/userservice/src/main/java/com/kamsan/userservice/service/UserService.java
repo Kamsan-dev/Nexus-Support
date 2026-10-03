@@ -19,7 +19,7 @@ public interface UserService {
 
     ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId);
 
-    void createUser(CreateUserDTO createUserDTO);
+    UUID createUser(CreateUserDTO createUserDTO);
 
     void verifyAccount(String token);
 

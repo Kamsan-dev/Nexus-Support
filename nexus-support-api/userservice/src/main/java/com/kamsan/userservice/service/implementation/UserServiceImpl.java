@@ -91,14 +91,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     @Modifying(clearAutomatically = true)
-    public void createUser(CreateUserDTO createUserDTO) {
+    public UUID createUser(CreateUserDTO createUserDTO) {
         // Verification email unique
         boolean isEmailUsed = userRepository.existsByEmail(createUserDTO.email());
         if (isEmailUsed) {
             throw new ApiException(String.format("Cannot create user. Email %s is already used",
                     createUserDTO.email()));
         }
-        String token = callCreateUserProcedure(createUserDTO);
+        UUID newUserPublicId = randomUUID.get();
+        String token = callCreateUserProcedure(createUserDTO, newUserPublicId);
         publisher.publishEvent(new Event(USER_CREATED,
                 Map.of("token",
                         token,
@@ -106,16 +107,16 @@ public class UserServiceImpl implements UserService {
                         createUserDTO.email(),
                         "name",
                         capitalizeFully(createUserDTO.firstName()))));
+        return newUserPublicId;
     }
 
-    private String callCreateUserProcedure(CreateUserDTO createUserDTO) {
+    private String callCreateUserProcedure(CreateUserDTO createUserDTO, UUID userPublicId) {
         User newUser = userMapper.createUserDTOToUser(createUserDTO);
-        newUser.setUserPublicId(randomUUID.get());
+        newUser.setUserPublicId(userPublicId);
         newUser.setMemberId(memberId.get());
         UUID credentialPublicId = randomUUID.get();
         UUID token = randomUUID.get();
 
-        log.info("password registered user : {}", newUser.getPassword());
         userRepository.createUser(newUser.getUserPublicId(),
                 newUser.getFirstName(),
                 newUser.getLastName(),
@@ -137,6 +138,7 @@ public class UserServiceImpl implements UserService {
         if (accountToken.isExpired()) {
             throw new ApiException("Link has expired. Please try again.");
         }
+        log.info("accountToken : {}", accountToken.toString());
         userRepository.updateUserSettings(accountToken.getUserId());
         accountTokenRepository.deleteByToken(token);
     }

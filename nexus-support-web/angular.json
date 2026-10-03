@@ -78,7 +78,11 @@
               "buildTarget": "nexus-support-web:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "host": "localhost",
+            "port": 3000
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

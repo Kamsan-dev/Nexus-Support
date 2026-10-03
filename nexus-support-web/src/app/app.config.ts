@@ -10,6 +10,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHotToastConfig({
       dismissible: true,
+      position: 'top-right',
     }),
   ],
 };

@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface AccountTokenRepository extends JpaRepository<AccountToken, Long> {
 
     @Query(value = """
-            SELECT *, (created_at + INTERVAL '24 HOURS') < NOW() as is_expired
-            FROM account_token
+            SELECT *
+            FROM account_tokens
             WHERE token = :token
             """, nativeQuery = true)
     Optional<AccountToken> findByToken(String token);

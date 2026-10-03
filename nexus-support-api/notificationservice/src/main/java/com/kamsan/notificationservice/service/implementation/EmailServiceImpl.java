@@ -1,5 +1,6 @@
 package com.kamsan.notificationservice.service.implementation;
 
+import com.kamsan.notificationservice.domain.Notification;
 import com.kamsan.notificationservice.dto.SendCommentEmailDTO;
 import com.kamsan.notificationservice.dto.SendFilesEmailDTO;
 import com.kamsan.notificationservice.dto.SendTicketEmailDTO;
@@ -28,7 +29,7 @@ import static com.kamsan.notificationservice.utils.DateFormatter.shortDate;
 public class EmailServiceImpl implements EmailService {
 
     public static final String UTF_8_ENCODING = "UTF-8";
-    public static final String ACCOUNT_VERIFICATION_TEMPLATE = "newaccount";
+    public static final String ACCOUNT_VERIFICATION_TEMPLATE = "emails/account-verification";
     public static final String PASSWORD_RESET_TEMPLATE = "resetpassword";
     public static final String NEW_TICKET_TEMPLATE = "newticket";
     public static final String NEW_COMMENT_TEMPLATE = "newcomment";
@@ -55,6 +56,7 @@ public class EmailServiceImpl implements EmailService {
                     "name", sendTokenEmailDTO.name(),
                     "url", NotificationUtils.getVerificationUrl(this.host, sendTokenEmailDTO.token())
             ));
+            log.info("verificationUrl : {}", NotificationUtils.getVerificationUrl(this.host, sendTokenEmailDTO.token()));
             String text = templateEngine.process(ACCOUNT_VERIFICATION_TEMPLATE, context);
             MimeMessage message = getMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, UTF_8_ENCODING);

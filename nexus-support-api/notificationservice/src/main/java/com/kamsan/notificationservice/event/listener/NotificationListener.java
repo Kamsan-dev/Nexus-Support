@@ -24,7 +24,7 @@ public class NotificationListener {
 
     @KafkaListener(topics = NOTIFICATION_TOPIC)
     public void handleNotification(Notification notification) {
-        log.info("Received notification : {]", notification.toString());
+        log.info("Received notification : {}", notification.toString());
         var mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         var data = mapper.convertValue(notification.getPayload().getData(), Data.class);

@@ -18,7 +18,14 @@ export class UserService {
   private readonly server: string = environment.API_URL;
 
   public register(request: CreateUserRequest): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.server}user/register`, request);
+    return this.http.post<ApiResponse<null>>(`${this.server}/user/register`, request);
+  }
+
+  public verifyAccount(token: string): Observable<ApiResponse<null>> {
+    return this.http.post<ApiResponse<null>>(
+      `${this.server}/user/verify/account?token=${token}`,
+      null,
+    );
   }
   public isAuthenticated(): boolean {
     const token = this.storage.get(Key.TOKEN);

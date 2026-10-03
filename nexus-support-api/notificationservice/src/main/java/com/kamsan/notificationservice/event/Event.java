@@ -1,10 +1,7 @@
 package com.kamsan.notificationservice.event;
 
 import com.kamsan.notificationservice.enumeration.EventType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Map;
 
@@ -12,7 +9,8 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Event {
     private EventType eventType;
-    private Map<String, ?> data;
+    private Map<String, Object> data;
 }

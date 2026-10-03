@@ -22,8 +22,10 @@ public class AccountToken {
     private Long accountTokenId;
     private Long userId;
     private String token;
-    @Transient
-    private boolean isExpired;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+
+    public boolean isExpired(){
+        return this.createdAt.plusMinutes(15).isBefore(OffsetDateTime.now());
+    }
 }

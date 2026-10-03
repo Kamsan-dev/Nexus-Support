@@ -4,6 +4,7 @@ import com.kamsan.userservice.model.User;
 import com.kamsan.userservice.repository.projection.UserRoleAndAuthoritiesProjection;
 import com.kamsan.userservice.repository.projection.UserSecurityProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
@@ -58,10 +59,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("p_member_id") String memberId
     );
 
+    @Modifying
     @Query(value = """
             UPDATE users SET is_account_enabled = TRUE WHERE user_id = :userId
             """, nativeQuery = true)
-    void updateUserSettings(Long userId);
+    void updateUserSettings(@Param("userId") Long userId);
 
     @Query(value = """
             UPDATE user_roles ur SET ur.role_id = :roleId

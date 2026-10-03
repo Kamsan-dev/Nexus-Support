@@ -1,9 +1,13 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { StorageService } from '../../../service/storage.service';
-import { UserService } from '../../../service/user.service';
-import { State } from '../../../core/model/state.model';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+  WritableSignal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -11,12 +15,14 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import Validation from '../../../shared/utils/validation';
+import { Router, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
-import { ApiResponse } from '../../../core/response/api.response';
 import { finalize } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
+import { ApiResponse } from '../../../core/response/api.response';
+import { StorageService } from '../../../service/storage.service';
+import { UserService } from '../../../service/user.service';
+import Validation from '../../../shared/utils/validation';
 
 @Component({
   selector: 'app-register',
@@ -33,11 +39,9 @@ export class Register {
   private fb = inject(FormBuilder);
   private toastService = inject(HotToastService);
 
-  state = signal<State>({
-    loading: false,
-    message: undefined,
-    error: undefined,
-  });
+  loading = signal(false);
+  message: WritableSignal<undefined | string> = signal(undefined);
+  error: WritableSignal<undefined | string> = signal(undefined);
 
   registerForm!: FormGroup;
 
@@ -68,7 +72,7 @@ export class Register {
 
   public onSubmitRegisterForm(event: MouseEvent | TouchEvent): void {
     event.stopImmediatePropagation();
-    this.state().loading = true;
+    this.loading.set(true);
     const { email, password, firstName, lastName } = this.registerForm.value;
 
     this.userService
@@ -76,29 +80,27 @@ export class Register {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
-          this.state().loading = false;
+          this.loading.set(false);
         }),
       )
       .subscribe({
         next: (response: ApiResponse<null>) => {
-          this.state().message = response.message;
-          this.toastService.success('Success !');
+          this.message.set(response.message);
+          this.toastService.success(response.message);
           this.registerForm.reset;
           this.registerForm.markAsPristine();
         },
         error: (error: HttpErrorResponse) => {
           this.toastService.error(error.error.detail);
+          this.error.set(error.error.detail);
         },
       });
   }
 
   public closeMessage(event: MouseEvent | TouchEvent): void {
     event.stopImmediatePropagation();
-    this.state.set({
-      loading: false,
-      message: undefined,
-      error: undefined,
-    });
+    this.message.set(undefined);
+    this.error.set(undefined);
   }
 
   get f(): { [key: string]: AbstractControl } {

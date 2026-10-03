@@ -20,7 +20,7 @@ export const AUTH_ROUTES: Routes = [
         loadComponent: () => import('./register/register').then((c) => c.Register),
       },
       {
-        path: 'verify/password',
+        path: 'verification/password',
         loadComponent: () =>
           import('./verify-password/verify-password').then((c) => c.VerifyPassword),
       },
@@ -29,7 +29,7 @@ export const AUTH_ROUTES: Routes = [
         loadComponent: () => import('./reset-password/reset-password').then((c) => c.ResetPassword),
       },
       {
-        path: 'verify/account',
+        path: 'verification/account',
         loadComponent: () => import('./verify-account/verify-account').then((c) => c.VerifyAccount),
       },
     ],

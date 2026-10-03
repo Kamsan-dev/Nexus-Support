@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Account Verification</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, Helvetica, sans-serif;">
+
+<!-- Main wrapper table -->
+<table width="100%" border="0" style="background-color: #f4f4f4; padding: 30px 0;">
+    <tr>
+        <td align="center">
+
+            <!-- Email container -->
+            <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+                <!-- Header -->
+                <tr>
+                    <td align="center" style="background-color: #4a5568; padding: 28px 20px;">
+                        <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: normal; text-decoration: underline;">
+                            Nexus Support, Inc.
+                        </h1>
+                        <p style="margin: 10px 0 0 0; color: #e2e8f0; font-size: 16px;">
+                            New Account Verification
+                        </p>
+                    </td>
+                </tr>
+
+                <!-- Body content -->
+                <tr>
+                    <td style="padding: 40px 40px 20px 40px; color: #333333; font-size: 15px; line-height: 1.6;">
+
+                        <p style="margin: 0 0 18px 0;">
+                            Hello <strong th:text="${name}"></strong>,
+                        </p>
+
+                        <p style="margin: 0 0 18px 0;">
+                            Welcome to <strong>Nexus Support</strong>!
+                        </p>
+
+                        <p style="margin: 0 0 18px 0;">
+                            We're excited to welcome you on board. Our dedicated support team is here to assist you every step of the way.
+                        </p>
+
+                        <p style="margin: 0 0 18px 0;">
+                            Whenever you have a question or need help, you can submit a support ticket through the support portal. Our team will respond promptly to ensure your concerns are addressed.
+                        </p>
+
+                        <p style="margin: 0 0 28px 0;">
+                            There's just one more tiny step you need to take to achieve all these amazing things. Please click below to verify your new account.
+                        </p>
+
+                        <!-- Button -->
+                        <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 30px auto;">
+                            <tr>
+                                <td align="center" bgcolor="#3b82f6" style="border-radius: 6px;">
+                                    <a th:href="${url}"
+                                       target="_blank"
+                                       style="display: inline-block; padding: 14px 32px; font-size: 16px; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 6px;">
+                                        Verify My Account
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin: 0; color: #333333;">
+                            Thanks for choosing <strong>Nexus Support, Inc.</strong>
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- Footer spacing -->
+                <tr>
+                    <td style="padding-bottom: 30px;"></td>
+                </tr>
+
+            </table>
+            <!-- End email container -->
+
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

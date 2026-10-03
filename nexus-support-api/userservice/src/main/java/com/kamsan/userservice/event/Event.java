@@ -14,5 +14,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class Event {
     private EventType eventType;
-    private Map<String, ?> data;
+    private Map<String, Object> data;
 }
