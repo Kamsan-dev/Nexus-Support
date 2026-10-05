@@ -25,7 +25,7 @@ export const AUTH_ROUTES: Routes = [
           import('./verify-password/verify-password').then((c) => c.VerifyPassword),
       },
       {
-        path: 'reset-password',
+        path: 'reset/password',
         loadComponent: () => import('./reset-password/reset-password').then((c) => c.ResetPassword),
       },
       {

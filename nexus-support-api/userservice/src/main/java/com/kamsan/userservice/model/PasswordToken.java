@@ -1,10 +1,9 @@
 package com.kamsan.userservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 
@@ -17,11 +16,17 @@ import java.time.OffsetDateTime;
 @Table(name = "password_tokens")
 public class PasswordToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long passwordTokenId;
     private Long userId;
     private String token;
-    @Transient
-    private boolean isExpired;
+    @CreationTimestamp
     private OffsetDateTime createdAt;
+    @UpdateTimestamp
     private OffsetDateTime updatedAt;
+
+    public boolean isExpired(){
+        return this.createdAt.plusMinutes(15).isBefore(OffsetDateTime.now());
+    }
 }
+

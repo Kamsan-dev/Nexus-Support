@@ -31,7 +31,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.kamsan.userservice.enumeration.EventType.RESETPASSWORD;
+import static com.kamsan.userservice.enumeration.EventType.RESET_PASSWORD;
 import static com.kamsan.userservice.enumeration.EventType.USER_CREATED;
 import static com.kamsan.userservice.utils.UserUtils.memberId;
 import static com.kamsan.userservice.utils.UserUtils.randomUUID;
@@ -200,18 +200,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void resetPassword(String email) {
         User user = userRepository.findByEmail(email)
-                                  .orElseThrow(() -> new UsernameNotFoundException(
-                                          String.format("Email address %s does not exist", email)));
+                                  .orElseThrow(() -> new ApiException("No account exists for this email address."));
 
+        // Check if the user has already an existing token.
         Optional<PasswordToken> tokenOpt =
                 passwordTokenRepository.findByUserId(user.getUserId());
 
         if (tokenOpt.isPresent()) {
             PasswordToken passwordToken = tokenOpt.get();
             if (!passwordToken.isExpired()) {
-                return;
+                throw new ApiException("You have already initiated a password reset request. Please check your email address.");
             } else {
                 passwordTokenRepository.deleteByToken(passwordToken.getToken());
+                passwordTokenRepository.flush();
             }
         }
 
@@ -221,7 +222,7 @@ public class UserServiceImpl implements UserService {
                                               .build();
         passwordTokenRepository.save(newToken);
         publisher.publishEvent(new Event(
-                RESETPASSWORD,
+                RESET_PASSWORD,
                 Map.of(
                         "token", newToken.getToken(),
                         "email", email,

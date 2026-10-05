@@ -79,7 +79,7 @@ export class VerifyAccount {
       });
   }
 
-  private readTokenFromQueryParams(): string {
-    return this.activatedRoute.snapshot.queryParamMap.get('token') ?? '';
+  private readTokenFromQueryParams(): string | null {
+    return this.activatedRoute.snapshot.queryParamMap.get('token') ?? null;
   }
 }

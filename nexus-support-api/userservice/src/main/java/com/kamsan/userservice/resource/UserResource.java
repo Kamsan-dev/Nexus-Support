@@ -48,7 +48,7 @@ public class UserResource {
     }
 
     @PostMapping("/verify/account")
-    public ResponseEntity<ApiResponse<Void>> verifyAccount(@RequestParam("") String token) {
+    public ResponseEntity<ApiResponse<Void>> verifyAccount(@RequestParam("token") String token) {
         userService.verifyAccount(token);
         return ResponseEntity.ok().body(getResponse(
                 null,
@@ -146,7 +146,7 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PostMapping("/password/reset")
+    @PostMapping("/reset/password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@RequestParam("email") @Email(message = "Invalid email address") String email) {
         this.userService.resetPassword(email);
         return ResponseEntity.ok().body(getResponse(
@@ -155,16 +155,16 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @GetMapping("/password/reset/verify")
+    @GetMapping("/reset/password/verify")
     public ResponseEntity<ApiResponse<Void>> resetPasswordTokenVerify(@RequestParam("token") String token) {
         this.userService.verifyPasswordToken(token);
         return ResponseEntity.ok().body(getResponse(
                 null,
-                null,
+                "Link has been verified.",
                 HttpStatus.OK));
     }
 
-    @PostMapping("/password/reset/confirm")
+    @PostMapping("/reset/password/confirm")
     public ResponseEntity<ApiResponse<Void>> resetPasswordConfirm(@RequestBody DoResetPasswordDTO doResetPasswordDTO) {
         this.userService.doResetPassword(doResetPasswordDTO);
         return ResponseEntity.ok().body(getResponse(

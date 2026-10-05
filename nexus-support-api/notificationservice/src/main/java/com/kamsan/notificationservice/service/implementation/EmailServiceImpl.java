@@ -30,7 +30,7 @@ public class EmailServiceImpl implements EmailService {
 
     public static final String UTF_8_ENCODING = "UTF-8";
     public static final String ACCOUNT_VERIFICATION_TEMPLATE = "emails/account-verification";
-    public static final String PASSWORD_RESET_TEMPLATE = "resetpassword";
+    public static final String PASSWORD_RESET_TEMPLATE = "emails/reset-password";
     public static final String NEW_TICKET_TEMPLATE = "newticket";
     public static final String NEW_COMMENT_TEMPLATE = "newcomment";
     public static final String NEW_FILE_TEMPLATE = "newfile";

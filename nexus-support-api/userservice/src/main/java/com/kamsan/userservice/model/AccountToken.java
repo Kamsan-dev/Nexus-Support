@@ -1,9 +1,6 @@
 package com.kamsan.userservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +16,7 @@ import java.time.OffsetDateTime;
 @Table(name = "account_tokens")
 public class AccountToken {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountTokenId;
     private Long userId;
     private String token;
