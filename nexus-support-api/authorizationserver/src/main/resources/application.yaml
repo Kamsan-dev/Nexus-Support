@@ -44,3 +44,10 @@ ui:
 keys:
   private: ${PRIVATE_KEY}
   public: ${PUBLIC_KEY}
+
+server:
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        name: AUTHSESSIONID

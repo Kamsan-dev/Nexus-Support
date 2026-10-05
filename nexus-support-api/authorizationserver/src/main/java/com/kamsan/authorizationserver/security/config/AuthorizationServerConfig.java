@@ -5,6 +5,10 @@ import com.kamsan.authorizationserver.security.authentication.client.ClientRefre
 import com.kamsan.authorizationserver.security.authentication.mfa.MfaAuthenticationHandler;
 import com.kamsan.authorizationserver.security.token.ClientOAuth2RefreshTokenGenerator;
 import com.kamsan.authorizationserver.security.token.UserJwtGenerator;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +39,9 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -182,5 +188,30 @@ public class AuthorizationServerConfig {
                       .stream()
                       .map(GrantedAuthority::getAuthority)
                       .collect(Collectors.joining(","));
+    }
+
+    @Bean
+    public OncePerRequestFilter debugRequestFilter() {
+        return new OncePerRequestFilter() {
+
+            @Override
+            protected void doFilterInternal(
+                    HttpServletRequest request,
+                    HttpServletResponse response,
+                    FilterChain filterChain
+            ) throws ServletException, IOException {
+
+                System.out.println("========== REQUEST ==========");
+                System.out.println("Method: " + request.getMethod());
+                System.out.println("URI: " + request.getRequestURI());
+                System.out.println("Host: " + request.getHeader("Host"));
+                System.out.println("X-Forwarded-Host: " + request.getHeader("X-Forwarded-Host"));
+                System.out.println("X-Forwarded-Port: " + request.getHeader("X-Forwarded-Port"));
+                System.out.println("X-Forwarded-Proto: " + request.getHeader("X-Forwarded-Proto"));
+                System.out.println("=============================");
+
+                filterChain.doFilter(request, response);
+            }
+        };
     }
 }

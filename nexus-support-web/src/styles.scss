@@ -1,3 +1,7 @@
 @use '@ngxpert/hot-toast/styles';
 @import 'tailwindcss';
 @import '@fortawesome/fontawesome-svg-core/styles.css';
+
+html {
+  background-color: oklch(96.7% 0.003 264.542);
+}

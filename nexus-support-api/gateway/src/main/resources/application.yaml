@@ -9,11 +9,12 @@ spring:
     gateway:
       server:
         webmvc:
+          trusted-proxies: ".*"
           routes:
             - id: authorization-server
               uri: lb://AUTHORIZATIONSERVER
               predicates:
-                - Path=/authorization/**
+                - Path=/oauth2/**,/login/**,/mfa/**
 
             - id: user-service
               uri: lb://USERSERVICE
@@ -48,6 +49,11 @@ logging:
 
 server:
   port: ${SERVER_PORT}
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      cookie:
+        name: GATEWAYSESSIONID
 
 jwks:
   uri: ${JWKS_URI}

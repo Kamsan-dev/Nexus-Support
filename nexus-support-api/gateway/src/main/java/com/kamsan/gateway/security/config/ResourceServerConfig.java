@@ -41,7 +41,9 @@ public class ResourceServerConfig {
                             "/user/verify/**",
                             "/user/reset/password/**",
                             "/user/image/**",
-                            "/authorization/**")
+                            "/oauth2/**",
+                            "/error/**",
+                            "/login/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
