@@ -190,28 +190,28 @@ public class AuthorizationServerConfig {
                       .collect(Collectors.joining(","));
     }
 
-    @Bean
-    public OncePerRequestFilter debugRequestFilter() {
-        return new OncePerRequestFilter() {
-
-            @Override
-            protected void doFilterInternal(
-                    HttpServletRequest request,
-                    HttpServletResponse response,
-                    FilterChain filterChain
-            ) throws ServletException, IOException {
-
-                System.out.println("========== REQUEST ==========");
-                System.out.println("Method: " + request.getMethod());
-                System.out.println("URI: " + request.getRequestURI());
-                System.out.println("Host: " + request.getHeader("Host"));
-                System.out.println("X-Forwarded-Host: " + request.getHeader("X-Forwarded-Host"));
-                System.out.println("X-Forwarded-Port: " + request.getHeader("X-Forwarded-Port"));
-                System.out.println("X-Forwarded-Proto: " + request.getHeader("X-Forwarded-Proto"));
-                System.out.println("=============================");
-
-                filterChain.doFilter(request, response);
-            }
-        };
-    }
+//    @Bean
+//    public OncePerRequestFilter debugRequestFilter() {
+//        return new OncePerRequestFilter() {
+//
+//            @Override
+//            protected void doFilterInternal(
+//                    HttpServletRequest request,
+//                    HttpServletResponse response,
+//                    FilterChain filterChain
+//            ) throws ServletException, IOException {
+//
+//                System.out.println("========== REQUEST ==========");
+//                System.out.println("Method: " + request.getMethod());
+//                System.out.println("URI: " + request.getRequestURI());
+//                System.out.println("Host: " + request.getHeader("Host"));
+//                System.out.println("X-Forwarded-Host: " + request.getHeader("X-Forwarded-Host"));
+//                System.out.println("X-Forwarded-Port: " + request.getHeader("X-Forwarded-Port"));
+//                System.out.println("X-Forwarded-Proto: " + request.getHeader("X-Forwarded-Proto"));
+//                System.out.println("=============================");
+//
+//                filterChain.doFilter(request, response);
+//            }
+//        };
+//    }
 }

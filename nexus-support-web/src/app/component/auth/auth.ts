@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLinkActive, RouterLink } from '@angular/router';
-import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { fontAwesomeIcons } from '../../shared/icons/font-awesome-icon';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from '../../service/auth.service';
 
 @Component({
@@ -14,6 +13,7 @@ import { AuthService } from '../../service/auth.service';
 export class Auth {
   private authService = inject(AuthService);
   public onLoginButtonClick(event: TouchEvent | MouseEvent): void {
+    event.stopImmediatePropagation();
     this.authService.login();
   }
 }

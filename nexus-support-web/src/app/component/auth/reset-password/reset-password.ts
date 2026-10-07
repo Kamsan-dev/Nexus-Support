@@ -23,6 +23,7 @@ import { finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../../../core/response/api.response';
 import { getFormData } from '../../../shared/utils/request';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-reset-password',
@@ -34,6 +35,7 @@ import { getFormData } from '../../../shared/utils/request';
 export class ResetPassword {
   private storage = inject(StorageService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -46,7 +48,7 @@ export class ResetPassword {
   resetForm!: FormGroup;
 
   ngOnInit(): void {
-    if (this.userService.isAuthenticated()) {
+    if (this.authService.isAuthenticated()) {
       this.storage.getRedirectUrl()
         ? this.router.navigate([this.storage.getRedirectUrl])
         : this.router.navigate(['/dashboard']);

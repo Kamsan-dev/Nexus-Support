@@ -18,12 +18,12 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
-import { delay, finalize, forkJoin, timer } from 'rxjs';
+import { delay, finalize } from 'rxjs';
+import { DoResetPasswordRequest } from '../../../core/request/change-password.request';
 import { ApiResponse } from '../../../core/response/api.response';
 import { StorageService } from '../../../service/storage.service';
 import { UserService } from '../../../service/user.service';
 import Validation from '../../../shared/utils/validation';
-import { DoResetPasswordRequest } from '../../../core/request/change-password.request';
 
 @Component({
   selector: 'app-verify-password',

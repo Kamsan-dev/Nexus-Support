@@ -15,6 +15,7 @@ import { delay, finalize } from 'rxjs';
 import { ApiResponse } from '../../../core/response/api.response';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-verify-account',
@@ -28,6 +29,7 @@ export class VerifyAccount {
   message: WritableSignal<undefined | string> = signal(undefined);
   error: WritableSignal<undefined | string> = signal(undefined);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private storage = inject(StorageService);
   private router = inject(Router);
   private toastService = inject(HotToastService);
@@ -35,7 +37,7 @@ export class VerifyAccount {
   private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    if (this.userService.isAuthenticated()) {
+    if (this.authService.isAuthenticated()) {
       this.storage.getRedirectUrl()
         ? this.router.navigate([this.storage.getRedirectUrl])
         : this.router.navigate(['/dashboard']);

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { delay, firstValueFrom } from 'rxjs';
 import { PkceService } from './pcke.service';
 import { OAuthStorageService } from './oauthstorage.service';
 import { environment } from '../../environments/environment';
@@ -29,7 +29,7 @@ export class OAuthService {
 
   private readonly clientId = 'client';
 
-  private readonly redirectUri = 'http://localhost:3000';
+  private readonly redirectUri = 'http://localhost:3000/auth/callback';
 
   async login(): Promise<void> {
     const codeVerifier = await this.pkce.generateCodeVerifier();
@@ -79,6 +79,7 @@ export class OAuthService {
       .set('code_verifier', codeVerifier);
 
     try {
+      delay(5000);
       const response = await firstValueFrom(
         this.http.post<TokenResponse>(this.tokenEndpoint, body.toString(), {
           headers: {
@@ -86,11 +87,11 @@ export class OAuthService {
           },
         }),
       );
-      this.storage.clear();
       return response;
     } catch (error) {
-      this.storage.clear();
       throw error;
+    } finally {
+      this.storage.clear();
     }
   }
 }

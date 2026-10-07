@@ -1,20 +1,19 @@
-import { inject, Injectable } from '@angular/core';
-import { JwtHelperService } from '@auth0/angular-jwt';
-import { StorageService } from './storage.service';
-import { Key } from '../enum/cache.key';
 import { HttpClient } from '@angular/common/http';
-import { CreateUserRequest } from '../core/request/create-user.request';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiResponse } from '../core/response/api.response';
 import { environment } from '../../environments/environment';
 import { DoResetPasswordRequest } from '../core/request/change-password.request';
+import { CreateUserRequest } from '../core/request/create-user.request';
+import { ApiResponse } from '../core/response/api.response';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  private jwt = new JwtHelperService();
-  private storage = inject(StorageService);
+  isAuthenticated() {
+    throw new Error('Method not implemented.');
+  }
+
   private http = inject(HttpClient);
   private readonly server: string = environment.API_URL;
 
@@ -46,15 +45,4 @@ export class UserService {
   }
 
   //#endregion
-
-  public isAuthenticated(): boolean {
-    const token = this.storage.get(Key.TOKEN);
-    if (token == null) return false;
-    if (this.jwt.decodeToken<string>(token) != null && !this.isTokenExpired(token)) return true;
-    else return false;
-  }
-
-  private isTokenExpired(token: string): boolean {
-    return this.jwt.isTokenExpired(token) ? true : false;
-  }
 }

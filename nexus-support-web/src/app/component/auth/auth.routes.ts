@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './home/home';
+import { Callback } from './callback/callback';
 
 export const AUTH_ROUTES: Routes = [
   {
@@ -14,6 +15,10 @@ export const AUTH_ROUTES: Routes = [
       {
         path: '',
         component: Home,
+      },
+      {
+        path: 'auth/callback',
+        component: Callback,
       },
       {
         path: 'register',

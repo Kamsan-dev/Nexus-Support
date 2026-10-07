@@ -23,6 +23,7 @@ import { ApiResponse } from '../../../core/response/api.response';
 import { StorageService } from '../../../service/storage.service';
 import { UserService } from '../../../service/user.service';
 import Validation from '../../../shared/utils/validation';
+import { AuthService } from '../../../service/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -34,6 +35,7 @@ import Validation from '../../../shared/utils/validation';
 export class Register {
   private storage = inject(StorageService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -46,10 +48,10 @@ export class Register {
   registerForm!: FormGroup;
 
   ngOnInit(): void {
-    if (this.userService.isAuthenticated()) {
+    if (this.authService.isAuthenticated()) {
       this.storage.getRedirectUrl()
         ? this.router.navigate([this.storage.getRedirectUrl])
-        : this.router.navigate(['/dashboard']);
+        : this.router.navigate(['dashboard']);
     }
 
     this.initRegisterForm();
