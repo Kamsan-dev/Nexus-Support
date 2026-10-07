@@ -103,13 +103,13 @@
                     </div>
                 </form>
                 <div class="mt-4">
-                    <a href="http://localhost:3000/resetpassword"
+                    <a th:href="${clientUrl + '/auth/reset/password'}"
                        class="block mt-4 text-base text-blue-600 hover:underline">Forgot Password?</a>
                     <div class="mt-3 flex items-center justify-between">
-                        <a href="http://localhost:3000/register"
+                        <a th:href="${clientUrl + '/auth/register'}"
                            class="bg-blue-600 hover:bg-blue-700 p-2 rounded-md text-white block text-sm text-blue-600">Create
                             account</a>
-                        <a href="http://localhost:3000"
+                        <a th:href="${clientUrl}"
                            class="inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 p-2 rounded-md text-white block text-sm text-blue-600">
                             Back to home
                             <svg xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" width="24" height="24"

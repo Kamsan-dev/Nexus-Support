@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DoResetPasswordRequest } from '../core/request/change-password.request';
-import { CreateUserRequest } from '../core/request/create-user.request';
-import { ApiResponse } from '../core/response/api.response';
+import { ApiResponse } from '../core/model/response/api.response';
+import { DoResetPasswordRequest } from '../core/model/request/change-password.request';
+import { CreateUserRequest } from '../core/model/request/create-user.request';
 
 @Injectable({
   providedIn: 'root',

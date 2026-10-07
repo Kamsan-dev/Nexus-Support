@@ -9,7 +9,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -33,7 +35,7 @@ import static com.kamsan.authorizationserver.utils.RequestUtils.getMessage;
 import static com.kamsan.authorizationserver.utils.UserUtils.getUser;
 
 @Controller
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoginController {
     private final UserServiceImpl userService;
     private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
@@ -41,8 +43,12 @@ public class LoginController {
             "/mfa?error");
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
+    @Value("${ui.app.url}")
+    private String clientUrl;
+
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model) {
+        model.addAttribute("clientUrl", this.clientUrl);
         return "login";
     }
 
