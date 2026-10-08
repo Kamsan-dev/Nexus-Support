@@ -1,5 +1,6 @@
 import {
   faCheck,
+  faChevronDown,
   faChevronRight,
   faCircleNotch,
   faSpinner,
@@ -12,4 +13,5 @@ export const fontAwesomeIcons: IconDefinition[] = [
   faCircleNotch,
   faSpinner,
   faCheck,
+  faChevronDown,
 ];

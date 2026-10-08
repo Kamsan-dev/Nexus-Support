@@ -21,3 +21,15 @@ export interface User {
   isAccountLocked: boolean;
   isAccountEnabled: boolean;
 }
+
+export interface Profile {
+  user: User;
+  devices: Device[];
+}
+
+export interface Device {
+  machine: string;
+  client: string;
+  ipAddress: string;
+  createdAt: string;
+}

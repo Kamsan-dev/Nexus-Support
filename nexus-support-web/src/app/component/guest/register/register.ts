@@ -20,10 +20,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { finalize } from 'rxjs';
 import { ApiResponse } from '../../../core/model/response/api.response';
-import { AuthService } from '../../../service/auth.service';
 import { StorageService } from '../../../service/storage.service';
 import { UserService } from '../../../service/user.service';
 import Validation from '../../../shared/utils/validation';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-register',

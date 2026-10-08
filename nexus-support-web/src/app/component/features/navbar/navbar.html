@@ -5,7 +5,7 @@
         <button
           (click)="toggleNav()"
           type="button"
-          class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+          class="cursor-pointer relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
           aria-controls="mobile-menu"
           aria-expanded="false"
         >
@@ -83,7 +83,7 @@
               >Messages
               <span
                 class="inline-flex items-center justify-center h-4 w-max px-[5px] py-[5px] text-xs font-semibold text-black bg-yellow-400 rounded-full"
-                >8</span
+                >{{ messageStore.unreadMessageCount() }}</span
               >
             </a>
           </div>
@@ -109,32 +109,29 @@
           </svg>
           New Ticket
         </button>
+        @if (authStore.profileLoading()) {
+          <fa-icon class="ml-2 text-primary animate-spin" icon="spinner" size="2x"></fa-icon>
+        }
         <button
           (click)="toggleMenu()"
           type="button"
-          class="flex items-center text-sm pe-1 font-medium text-white rounded-full md:me-0 focus:ring-1 focus:ring-gray-100"
+          class="cursor-pointer flex items-center text-sm pe-1 font-medium text-white rounded-full md:me-0 focus:ring-1 focus:ring-gray-100"
         >
           <img
             class="w-8 h-8 me-2 rounded-full object-cover"
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
-            alt="Junior"
+            [src]="
+              authStore.profile()
+                ? authStore.user()?.imageUrl
+                : 'https://cdn.vectorstock.com/i/1000v/41/91/avatar-default-user-profile-icon-simple-flat-grey-vector-57234191.jpg'
+            "
+            [alt]="'Profile image of user ' + authStore.user()?.lastName"
           />
-          Junior RT
-          <svg
-            class="w-2.5 h-2.5 ms-3"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 10 6"
-          >
-            <path
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="m1 1 4 4 4-4"
-            />
-          </svg>
+          @if (authStore.profile()) {
+            {{ authStore.user()?.firstName }} {{ authStore.user()?.lastName }}
+          } @else {
+            <span>Unauthenticated</span>
+          }
+          <fa-icon [icon]="'chevron-down'" class="fa-fw"></fa-icon>
         </button>
         <div
           id="usermenu"
@@ -143,7 +140,7 @@
         >
           <div class="px-4 py-3 text-sm text-gray-700">
             <div class="text-xs font-medium">Signed in as:</div>
-            <div class="font-medium text-md">getarrayz@gmail.com</div>
+            <div class="font-medium text-md">{{ authStore.user()?.email }}</div>
           </div>
           <ul class="p-2 text-sm text-gray-700" aria-labelledby="dropdownHoverButton">
             <li
@@ -248,33 +245,39 @@
     >
       <div class="space-y-1 pb-3 pt-2">
         <a
-          href=""
-          class="block rounded-md px-3 py-2 text-base font-medium text-white bg-gray-700 hover:bg-gray-700"
+          [routerLink]="['/app/dashboard']"
+          [routerLinkActive]="['bg-gray-700']"
+          class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700"
           aria-current="page"
           >Dashboard</a
         >
         <a
-          href=""
-          class="block rounded-md px-3 py-2 text-base font-medium text-white bg-gray-700 hover:bg-gray-700"
+          [routerLink]="['/app/tickets/list']"
+          [routerLinkActive]="['bg-gray-700']"
+          class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700"
           >Tickets</a
         >
         <a
-          href=""
-          class="block rounded-md px-3 py-2 text-base font-medium text-white bg-gray-700 hover:bg-gray-700"
+          [routerLink]="['/app/users/list']"
+          [routerLinkActive]="['bg-gray-700']"
+          class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700"
           >Users</a
         >
         <a
-          href=""
-          class="block rounded-md px-3 py-2 text-base font-medium text-white bg-gray-700 hover:bg-gray-700"
+          [routerLink]="['/app/reports']"
+          [routerLinkActive]="['bg-gray-700']"
+          class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700"
           >Reports</a
         >
         <a
-          href=""
-          class="block rounded-md px-3 py-2 text-base font-medium text-white bg-gray-700 hover:bg-gray-700"
+          [routerLink]="['/app/messages/list']"
+          [routerLinkActive]="['bg-gray-700']"
+          class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700"
           >Messages
           <span
             class="inline-flex items-center justify-center w-4 h-4 text-xs font-semibold text-black bg-yellow-300 rounded-full"
-          ></span>
+            >{{ messageStore.unreadMessageCount() }}</span
+          >
         </a>
       </div>
     </div>

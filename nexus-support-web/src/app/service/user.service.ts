@@ -5,15 +5,12 @@ import { environment } from '../../environments/environment';
 import { ApiResponse } from '../core/model/response/api.response';
 import { DoResetPasswordRequest } from '../core/model/request/change-password.request';
 import { CreateUserRequest } from '../core/model/request/create-user.request';
+import { Profile } from '../core/model/user.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  isAuthenticated() {
-    throw new Error('Method not implemented.');
-  }
-
   private http = inject(HttpClient);
   private readonly server: string = environment.API_URL;
 
@@ -26,6 +23,10 @@ export class UserService {
       `${this.server}/user/verify/account?token=${token}`,
       null,
     );
+  }
+
+  public getProfile(): Observable<ApiResponse<Profile>> {
+    return this.http.get<ApiResponse<Profile>>(`${this.server}/user/profile`);
   }
 
   //#region password management

@@ -2,8 +2,8 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { AuthSession } from '../core/model/auth-session.model';
 import { OAuthService } from './oauth.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { StorageService } from './storage.service';
 import { Key } from '../enum/cache.key';
+import { StorageService } from '../service/storage.service';
 
 interface TokenResponse {
   access_token: string;

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
-import { AuthService } from '../../../service/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-callback',

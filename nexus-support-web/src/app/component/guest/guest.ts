@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AuthService } from '../../service/auth.service';
 import { StorageService } from '../../service/storage.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-guest',

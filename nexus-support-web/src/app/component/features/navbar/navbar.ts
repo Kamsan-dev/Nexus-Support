@@ -12,6 +12,8 @@ import {
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DialogService } from '@ngneat/dialog';
+import { AuthStore } from '../../../auth/auth.store';
+import { MessageStore } from '../../../store/message.store';
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +26,8 @@ export class Navbar {
   private element = inject(ElementRef);
   private dialogService = inject(DialogService);
   private readonly TICKET_MODAL_ID = 'ticketModal';
+  protected authStore = inject(AuthStore);
+  protected messageStore = inject(MessageStore);
   @ViewChild('addFormTicket') addTicketTemplate!: TemplateRef<any>;
   isNavOpen = signal(false);
   isMenuOpen = signal(false);

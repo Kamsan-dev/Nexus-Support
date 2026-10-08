@@ -9,8 +9,8 @@ export const CLIENT_STORAGE = new InjectionToken<Storage>('CLIENT_STORAGE', {
 export class StorageService {
   private readonly storage = inject(CLIENT_STORAGE);
 
-  get(key: string): string | null {
-    return this.storage.getItem(key);
+  get(key: string): string {
+    return this.storage.getItem(key) ?? '';
   }
 
   set(key: string, value: unknown): void {
