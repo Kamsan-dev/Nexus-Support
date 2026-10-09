@@ -1,9 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { signalStore, withComputed, withProps } from '@ngrx/signals';
 import { UserService } from '../service/user.service';
-import { Profile } from '../core/model/user.model';
-import { HttpErrorResponse } from '@angular/common/http';
 // import { pipe, switchMap, tap } from 'rxjs';
 // import { rxMethod } from '@ngrx/signals/rxjs-interop';
 // import { tapResponse } from '@ngrx/operators';
@@ -32,6 +31,5 @@ export const AuthStore = signalStore(
 
 interface AuthState {
   loading: boolean;
-  profile: Profile | null;
   error: HttpErrorResponse | null;
 }

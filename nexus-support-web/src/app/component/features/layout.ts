@@ -5,7 +5,7 @@ import { HotToastService } from '@ngxpert/hot-toast';
 import { StorageService } from '../../service/storage.service';
 import { Footer } from './footer/footer';
 import { Navbar } from './navbar/navbar';
-import { AuthStore } from '../../auth/auth.store';
+import { AuthStore } from '../../store/auth.store';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({

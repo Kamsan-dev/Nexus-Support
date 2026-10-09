@@ -1,9 +1,10 @@
 import { HttpParams } from '@angular/common/http';
+import { TicketFilters } from './ticket.model';
 
 export interface Pagination {
   page: number;
   size: number;
-  sort: string[];
+  sort?: string[];
 }
 
 export interface Pageable {
@@ -35,12 +36,21 @@ export interface Page<T> {
   empty: boolean;
 }
 
-export const createPaginationOption = (req: Pagination): HttpParams => {
+export const createPaginationOption = <T extends object>(
+  req: Pagination,
+  filters?: T,
+): HttpParams => {
   let params = new HttpParams();
   params = params.append('page', req.page).append('size', req.size);
 
-  req.sort.forEach((value) => {
+  req.sort?.forEach((value) => {
     params = params.append('sort', value);
+  });
+
+  Object.entries(filters ?? {}).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== '') {
+      params = params.set(key, String(value));
+    }
   });
 
   return params;

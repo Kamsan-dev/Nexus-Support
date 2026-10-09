@@ -1,6 +1,6 @@
 import { computed, inject } from '@angular/core';
 import { signalStore, withComputed, withProps, withState } from '@ngrx/signals';
-import { Message } from '../component/features/messages/model/message.model';
+import { Message } from '../core/model/message.model';
 import { MessageService } from '../service/message.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 
@@ -12,7 +12,7 @@ export const MessageStore = signalStore(
 
     return {
       messageResource: rxResource({
-        stream: () => messageService.loadAllMessages(),
+        stream: () => messageService.getAllMessages(),
       }),
     };
   }),

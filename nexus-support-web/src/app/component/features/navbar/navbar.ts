@@ -12,7 +12,7 @@ import {
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DialogService } from '@ngneat/dialog';
-import { AuthStore } from '../../../auth/auth.store';
+import { AuthStore } from '../../../store/auth.store';
 import { MessageStore } from '../../../store/message.store';
 
 @Component({
