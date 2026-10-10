@@ -1,0 +1,44 @@
+package com.kamsan.ticketservice.model;
+
+import com.kamsan.ticketservice.sharedkernel.domain.AbstractAuditingEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "comments")
+public class Comment extends AbstractAuditingEntity<Long> {
+
+    @Id
+    private Long commentId;
+    private UUID commentPublicId;
+    private Long userId;
+    private Long ticketId;
+    private String comment;
+    private boolean isEdited;
+
+    @Transient
+    private UUID userPublicId;
+    @Transient
+    private String firstName;
+    @Transient
+    private String lastName;
+    @Transient
+    private String imageUrl;
+
+    @Override
+    public Long getId() {
+        return this.commentId;
+    }
+}

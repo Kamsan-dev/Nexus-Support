@@ -1,0 +1,57 @@
+<div class="p-4 flex flex-col rounded-xl bg-white border border-solid border-gray-200 overflow-auto">
+  <div class="flex flex-row justify-between items-center">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="bg-gray-300 p-1 rounded-full text-[#0a365e] cursor-pointer">
+        <fa-icon [icon]="'ticket'" class="fa-fw"></fa-icon>
+      </div>
+      <div class="flex space-x-2">
+        <h4 class="cursor-pointer font-sans text-md font-medium text-gray-900">Ticket #{{ ticketNumber() }}</h4>
+
+        <span class="text-sm font-medium w-fit px-1.5 py-0.5 rounded" [ngClass]="ticketTypeColor[type()]">
+          {{ ticketTypeLabel[type()] }}
+        </span>
+        <span class="text-sm font-semibold px-1 py-0.5 rounded" [ngClass]="ticketStatusColor[status()]">
+          {{ ticketStatusLabel[status()] }}
+        </span>
+      </div>
+    </div>
+    <div class="cursor-pointer">
+      <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
+    </div>
+  </div>
+  <h5 class="mt-4 cursor-pointer text-base font-semibold text-gray-900 line-clamp-1">
+    {{ title() }}
+  </h5>
+  <p class="cursor-pointer overflow-hidden line-clamp-2 text-md">
+    {{ description() }}
+  </p>
+  <div class="mt-4 flex flex-row justify-between items-center">
+    <div class="flex flex-row justify-between items-center gap-8">
+      <div class="flex flex-row justify-between items-center gap-1">
+        <div class="cursor-pointer">
+          <fa-icon [icon]="'paperclip'" class="fa-fw"></fa-icon>
+        </div>
+        <span>{{ fileCount() }}</span>
+      </div>
+      <div class="flex flex-row justify-between items-center gap-1">
+        <div class="cursor-pointer">
+          <fa-icon [icon]="['far', 'comment']" class="fa-fw"></fa-icon>
+        </div>
+        <span>{{ commentCount() }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="mt-2 flex flex-row justify-between items-center flex-wrap gap-1">
+    <div class="min-w-44 bg-gray-200 rounded-full h-3">
+      <div
+        class="text-blue-100 bg-blue-600 text-xs font-medium text-center h-3 leading-none rounded-full"
+        [style.width.%]="progress()"
+      >
+        {{ progress() }}%
+      </div>
+    </div>
+    <p class="antialiased font-sans text-sm font-medium text-blue-gray-500">
+      Since {{ createdAt() | date: 'dd/MM/yyyy' }}
+    </p>
+  </div>
+</div>

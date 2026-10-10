@@ -1,0 +1,260 @@
+package com.kamsan.ticketservice.resource;
+
+import com.kamsan.ticketservice.domain.ApiResponse;
+import com.kamsan.ticketservice.dto.*;
+import com.kamsan.ticketservice.enumeration.TicketStatus;
+import com.kamsan.ticketservice.enumeration.TicketType;
+import com.kamsan.ticketservice.service.TicketService;
+import com.kamsan.ticketservice.service.UserService;
+import com.kamsan.ticketservice.service.implementation.TicketReportPdfService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.UUID;
+
+import static com.kamsan.ticketservice.constants.Constants.FILE_NAME_HEADER;
+import static com.kamsan.ticketservice.utils.RequestUtils.getResponse;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/ticket")
+public class TicketResource {
+
+    private final UserService userService;
+    private final TicketService ticketService;
+    private final TicketReportPdfService ticketReportPdfService;
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<Page<PageTicketDTO>>> getTickets(@NotNull Authentication authentication,
+                                                                       Pageable pageable,
+                                                                       @RequestParam(required = false) TicketStatus status,
+                                                                       @RequestParam(required = false) TicketType type,
+                                                                       @RequestParam(required = false) String filter) {
+        PageTicketRequestDTO pageTicketRequestDTO = new PageTicketRequestDTO(pageable, status, type, filter);
+        Page<PageTicketDTO> tickets = ticketService.getTickets(UUID.fromString(authentication.getName()),
+                pageTicketRequestDTO);
+        return ResponseEntity.ok().body(getResponse(
+                tickets,
+                "Tickets retrieved.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<UUID>> createTicket(@NotNull Authentication authentication,
+                                                          @RequestPart @Valid CreateTicketDTO createTicketDTO,
+                                                          @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        UUID ticketPublicId = this.ticketService.createTicket(UUID.fromString(authentication.getName()),
+                createTicketDTO,
+                files);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                ticketPublicId,
+                "Ticket created successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @GetMapping("/{ticketPublicId}")
+    public ResponseEntity<ApiResponse<TicketDTO>> getTicket(@NotNull Authentication authentication,
+                                                            @PathVariable("ticketPublicId") UUID ticketPublicId) {
+        TicketDetailsDTO userTicket = ticketService.getUserTicket(UUID.fromString(authentication.getName()),
+                ticketPublicId);
+        List<CommentDTO> ticketComments = ticketService.getTicketComments(UUID.fromString(authentication.getName()));
+        List<AttachmentDTO> ticketFiles = ticketService.getTicketFiles(ticketPublicId);
+        List<TaskDTO> ticketTasks = ticketService.getTicketTasks(ticketPublicId);
+        List<TicketUserDTO> techSupports = userService.getTechSupports();
+        TicketUserDTO assignee = userService.getAssignee(ticketPublicId);
+        ReadUserDTO connectedUser = userService.getUserByUUID(UUID.fromString(authentication.getName()));
+
+        return ResponseEntity.ok().body(getResponse(
+                new TicketDTO(userTicket,
+                        ticketComments,
+                        ticketFiles,
+                        ticketTasks,
+                        techSupports,
+                        assignee,
+                        connectedUser),
+                "Ticket retrieved.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<Void>> updateTicket(@NotNull Authentication authentication,
+                                                          @RequestBody @Valid UpdateTicketDTO updateTicketDTO) {
+        this.ticketService.updateTicket(UUID.fromString(authentication.getName()), updateTicketDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Ticket updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PreAuthorize("hasAuthority('ticket:assignee')")
+    @PatchMapping("/update/assignee")
+    public ResponseEntity<ApiResponse<Void>> updateAssignee(@NotNull Authentication authentication,
+                                                            @RequestParam("assigneePublicId") UUID assigneePublicId,
+                                                            @RequestParam("ticketPublicId") UUID ticketPublicId) {
+        this.ticketService.updateAssignee(UUID.fromString(authentication.getName()), assigneePublicId, ticketPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                String.format("Assignee of ticket %s updated successfully", ticketPublicId),
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping("/comment/")
+    ResponseEntity<ApiResponse<UUID>> createComment(@NotNull Authentication authentication,
+                                                    @RequestBody CreateCommentDTO createCommentDTO) {
+        UUID comment = ticketService.createComment(UUID.fromString(authentication.getName()), createCommentDTO);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                comment,
+                "Comment added successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @PatchMapping("/comment/update")
+    public ResponseEntity<ApiResponse<Void>> updateComment(@NotNull Authentication authentication,
+                                                           @RequestBody @Valid UpdateCommentDTO updateCommentDTO) {
+        this.ticketService.updateComment(UUID.fromString(authentication.getName()), updateCommentDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Comment updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @DeleteMapping("/comment/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteComment(@NotNull Authentication authentication,
+                                                           @RequestParam("commentPublicId") UUID commentPublicId) {
+        this.ticketService.deleteComment(UUID.fromString(authentication.getName()), commentPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Comment deleted successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PreAuthorize("hasAuthority('task:create')")
+    @PutMapping("/task/")
+    ResponseEntity<ApiResponse<UUID>> createTask(@NotNull Authentication authentication,
+                                                 @RequestBody CreateTaskDTO createTaskDTO) {
+        UUID task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                task,
+                "Task added successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @PreAuthorize("hasAuthority('task:update')")
+    @PutMapping("/task/update")
+    public ResponseEntity<ApiResponse<Void>> updateTask(@NotNull Authentication authentication,
+                                                        @RequestBody @Valid UpdateTaskDTO updateTaskDTO) {
+        this.ticketService.updateTask(UUID.fromString(authentication.getName()), updateTaskDTO);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Task updated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PreAuthorize("hasAuthority('task:delete')")
+    @DeleteMapping("/task/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteTask(@NotNull Authentication authentication,
+                                                        @RequestParam("taskPublicId") UUID taskPublicId) {
+        this.ticketService.deleteTask(UUID.fromString(authentication.getName()), taskPublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "Task deleted successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping("/file/upload")
+    ResponseEntity<ApiResponse<UUID>> uploadFile(@NotNull Authentication authentication,
+                                                 @RequestParam("ticketPublicId") UUID ticketPublicId,
+                                                 @RequestParam("files") List<MultipartFile> files) {
+        ticketService.uploadFiles(UUID.fromString(authentication.getName()), ticketPublicId, files);
+        return ResponseEntity.created(getUri()).body(getResponse(
+                null,
+                "Files uploaded successfully.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @DeleteMapping("/file/delete")
+    public ResponseEntity<ApiResponse<Void>> deleteFile(@NotNull Authentication authentication,
+                                                        @RequestParam("filePublicId") UUID filePublicId) {
+        this.ticketService.deleteFile(UUID.fromString(authentication.getName()), filePublicId);
+        return ResponseEntity.ok().body(getResponse(
+                null,
+                "File deleted successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @GetMapping("/file/download/{filePublicId}")
+    public ResponseEntity<UrlResource> downloadFile(@NotNull Authentication authentication,
+                                                    @PathVariable("filePublicId") UUID filePublicId) throws IOException {
+        var path = this.ticketService.downloadFile(filePublicId);
+        var resource = new UrlResource(path.toUri());
+        var headers = new HttpHeaders();
+        headers.add(FILE_NAME_HEADER, resource.getFilename());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION,
+                String.format("attachment;%s=%s", FILE_NAME_HEADER, resource.getFilename()));
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(path)))
+                             .headers(headers).body(resource);
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<ApiResponse<List<TicketReportDTO>>> generateReport(@NotNull Authentication authentication,
+                                                                             @RequestBody @Valid CreateReportDTO createReportDTO) {
+        List<TicketReportDTO> report = ticketService.report(UUID.fromString(authentication.getName()), createReportDTO);
+        return ResponseEntity.ok().body(getResponse(
+                report,
+                "Report generated successfully.",
+                HttpStatus.OK
+        ));
+    }
+
+    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
+                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
+
+        List<TicketReportDTO> tickets = ticketService.report(UUID.fromString(authentication.getName()),
+                createReportDTO);
+        ticketReportPdfService.generateReport(tickets);
+        byte[] pdf = ticketReportPdfService.generateReport(tickets);
+
+        return ResponseEntity.ok()
+                             .contentType(MediaType.APPLICATION_PDF)
+                             .header(
+                                     HttpHeaders.CONTENT_DISPOSITION,
+                                     "attachment; filename=\"tickets-report.pdf\""
+                             )
+                             .body(pdf);
+    }
+
+    private URI getUri() {
+        return URI.create("/ticket/<ticketPublicId>");
+    }
+
+}

@@ -30,3 +30,14 @@ export default class Validation {
     };
   }
 }
+
+export function parseEnum<T extends Record<string, string>>(
+  enumObject: T,
+  value: string | undefined,
+): T[keyof T] | undefined {
+  if (value && Object.values(enumObject).includes(value)) {
+    return value as T[keyof T];
+  }
+
+  return undefined;
+}

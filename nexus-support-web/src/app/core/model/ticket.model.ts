@@ -1,35 +1,28 @@
-import { TicketStatus } from '../../enum/ticket-status';
-import { TicketType } from '../../enum/ticket-type';
-import { Pageable } from './request.model';
+import { TicketPriority } from '../../enum/ticket-priority';
+import { TicketStatusEnum } from '../../enum/ticket-status';
+import { TicketTypeEnum } from '../../enum/ticket-type';
 
 export interface PageTicket {
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   ticketPublicId: string;
   title: string;
   description: string;
   progress: number;
-  status: string;
-  priority: string;
-  type: string;
-  dueDate: Date;
+  status: TicketStatusEnum;
+  priority: TicketPriority;
+  type: TicketTypeEnum;
+  dueDate: string;
   fileCount: number;
   commentCount: number;
 }
 
 //#region Pagination
 
-export interface PageTicketRequest {
-  page: Pageable;
-  status: TicketStatus;
-  type: TicketType;
-  filter: string;
-}
-
 export interface TicketFilters {
   filter?: string;
-  type?: TicketType;
-  status?: TicketStatus;
+  type?: TicketTypeEnum;
+  status?: TicketStatusEnum;
 }
 
 //#endregion

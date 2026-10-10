@@ -1,1 +1,156 @@
-<p>ticket works!</p>
+<div class="flex flex-wrap justify-between items-center md:flex-nowrap space-y-2 md:space-y-0">
+  <h3 class="text-xl font-bold">Tickets ({{ ticketStore.countTickets() }})</h3>
+  <div class="flex flex-wrap md:flex-nowrap justify-between items-center space-x-0 md:space-x-4 space-y-2 md:space-y-0">
+    <fa-icon [icon]="'rotate-left'" class="fa-fw" (click)="onResetFilters()"></fa-icon>
+    <select
+      name="status"
+      (change)="filterByStatus($any($event.target).value)"
+      [value]="ticketStore.statusQuery() || 'all'"
+      class="w-full rounded-md border-0 ml-0 px-2 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-full0 sm:text-sm sm:leading-6"
+    >
+      <option value="all">All</option>
+      @for (status of ticketStatuses; track $index) {
+        <option [value]="status">{{ ticketStatusLabel[status] }}</option>
+      }
+    </select>
+    <select
+      name="type"
+      (change)="filterByType($any($event.target).value)"
+      [value]="ticketStore.typeQuery() || 'all'"
+      class="w-full rounded-md border-0 ml-0 px-2 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-full0 sm:text-sm sm:leading-6"
+    >
+      <option value="all">All</option>
+      @for (type of ticketTypes; track $index) {
+        <option [value]="type">{{ ticketTypeLabel[type] }}</option>
+      }
+    </select>
+    <input
+      type="search"
+      name="title"
+      [value]="ticketStore.searchTermQuery() ?? ''"
+      (input)="searchTickets($event.target.value)"
+      placeholder="Search ticket title"
+      class="w-full min-w-60 rounded-md border-0 px-2 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+    />
+  </div>
+</div>
+<div class="mx-auto mt-3 mb-3 border-t border-gray-200"></div>
+<div class="container mx-auto">
+  @if (ticketStore.loading()) {
+    <div class="mt-5 grid gap-y-10 gap-x-6 md:grid-cols-3 xl:grid-cols-3">
+      @for (ticketCard of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
+        <div
+          class="p-4 animate-pulse flex flex-col rounded-xl bg-white border border-solid border-gray-200 overflow-auto"
+        >
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
+          <div class="h-2 bg-gray-200 rounded-full w-full"></div>
+        </div>
+      }
+    </div>
+  }
+  @if (!ticketStore.loading() && ticketStore.countTickets() == 0) {
+    <p class="text-lg font-semibold flex justify-center items-center">No tickets found</p>
+  }
+  @if (!ticketStore.loading() && ticketStore.countTickets() > 0) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6">
+      @for (ticket of ticketStore.tickets(); track $index) {
+        <app-ticket-card
+          [createdAt]="ticket.createdAt"
+          [ticketPublicId]="ticket.ticketPublicId"
+          [title]="ticket.title"
+          [description]="ticket.description"
+          [progress]="ticket.progress"
+          [status]="ticket.status"
+          [priority]="ticket.priority"
+          [type]="ticket.type"
+          [dueDate]="ticket.dueDate"
+          [fileCount]="ticket.fileCount"
+          [commentCount]="ticket.commentCount"
+        ></app-ticket-card>
+      }
+    </div>
+  }
+
+  <nav class="mt-6 flex justify-center" aria-label="Page navigation">
+    <ul class="flex items-center -space-x-px h-10 text-base">
+      <li class="pointer-events-none opacity-40">
+        <a
+          class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-blue-600 bg-white border border-blue-300 border-e-0 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
+        >
+          <span class="sr-only">Previous</span>
+          <svg
+            class="w-3 h-3 rtl:rotate-180"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 1 1 5l4 4"
+            />
+          </svg>
+        </a>
+      </li>
+      <li class="cursor-pointer">
+        <a
+          class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+        >
+          1
+        </a>
+      </li>
+      <li class="cursor-pointer">
+        <a
+          class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+        >
+          1
+        </a>
+      </li>
+      <li class="cursor-pointer">
+        <a
+          class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+        >
+          1
+        </a>
+      </li>
+      <li class="cursor-pointer">
+        <a
+          class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+        >
+          1
+        </a>
+      </li>
+      <li class="pointer-events-none opacity-40">
+        <a
+          class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 bg-white border border-blue-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
+        >
+          <span class="sr-only">Next</span>
+          <svg
+            class="w-3 h-3 rtl:rotate-180"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
