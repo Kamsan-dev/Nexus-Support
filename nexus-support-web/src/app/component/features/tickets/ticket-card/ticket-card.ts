@@ -8,10 +8,11 @@ import {
   TicketStatusLabel,
 } from '../../../../enum/ticket-status';
 import { TicketPriority, TicketPriorityLabel } from '../../../../enum/ticket-priority';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-ticket-card',
-  imports: [DatePipe, FontAwesomeModule, NgClass],
+  imports: [DatePipe, FontAwesomeModule, NgClass, RouterLink],
   templateUrl: './ticket-card.html',
   styleUrl: './ticket-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

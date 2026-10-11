@@ -18,11 +18,7 @@
               stroke="currentColor"
               aria-hidden="true"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           } @else {
             <svg
@@ -39,16 +35,8 @@
         </button>
       </div>
       <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-        <div
-          href=""
-          class="flex-shrink-0 items-center hidden cursor-pointer lg:block"
-          [routerLink]="['']"
-        >
-          <img
-            class="h-8 w-auto"
-            src="https://cdn-icons-png.flaticon.com/512/9732/9732800.png"
-            alt="Ticket App"
-          />
+        <div href="" class="flex-shrink-0 items-center hidden cursor-pointer lg:block" [routerLink]="['']">
+          <img class="h-8 w-auto" src="https://cdn-icons-png.flaticon.com/512/9732/9732800.png" alt="Ticket App" />
         </div>
         <div class="hidden sm:ml-6 lg:block">
           <div class="flex space-x-4">
@@ -131,7 +119,7 @@
           } @else {
             <span>Unauthenticated</span>
           }
-          <fa-icon [icon]="'chevron-down'" class="fa-fw"></fa-icon>
+          <fa-icon [icon]="'chevron-down'" class="text-xs ml-2 fa-fw"></fa-icon>
         </button>
         <div
           id="usermenu"
@@ -143,10 +131,7 @@
             <div class="font-medium text-md">{{ authStore.user()?.email }}</div>
           </div>
           <ul class="p-2 text-sm text-gray-700" aria-labelledby="dropdownHoverButton">
-            <li
-              href=""
-              class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
-            >
+            <li href="" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -161,11 +146,7 @@
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                 />
               </svg>
-              <div
-                class="block px-4 py-2 text-gray-700"
-                data-dropdown-trigger="click"
-                data-dropdown-hide="usermenu"
-              >
+              <div class="block px-4 py-2 text-gray-700" data-dropdown-trigger="click" data-dropdown-hide="usermenu">
                 Profile
               </div>
             </li>
@@ -212,9 +193,7 @@
               <div class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Settings</div>
             </li>
             <div class="mt-3 mb-3 border-t border-gray-200"></div>
-            <li
-              class="pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
-            >
+            <li class="pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -311,9 +290,7 @@
 
         <!-- Description -->
         <div>
-          <label for="description" class="mb-2 block text-sm font-medium text-gray-800"
-            >Description</label
-          >
+          <label for="description" class="mb-2 block text-sm font-medium text-gray-800">Description</label>
           <textarea
             formControlName="description"
             id="description"
@@ -343,9 +320,7 @@
           </div>
 
           <div>
-            <label for="priority" class="mb-2 block text-sm font-medium text-gray-800"
-              >Priority</label
-            >
+            <label for="priority" class="mb-2 block text-sm font-medium text-gray-800">Priority</label>
             <select
               formControlName="priority"
               id="priority"
@@ -393,16 +368,9 @@
 
         <!-- Fichier sélectionné (exemple) -->
         <div class="space-y-2">
-          <div
-            class="mt-2 flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
-          >
+          <div class="mt-2 flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
             <div class="flex items-center gap-3">
-              <svg
-                class="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -417,12 +385,7 @@
             </div>
             <button type="button" class="text-gray-400 hover:text-red-500 transition">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>

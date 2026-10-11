@@ -1,4 +1,3 @@
-import { TicketStatusEnum } from '../../../enum/ticket-status';
 import { Pagination } from '../request.model';
 import { TicketFilters } from '../ticket.model';
 

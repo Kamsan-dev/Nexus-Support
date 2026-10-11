@@ -7,6 +7,7 @@ import { Footer } from './footer/footer';
 import { Navbar } from './navbar/navbar';
 import { AuthStore } from '../../store/auth.store';
 import { AuthService } from '../../auth/auth.service';
+import { TicketStore } from '../../store/ticket.store';
 
 @Component({
   selector: 'app-layout',
@@ -16,21 +17,9 @@ import { AuthService } from '../../auth/auth.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Layout {
-  readonly authStore = inject(AuthStore);
-  private readonly toast = inject(HotToastService);
   private authService = inject(AuthService);
   private storage = inject(StorageService);
   private router = inject(Router);
-
-  constructor() {
-    effect(() => {
-      const error = this;
-      this.authStore.profileError();
-      if (error && error instanceof HttpErrorResponse) {
-        this.toast.error(error.error.detail);
-      }
-    });
-  }
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {

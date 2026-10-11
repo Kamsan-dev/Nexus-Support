@@ -14,6 +14,7 @@ interface TicketState {
   tickets: PageTicket[];
   currentPage: number;
   query: QueryRequest<TicketFilters>;
+  totalPages: number;
 }
 
 const initialTicketState: TicketState = {
@@ -22,6 +23,7 @@ const initialTicketState: TicketState = {
   tickets: [],
   currentPage: 0,
   query: defaultTicketQueryFilter,
+  totalPages: 0,
 };
 
 export const TicketStore = signalStore(
@@ -44,12 +46,13 @@ export const TicketStore = signalStore(
                   tickets: response.data.content,
                   query: { pageRequest, filters },
                   currentPage: response.data.pageable.pageNumber,
+                  totalPages: response.data.totalPages,
                 });
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, {
                   loading: false,
-                  error: error.error.detail,
+                  error: error.error,
                 });
               },
             }),
@@ -67,5 +70,7 @@ export const TicketStore = signalStore(
     typeQuery: computed(() => store.query()?.filters?.type),
     currentQuery: computed(() => store.query),
     searchTermQuery: computed(() => store.query()?.filters?.filter),
+    ticketPageError: computed(() => store.error()),
+    pagesTotal: computed(() => store.totalPages()),
   })),
 );
