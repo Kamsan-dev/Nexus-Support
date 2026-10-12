@@ -1,11 +1,11 @@
-export enum TicketPriority {
+export enum TicketPriorityEnum {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
   HIGH = 'HIGH',
 }
 
-export const TicketPriorityLabel: Record<TicketPriority, string> = {
-  [TicketPriority.LOW]: 'Low',
-  [TicketPriority.MEDIUM]: 'Medium',
-  [TicketPriority.HIGH]: 'High',
+export const TicketPriorityLabel: Record<TicketPriorityEnum, string> = {
+  [TicketPriorityEnum.LOW]: 'Low',
+  [TicketPriorityEnum.MEDIUM]: 'Medium',
+  [TicketPriorityEnum.HIGH]: 'High',
 };

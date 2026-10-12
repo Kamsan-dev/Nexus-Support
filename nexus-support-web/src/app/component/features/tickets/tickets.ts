@@ -26,7 +26,6 @@ export class Tickets {
   private readonly inputSubject: Subject<string> = new Subject();
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
-  private readonly toast = inject(HotToastService);
 
   // options, value
   protected readonly ticketStatuses = Object.values(TicketStatusEnum);
@@ -34,16 +33,6 @@ export class Tickets {
   protected readonly ticketTypeLabel = TicketTypeLabel;
   protected readonly ticketStatusLabel = TicketStatusLabel;
   protected readonly ticketPriorityLabel = TicketPriorityLabel;
-
-  constructor() {
-    effect(() => {
-      const errorPageTickets = this.ticketStore.ticketPageError();
-      if (errorPageTickets) {
-        const message = errorPageTickets.message ?? errorPageTickets.error.detail;
-        this.toast.error(message);
-      }
-    });
-  }
 
   ngOnInit(): void {
     this.listenToQueryParams();

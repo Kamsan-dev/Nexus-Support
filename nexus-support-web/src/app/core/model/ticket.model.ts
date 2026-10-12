@@ -1,4 +1,4 @@
-import { TicketPriority } from '../../enum/ticket-priority';
+import { TicketPriorityEnum } from '../../enum/ticket-priority';
 import { TicketStatusEnum } from '../../enum/ticket-status';
 import { TicketTypeEnum } from '../../enum/ticket-type';
 
@@ -10,7 +10,7 @@ export interface PageTicket {
   description: string;
   progress: number;
   status: TicketStatusEnum;
-  priority: TicketPriority;
+  priority: TicketPriorityEnum;
   type: TicketTypeEnum;
   dueDate: string;
   fileCount: number;

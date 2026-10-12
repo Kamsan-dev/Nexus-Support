@@ -7,7 +7,7 @@ import {
   TicketStatusColor,
   TicketStatusLabel,
 } from '../../../../enum/ticket-status';
-import { TicketPriority, TicketPriorityLabel } from '../../../../enum/ticket-priority';
+import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -24,7 +24,7 @@ export class TicketCard {
   description = input.required<string>();
   progress = input.required<number>();
   status = input.required<TicketStatusEnum>();
-  priority = input.required<TicketPriority>();
+  priority = input.required<TicketPriorityEnum>();
   type = input.required<TicketTypeEnum>();
   dueDate = input.required<string>();
   fileCount = input.required<number>();

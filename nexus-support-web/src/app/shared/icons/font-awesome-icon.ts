@@ -27,4 +27,5 @@ export const fontAwesomeIcons: IconDefinition[] = [
   faPaperclip,
   faComment,
   faRotateLeft,
+  faXmark,
 ];

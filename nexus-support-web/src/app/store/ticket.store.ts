@@ -3,10 +3,11 @@ import { computed, inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { delay, pipe, switchMap, tap } from 'rxjs';
+import { delay, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { defaultTicketQueryFilter, QueryRequest } from '../core/model/request/query-request';
 import { PageTicket, TicketFilters } from '../core/model/ticket.model';
 import { TicketService } from '../service/ticket.service';
+import { CreateTicketRequest } from '../core/model/request/create-ticket.request';
 
 interface TicketState {
   loading: boolean;
@@ -15,6 +16,8 @@ interface TicketState {
   currentPage: number;
   query: QueryRequest<TicketFilters>;
   totalPages: number;
+  lastCreatedticketPublicId: string | undefined;
+  ticketCreated: boolean;
 }
 
 const initialTicketState: TicketState = {
@@ -24,6 +27,8 @@ const initialTicketState: TicketState = {
   currentPage: 0,
   query: defaultTicketQueryFilter,
   totalPages: 0,
+  lastCreatedticketPublicId: undefined,
+  ticketCreated: false,
 };
 
 export const TicketStore = signalStore(
@@ -60,8 +65,33 @@ export const TicketStore = signalStore(
         ),
       ),
     ),
-    setCurrentPage(currentPage: number): void {
-      patchState(store, (state) => ({ currentPage }));
+    createTicket: rxMethod<FormData>(
+      pipe(
+        tap(() => patchState(store, { loading: true, error: null })),
+        exhaustMap((formData) =>
+          ticketService.createTicket(formData).pipe(
+            tapResponse({
+              next: (response) => {
+                patchState(store, {
+                  loading: false,
+                  lastCreatedticketPublicId: response.data,
+                  ticketCreated: true,
+                });
+                console.log(store.lastCreatedticketPublicId);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, {
+                  loading: false,
+                  error: error.error,
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    resetTicketCreated(): void {
+      patchState(store, { ticketCreated: false });
     },
   })),
   withComputed((store) => ({
@@ -70,7 +100,8 @@ export const TicketStore = signalStore(
     typeQuery: computed(() => store.query()?.filters?.type),
     currentQuery: computed(() => store.query),
     searchTermQuery: computed(() => store.query()?.filters?.filter),
-    ticketPageError: computed(() => store.error()),
+    ticketStoreError: computed(() => store.error()),
     pagesTotal: computed(() => store.totalPages()),
+    ticketCreated: computed(() => store.ticketCreated()),
   })),
 );

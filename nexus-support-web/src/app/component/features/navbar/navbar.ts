@@ -14,10 +14,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DialogService } from '@ngneat/dialog';
 import { AuthStore } from '../../../store/auth.store';
 import { MessageStore } from '../../../store/message.store';
+import { AddTicket } from '../tickets/add-ticket/add-ticket';
 
 @Component({
   selector: 'app-navbar',
-  imports: [FontAwesomeModule, RouterLink, CommonModule, RouterLinkActive],
+  imports: [FontAwesomeModule, RouterLink, CommonModule, RouterLinkActive, AddTicket],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

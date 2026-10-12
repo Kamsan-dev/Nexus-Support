@@ -58,12 +58,12 @@ public class TicketResource {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<UUID>> createTicket(@NotNull Authentication authentication,
-                                                          @RequestPart @Valid CreateTicketDTO createTicketDTO,
+                                                          @RequestPart @Valid CreateTicketDTO payload,
                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         UUID ticketPublicId = this.ticketService.createTicket(UUID.fromString(authentication.getName()),
-                createTicketDTO,
+                payload,
                 files);
-        return ResponseEntity.created(getUri()).body(getResponse(
+        return ResponseEntity.created(getUri(ticketPublicId)).body(getResponse(
                 ticketPublicId,
                 "Ticket created successfully.",
                 HttpStatus.CREATED
@@ -123,7 +123,7 @@ public class TicketResource {
     ResponseEntity<ApiResponse<UUID>> createComment(@NotNull Authentication authentication,
                                                     @RequestBody CreateCommentDTO createCommentDTO) {
         UUID comment = ticketService.createComment(UUID.fromString(authentication.getName()), createCommentDTO);
-        return ResponseEntity.created(getUri()).body(getResponse(
+        return ResponseEntity.created(getUri(comment)).body(getResponse(
                 comment,
                 "Comment added successfully.",
                 HttpStatus.CREATED
@@ -157,7 +157,7 @@ public class TicketResource {
     ResponseEntity<ApiResponse<UUID>> createTask(@NotNull Authentication authentication,
                                                  @RequestBody CreateTaskDTO createTaskDTO) {
         UUID task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);
-        return ResponseEntity.created(getUri()).body(getResponse(
+        return ResponseEntity.created(getUri(task)).body(getResponse(
                 task,
                 "Task added successfully.",
                 HttpStatus.CREATED
@@ -193,7 +193,7 @@ public class TicketResource {
                                                  @RequestParam("ticketPublicId") UUID ticketPublicId,
                                                  @RequestParam("files") List<MultipartFile> files) {
         ticketService.uploadFiles(UUID.fromString(authentication.getName()), ticketPublicId, files);
-        return ResponseEntity.created(getUri()).body(getResponse(
+        return ResponseEntity.ok().body(getResponse(
                 null,
                 "Files uploaded successfully.",
                 HttpStatus.CREATED
@@ -253,8 +253,8 @@ public class TicketResource {
                              .body(pdf);
     }
 
-    private URI getUri() {
-        return URI.create("/ticket/<ticketPublicId>");
+    private URI getUri(UUID publicId) {
+        return URI.create("/ticket/"+publicId);
     }
 
 }

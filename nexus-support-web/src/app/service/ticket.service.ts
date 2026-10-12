@@ -6,6 +6,8 @@ import { createPaginationOption, Page, Pagination } from '../core/model/request.
 import { ApiResponse } from '../core/model/response/api.response';
 import { PageTicket, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
+import { CreateTicketRequest } from '../core/model/request/create-ticket.request';
+import { getFormData } from '../shared/utils/request';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,10 @@ export class TicketService {
   ): Observable<ApiResponse<Page<PageTicket>>> {
     let params = createPaginationOption(pageRequest, filters);
     return this.http.get<ApiResponse<Page<PageTicket>>>(`${this.server}/ticket/list`, { params });
+  }
+
+  public createTicket(formData: FormData): Observable<ApiResponse<string>> {
+    return this.http.post<ApiResponse<string>>(`${this.server}/ticket/create`, formData);
   }
 
   public getDashboardData(): any {

@@ -18,8 +18,22 @@ import { TicketStore } from '../../store/ticket.store';
 })
 export class Layout {
   private authService = inject(AuthService);
+  private ticketStore = inject(TicketStore);
+  private readonly toast = inject(HotToastService);
   private storage = inject(StorageService);
   private router = inject(Router);
+
+  constructor() {
+    effect(() => {
+      const errorTicketStore = this.ticketStore.ticketStoreError();
+      console.log(errorTicketStore);
+      if (errorTicketStore) {
+        const message =
+          errorTicketStore.message || errorTicketStore.error.detail || errorTicketStore.error;
+        this.toast.error(message);
+      }
+    });
+  }
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
