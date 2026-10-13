@@ -12,6 +12,7 @@ import { TicketStore } from '../../../store/ticket.store';
 import { TicketCard } from './ticket-card/ticket-card';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { CommonModule } from '@angular/common';
+import { defaultTicketQueryFilter } from '../../../core/model/request/query-request';
 
 @Component({
   selector: 'app-tickets',
@@ -34,6 +35,8 @@ export class Tickets {
   protected readonly ticketStatusLabel = TicketStatusLabel;
   protected readonly ticketPriorityLabel = TicketPriorityLabel;
 
+  private readonly defaultTicketQueryFilter = defaultTicketQueryFilter;
+
   ngOnInit(): void {
     this.listenToQueryParams();
     this.listenToFilterChanges();
@@ -55,7 +58,13 @@ export class Tickets {
   onResetFilters = () => {
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: { page: 1, size: 10, status: 'all', type: 'all', filter: undefined },
+      queryParams: {
+        page: this.defaultTicketQueryFilter.pageRequest.page,
+        size: this.defaultTicketQueryFilter.pageRequest.size,
+        status: 'all',
+        type: 'all',
+        filter: undefined,
+      },
       queryParamsHandling: 'merge',
     });
   };

@@ -97,8 +97,8 @@ public class TicketQueryRepository {
                    .param("ticketPublicId", TicketUtils.randomUUID.get())
                    .param("description", request.description())
                    .param("title", request.title())
-                   .param("type", request.type())
-                   .param("priority", request.priority())
+                   .param("type", request.type().getValue())
+                   .param("priority", request.priority().getValue())
                    .param("status", status.getValue())
                    .param("userPublicId", userPublicId)
                    .query(UUID.class)
@@ -352,5 +352,13 @@ public class TicketQueryRepository {
                    ))
                    .list();
 
+    }
+
+    public PageTicketDTO getUserTicketByTicketPublicId(UUID userPublicId, UUID ticketPublicId) {
+        return jdbc.sql(SELECT_TICKET_BY_ISSUER_PUBLIC_ID_AND_TICKET_PUBLIC_ID_QUERY)
+                   .param("userPublicId", userPublicId)
+                   .param("ticketPublicId", ticketPublicId)
+                   .query(PageTicketDTO.class)
+                   .single();
     }
 }

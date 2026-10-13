@@ -192,7 +192,7 @@ public class TicketQuery {
             """;
 
     public static final String INSERT_FILE_TICKET_QUERY = """
-            INSERT INTO files f (
+            INSERT INTO files (
                 file_public_id,
                 ticket_id,
                 extension,
@@ -380,5 +380,36 @@ public class TicketQuery {
             WHERE t.task_public_id = :taskPublicId
             AND t.assignee_id = u.user_id
             AND u.user_public_id = :userPublicId
+            """;
+
+    public static final String SELECT_TICKET_BY_ISSUER_PUBLIC_ID_AND_TICKET_PUBLIC_ID_QUERY = """
+            SELECT
+            (
+                SELECT COUNT(*)
+                FROM comments c
+                WHERE c.ticket_id = t.ticket_id
+                ) AS comment_count,
+                (
+                SELECT COUNT(*)
+                FROM files f
+                WHERE f.ticket_id = t.ticket_id
+                ) AS file_count,
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            WHERE u.user_public_id = :userPublicId
+            AND t.ticket_public_id = :ticketPublicId
             """;
 }

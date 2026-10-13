@@ -67,21 +67,18 @@ export const TicketStore = signalStore(
     ),
     createTicket: rxMethod<FormData>(
       pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
+        tap(() => patchState(store, { error: null })),
         exhaustMap((formData) =>
           ticketService.createTicket(formData).pipe(
             tapResponse({
               next: (response) => {
                 patchState(store, {
-                  loading: false,
-                  lastCreatedticketPublicId: response.data,
                   ticketCreated: true,
+                  tickets: [response.data, ...store.tickets()],
                 });
-                console.log(store.lastCreatedticketPublicId);
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, {
-                  loading: false,
                   error: error.error,
                 });
               },

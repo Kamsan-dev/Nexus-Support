@@ -56,15 +56,15 @@ public class TicketResource {
         ));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<ApiResponse<UUID>> createTicket(@NotNull Authentication authentication,
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<PageTicketDTO>> createTicket(@NotNull Authentication authentication,
                                                           @RequestPart @Valid CreateTicketDTO payload,
                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files) {
-        UUID ticketPublicId = this.ticketService.createTicket(UUID.fromString(authentication.getName()),
+        PageTicketDTO ticket = this.ticketService.createTicket(UUID.fromString(authentication.getName()),
                 payload,
                 files);
-        return ResponseEntity.created(getUri(ticketPublicId)).body(getResponse(
-                ticketPublicId,
+        return ResponseEntity.created(getUri(ticket.ticketPublicId())).body(getResponse(
+                ticket,
                 "Ticket created successfully.",
                 HttpStatus.CREATED
         ));

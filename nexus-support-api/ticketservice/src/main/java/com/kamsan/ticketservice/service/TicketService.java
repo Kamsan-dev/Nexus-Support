@@ -13,7 +13,7 @@ public interface TicketService {
 
     Page<PageTicketDTO> getTickets(UUID userPublicId, PageTicketRequestDTO request);
 
-    UUID createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO, List<MultipartFile> files);
+    PageTicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO, List<MultipartFile> files);
 
     TicketDetailsDTO getUserTicket(UUID userPublicId, UUID ticketPublicId);
 

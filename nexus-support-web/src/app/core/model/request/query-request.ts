@@ -7,6 +7,6 @@ export interface QueryRequest<T extends object> {
 }
 
 export const defaultTicketQueryFilter: QueryRequest<TicketFilters> = {
-  pageRequest: { page: 0, size: 10, sort: [] },
+  pageRequest: { page: 0, size: 8, sort: [] },
   filters: {},
 };

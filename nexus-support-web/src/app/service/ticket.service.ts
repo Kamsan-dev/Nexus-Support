@@ -24,8 +24,8 @@ export class TicketService {
     return this.http.get<ApiResponse<Page<PageTicket>>>(`${this.server}/ticket/list`, { params });
   }
 
-  public createTicket(formData: FormData): Observable<ApiResponse<string>> {
-    return this.http.post<ApiResponse<string>>(`${this.server}/ticket/create`, formData);
+  public createTicket(formData: FormData): Observable<ApiResponse<PageTicket>> {
+    return this.http.post<ApiResponse<PageTicket>>(`${this.server}/ticket/create`, formData);
   }
 
   public getDashboardData(): any {

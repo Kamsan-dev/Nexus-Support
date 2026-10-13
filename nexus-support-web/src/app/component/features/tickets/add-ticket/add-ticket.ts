@@ -58,7 +58,7 @@ export class AddTicket {
       this.modalForm.markAllAsDirty;
       return;
     } else {
-      const formdata = createFormData('payload', this.modalForm.value, []);
+      const formdata = createFormData('payload', this.modalForm.value, this.filesToSave);
       this.ticketStore.createTicket(formdata);
       this.filesToSave = [];
       this.files.set([]);

@@ -72,20 +72,33 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional
-    public UUID createTicket(UUID userPublicId, CreateTicketDTO newTicket, List<MultipartFile> files) {
+    public PageTicketDTO createTicket(UUID userPublicId, CreateTicketDTO newTicket, List<MultipartFile> files) {
         UUID ticketPublicId = ticketQueryRepository.insertNewTicket(userPublicId, newTicket, TicketStatus.NEW);
         if (files != null && !files.isEmpty()) {
-            for (MultipartFile file : files) {
-                AttachmentDTO attachment = new AttachmentDTO(ticketPublicId,
-                        file.getOriginalFilename(),
-                        file.getSize(),
-                        byteCountToDisplaySize(file.getSize()),
-                        getExtension(file.getOriginalFilename()),
-                        getFileUri(file.getOriginalFilename()));
+            try {
+                for (MultipartFile file : files) {
+                    AttachmentDTO attachment = new AttachmentDTO(ticketPublicId,
+                            ticketPublicId + "_" + file.getOriginalFilename(),
+                            file.getSize(),
+                            byteCountToDisplaySize(file.getSize()),
+                            getExtension(file.getOriginalFilename()),
+                            getFileUri(file.getOriginalFilename()));
 
-                saveTicketFile(ticketPublicId, attachment);
+                    saveTicketFile(ticketPublicId, attachment);
+                    // Save bytes on R2 : TODO
+
+                    // saving locally
+                    var filename = cleanPath(ticketPublicId + "_" + file.getOriginalFilename());
+                    log.info("filename as clean path : {}", filename);
+                    var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
+                                                   .toAbsolutePath()
+                                                   .normalize();
+                    log.info("file storage URI : {}", fileStorageLocation);
+                    Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+                }
+            } catch (Exception ex){
+                throw new ApiException("Unable to upload files. Please try again later.");
             }
-            // Save bytes on R2
             ReadUserDTO user = userService.getUserByUUID(userPublicId);
             publisher.publishEvent(new Event(TICKET_CREATED,
                     Map.of("priority", newTicket.priority(),
@@ -94,7 +107,8 @@ public class TicketServiceImpl implements TicketService {
                             "name", capitalizeFully(user.firstName()),
                             "email", user.email())));
         }
-        return ticketPublicId;
+        return ticketQueryRepository.getUserTicketByTicketPublicId(userPublicId,
+                ticketPublicId);
     }
 
     @Override

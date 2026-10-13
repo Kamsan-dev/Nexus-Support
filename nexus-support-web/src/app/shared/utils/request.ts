@@ -1,5 +1,3 @@
-import { formatDate } from '@angular/common';
-
 export function getFormData(request: any, files: File[] | null): FormData {
   const formData = new FormData();
   for (const property in request) {
@@ -15,7 +13,12 @@ export function getFormData(request: any, files: File[] | null): FormData {
 
 export function createFormData(nameRequest: string, request: any, files: File[] | null): FormData {
   const formData = new FormData();
-  formData.append(nameRequest, request);
+  formData.append(
+    nameRequest,
+    new Blob([JSON.stringify(request)], {
+      type: 'application/json',
+    }),
+  );
   if (files && files.length > 0) {
     for (let i = 0; i < files.length; i++) {
       formData.append('files', files[i], files[i].name);

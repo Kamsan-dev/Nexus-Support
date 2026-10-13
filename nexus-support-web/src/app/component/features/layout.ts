@@ -26,7 +26,6 @@ export class Layout {
   constructor() {
     effect(() => {
       const errorTicketStore = this.ticketStore.ticketStoreError();
-      console.log(errorTicketStore);
       if (errorTicketStore) {
         const message =
           errorTicketStore.message || errorTicketStore.error.detail || errorTicketStore.error;
