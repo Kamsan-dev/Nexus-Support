@@ -5,9 +5,10 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { delay, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { defaultTicketQueryFilter, QueryRequest } from '../core/model/request/query-request';
-import { PageTicket, TicketFilters } from '../core/model/ticket.model';
+import { PageTicket, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { TicketService } from '../service/ticket.service';
-import { CreateTicketRequest } from '../core/model/request/create-ticket.request';
+import { User } from '../core/model/user.model';
+import { TicketDetail } from '../component/features/tickets/ticket-detail/ticket-detail';
 
 interface TicketState {
   loading: boolean;
@@ -16,8 +17,10 @@ interface TicketState {
   currentPage: number;
   query: QueryRequest<TicketFilters>;
   totalPages: number;
+  totalTickets: number;
   lastCreatedticketPublicId: string | undefined;
   ticketCreated: boolean;
+  ticket: Ticket | undefined;
 }
 
 const initialTicketState: TicketState = {
@@ -27,8 +30,10 @@ const initialTicketState: TicketState = {
   currentPage: 0,
   query: defaultTicketQueryFilter,
   totalPages: 0,
+  totalTickets: 0,
   lastCreatedticketPublicId: undefined,
   ticketCreated: false,
+  ticket: undefined,
 };
 
 export const TicketStore = signalStore(
@@ -52,12 +57,13 @@ export const TicketStore = signalStore(
                   query: { pageRequest, filters },
                   currentPage: response.data.pageable.pageNumber,
                   totalPages: response.data.totalPages,
+                  totalTickets: response.data.totalElements,
                 });
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, {
                   loading: false,
-                  error: error.error,
+                  error: error,
                 });
               },
             }),
@@ -79,7 +85,31 @@ export const TicketStore = signalStore(
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, {
-                  error: error.error,
+                  error: error,
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    getTicket: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, { loading: true, error: null, ticket: undefined })),
+        delay(1000),
+        switchMap((ticketPublicId) =>
+          ticketService.getTicket(ticketPublicId).pipe(
+            tapResponse({
+              next: (response) => {
+                patchState(store, {
+                  loading: false,
+                  ticket: response.data,
+                });
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, {
+                  loading: false,
+                  error: error,
                 });
               },
             }),
@@ -92,13 +122,16 @@ export const TicketStore = signalStore(
     },
   })),
   withComputed((store) => ({
-    countTickets: computed(() => store.tickets().length),
+    countTickets: computed(() => store.totalTickets()),
     statusQuery: computed(() => store.query()?.filters?.status),
     typeQuery: computed(() => store.query()?.filters?.type),
-    currentQuery: computed(() => store.query),
+    currentQuery: computed(() => store.query()),
     searchTermQuery: computed(() => store.query()?.filters?.filter),
     ticketStoreError: computed(() => store.error()),
     pagesTotal: computed(() => store.totalPages()),
     ticketCreated: computed(() => store.ticketCreated()),
+    issuerTicket: computed(() => store.ticket()?.issuerTicket),
+    ticketDetail: computed(() => store.ticket()?.ticket),
+    currentTicket: computed(() => store.ticket()),
   })),
 );

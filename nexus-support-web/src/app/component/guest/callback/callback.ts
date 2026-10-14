@@ -27,15 +27,12 @@ export class Callback {
   private async authenticate(): Promise<void> {
     const state = this.activatedRoute.snapshot.queryParamMap.get('state') ?? null;
     const code = this.activatedRoute.snapshot.queryParamMap.get('code') ?? null;
-    console.log(state);
-    console.log(code);
     this.loading.set(true);
     if (!state || !code) {
       this.toastService.error('Unable to authenticate');
     } else {
       try {
         await this.authService.handleCallback(code, state);
-        console.log('waiting to be redirecting');
         this.router.navigate(['/app/dashboard']);
       } catch (error) {
         this.toastService.error('Unable to authenticate');

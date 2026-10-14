@@ -15,7 +15,7 @@ public interface TicketService {
 
     PageTicketDTO createTicket(UUID userPublicId, CreateTicketDTO createTicketDTO, List<MultipartFile> files);
 
-    TicketDetailsDTO getUserTicket(UUID userPublicId, UUID ticketPublicId);
+    TicketDetailsDTO getUserTicket(UUID ticketPublicId);
 
     List<CommentDTO> getTicketComments(UUID ticketPublicId);
 

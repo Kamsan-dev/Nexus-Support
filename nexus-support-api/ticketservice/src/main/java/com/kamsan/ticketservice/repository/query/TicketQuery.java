@@ -85,37 +85,14 @@ public class TicketQuery {
             JOIN priorities p ON p.priority = :priority
             JOIN types typ ON typ.type = :type
             WHERE u.user_public_id = :userPublicId
-            RETURNING ticket_public_id;
+            RETURNING *
             """;
 
-    public static final String SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY = """
+    public static final String SELECT_TICKET_BY_TICKET_PUBLIC_ID_QUERY = """
             SELECT
                  t.ticket_public_id,
                  a.user_public_id AS assignee_public_id,
-                 t.title,
-                 t.description,
-                 t.progress,
-                 t.due_date,
-                 t.created_at,
-                 t.updated_at,
-                 s.status,
-                 typ.type,
-                 pr.priority
-             FROM tickets t
-             JOIN users u ON u.user_id = t.issuer_id
-             LEFT JOIN users a ON a.user_id = t.assignee_id
-             JOIN statuses s ON s.status_id = t.status_id
-             JOIN types typ ON typ.type_id = t.type_id
-             JOIN priorities pr ON pr.priority_id = t.priority_id
-             WHERE u.user_public_id = :userPublicId
-             AND t.ticket_public_id = :ticketPublicId
-            """;
-
-    public static final String SELECT_TICKET_BY_PUBLIC_ID_QUERY = """
-            SELECT
-                 t.ticket_public_id,
                  u.user_public_id AS issuer_public_id,
-                 a.user_public_id AS assignee_public_id,
                  t.title,
                  t.description,
                  t.progress,
@@ -148,7 +125,7 @@ public class TicketQuery {
             FROM comments c
             JOIN tickets t ON t.ticket_id = c.ticket_id
             JOIN users u ON c.user_id = u.user_id
-            WHERE t.ticket_public_id = :ticketPublic
+            WHERE t.ticket_public_id = :ticketPublicId
             ORDER BY c.created_at DESC
             """;
 
@@ -164,12 +141,12 @@ public class TicketQuery {
                 a.user_public_id AS assignee_public_id,
                 a.first_name,
                 a.last_name,
-                a.image_url,
+                a.image_url
             FROM tasks ta
             JOIN tickets t ON t.ticket_id = ta.ticket_id
             LEFT JOIN users a ON a.user_id = ta.assignee_id
             JOIN statuses s ON s.status_id = ta.status_id
-            WHERE t.ticket_public_id = :ticketPublic
+            WHERE t.ticket_public_id = :ticketPublicId
             ORDER BY ta.created_at DESC
             """;
 

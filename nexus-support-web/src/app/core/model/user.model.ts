@@ -1,4 +1,4 @@
-import { Role } from '../../enum/role';
+import { RoleEnum } from '../../enum/role';
 
 export interface User {
   userPublicId: string;
@@ -15,7 +15,7 @@ export interface User {
   lastLogin: string;
   createdAt: string;
   updatedAt: string;
-  role: Role;
+  role: RoleEnum;
   authorities: string;
   isAccountExpired: boolean;
   isAccountLocked: boolean;

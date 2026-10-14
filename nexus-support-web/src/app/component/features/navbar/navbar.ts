@@ -33,6 +33,10 @@ export class Navbar {
   isNavOpen = signal(false);
   isMenuOpen = signal(false);
 
+  ngOnInit(): void {
+    this.authStore.loadProfile();
+  }
+
   toggleNav = () => {
     this.isNavOpen.update(() => !this.isNavOpen());
   };

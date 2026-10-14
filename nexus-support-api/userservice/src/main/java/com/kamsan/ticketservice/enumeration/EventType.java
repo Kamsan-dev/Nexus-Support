@@ -1,5 +1,0 @@
-package com.kamsan.ticketservice.enumeration;
-
-public enum EventType {
-    USER_CREATED, ACCOUNT_VERIFIED, REGISTRATION, RESET_PASSWORD
-}

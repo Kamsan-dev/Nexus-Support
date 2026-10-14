@@ -7,6 +7,7 @@ import com.kamsan.ticketservice.enumeration.TicketType;
 import com.kamsan.ticketservice.model.Attachment;
 import com.kamsan.ticketservice.utils.TicketUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +42,9 @@ public class TicketQueryRepository {
                            rs.getString("title"),
                            rs.getString("description"),
                            rs.getInt("progress"),
-                           rs.getString("status"),
-                           rs.getString("priority"),
-                           rs.getString("type"),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
                            rs.getObject("due_date", OffsetDateTime.class),
                            rs.getInt("file_count"),
                            rs.getInt("comment_count")
@@ -69,9 +70,9 @@ public class TicketQueryRepository {
                            rs.getString("title"),
                            rs.getString("description"),
                            rs.getInt("progress"),
-                           rs.getString("status"),
-                           rs.getString("priority"),
-                           rs.getString("type"),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
                            rs.getObject("due_date", OffsetDateTime.class),
                            rs.getInt("file_count"),
                            rs.getInt("comment_count")
@@ -92,7 +93,7 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public UUID insertNewTicket(UUID userPublicId, CreateTicketDTO request, TicketStatus status) {
+    public PageTicketDTO insertNewTicket(UUID userPublicId, CreateTicketDTO request, TicketStatus status) {
         return jdbc.sql(INSERT_TICKET_QUERY)
                    .param("ticketPublicId", TicketUtils.randomUUID.get())
                    .param("description", request.description())
@@ -101,33 +102,12 @@ public class TicketQueryRepository {
                    .param("priority", request.priority().getValue())
                    .param("status", status.getValue())
                    .param("userPublicId", userPublicId)
-                   .query(UUID.class)
-                   .single();
-    }
-
-    public TicketDetailsDTO findByUserPublicIdAndTicketPublicId(UUID userPublicId, UUID ticketPublicId) {
-        return jdbc.sql(SELECT_TICKET_BY_USER_AND_TICKET_PUBLIC_ID_QUERY)
-                   .param("ticketPublicId", ticketPublicId)
-                   .param("userPublicId", userPublicId)
-                   .query((rs, rowNum) -> new TicketDetailsDTO(
-                           rs.getObject("created_at", OffsetDateTime.class),
-                           rs.getObject("updated_at", OffsetDateTime.class),
-                           rs.getObject("ticket_public_id", UUID.class),
-                           userPublicId,
-                           rs.getObject("assignee_public_id", UUID.class),
-                           rs.getString("title"),
-                           rs.getString("description"),
-                           rs.getInt("progress"),
-                           rs.getObject("status", TicketStatus.class),
-                           rs.getObject("priority", TicketPriority.class),
-                           rs.getObject("type", TicketType.class),
-                           rs.getObject("due_date", OffsetDateTime.class)
-                   ))
+                   .query(PageTicketDTO.class)
                    .single();
     }
 
     public TicketDetailsDTO findByTicketPublicId(UUID ticketPublicId) {
-        return jdbc.sql(SELECT_TICKET_BY_PUBLIC_ID_QUERY)
+        return jdbc.sql(SELECT_TICKET_BY_TICKET_PUBLIC_ID_QUERY)
                    .param("ticketPublicId", ticketPublicId)
                    .query((rs, rowNum) -> new TicketDetailsDTO(
                            rs.getObject("created_at", OffsetDateTime.class),
@@ -138,9 +118,9 @@ public class TicketQueryRepository {
                            rs.getString("title"),
                            rs.getString("description"),
                            rs.getInt("progress"),
-                           rs.getObject("status", TicketStatus.class),
-                           rs.getObject("priority", TicketPriority.class),
-                           rs.getObject("type", TicketType.class),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
                            rs.getObject("due_date", OffsetDateTime.class)
                    ))
                    .single();
@@ -174,7 +154,7 @@ public class TicketQueryRepository {
                            rs.getString("name"),
                            rs.getString("description"),
                            rs.getObject("due_date", OffsetDateTime.class),
-                           rs.getObject("status", TicketStatus.class),
+                           TicketStatus.valueOf(rs.getString("status")),
                            rs.getString("first_name"),
                            rs.getString("last_name"),
                            rs.getString("image_url"),
@@ -278,7 +258,7 @@ public class TicketQueryRepository {
                            rs.getString("name"),
                            rs.getString("description"),
                            rs.getObject("due_date", OffsetDateTime.class),
-                           rs.getObject("status", TicketStatus.class),
+                           TicketStatus.valueOf(rs.getString("status")),
                            rs.getString("first_name"),
                            rs.getString("last_name"),
                            rs.getString("image_url"),
@@ -319,9 +299,9 @@ public class TicketQueryRepository {
                            rs.getObject("ticket_public_id", UUID.class),
                            rs.getString("title"),
                            rs.getString("description"),
-                           rs.getObject("status", TicketStatus.class),
-                           rs.getObject("priority", TicketPriority.class),
-                           rs.getObject("type", TicketType.class),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
                            rs.getObject("due_date", OffsetDateTime.class),
                            rs.getObject("created_at", OffsetDateTime.class),
                            rs.getObject("updated_at", OffsetDateTime.class)
@@ -343,9 +323,9 @@ public class TicketQueryRepository {
                            rs.getObject("ticket_public_id", UUID.class),
                            rs.getString("title"),
                            rs.getString("description"),
-                           rs.getObject("status", TicketStatus.class),
-                           rs.getObject("priority", TicketPriority.class),
-                           rs.getObject("type", TicketType.class),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
                            rs.getObject("due_date", OffsetDateTime.class),
                            rs.getObject("created_at", OffsetDateTime.class),
                            rs.getObject("updated_at", OffsetDateTime.class)

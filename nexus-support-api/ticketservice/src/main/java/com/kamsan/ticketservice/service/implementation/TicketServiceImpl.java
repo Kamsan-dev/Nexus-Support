@@ -73,22 +73,22 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional
     public PageTicketDTO createTicket(UUID userPublicId, CreateTicketDTO newTicket, List<MultipartFile> files) {
-        UUID ticketPublicId = ticketQueryRepository.insertNewTicket(userPublicId, newTicket, TicketStatus.NEW);
+        PageTicketDTO ticket = ticketQueryRepository.insertNewTicket(userPublicId, newTicket, TicketStatus.NEW);
         if (files != null && !files.isEmpty()) {
             try {
                 for (MultipartFile file : files) {
-                    AttachmentDTO attachment = new AttachmentDTO(ticketPublicId,
-                            ticketPublicId + "_" + file.getOriginalFilename(),
+                    AttachmentDTO attachment = new AttachmentDTO(ticket.getTicketPublicId(),
+                            ticket.getTicketPublicId() + "_" + file.getOriginalFilename(),
                             file.getSize(),
                             byteCountToDisplaySize(file.getSize()),
                             getExtension(file.getOriginalFilename()),
                             getFileUri(file.getOriginalFilename()));
 
-                    saveTicketFile(ticketPublicId, attachment);
+                    saveTicketFile(ticket.getTicketPublicId(), attachment);
                     // Save bytes on R2 : TODO
 
                     // saving locally
-                    var filename = cleanPath(ticketPublicId + "_" + file.getOriginalFilename());
+                    var filename = cleanPath(ticket.getTicketPublicId() + "_" + file.getOriginalFilename());
                     log.info("filename as clean path : {}", filename);
                     var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
                                                    .toAbsolutePath()
@@ -96,19 +96,27 @@ public class TicketServiceImpl implements TicketService {
                     log.info("file storage URI : {}", fileStorageLocation);
                     Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
                 }
+
+                ticket.setFileCount(files.size());
+
             } catch (Exception ex){
                 throw new ApiException("Unable to upload files. Please try again later.");
             }
-            ReadUserDTO user = userService.getUserByUUID(userPublicId);
-            publisher.publishEvent(new Event(TICKET_CREATED,
-                    Map.of("priority", newTicket.priority(),
-                            "ticketTitle", newTicket.title(),
-                            "ticketNumber", ticketPublicId,
-                            "name", capitalizeFully(user.firstName()),
-                            "email", user.email())));
         }
-        return ticketQueryRepository.getUserTicketByTicketPublicId(userPublicId,
-                ticketPublicId);
+//        ReadUserDTO user = userService.getUserByUUID(userPublicId);
+//        publisher.publishEvent(new Event(TICKET_CREATED,
+//                Map.of("priority", newTicket.priority(),
+//                        "ticketTitle", newTicket.title(),
+//                        "ticketNumber", ticket.getTicketPublicId(),
+//                        "name", capitalizeFully(user.firstName()),
+//                        "email", user.email())));
+
+        ticket.setStatus(TicketStatus.NEW);
+        ticket.setPriority(newTicket.priority());
+        ticket.setType(newTicket.type());
+        ticket.setCommentCount(0);
+
+        return ticket;
     }
 
     @Override
@@ -122,8 +130,8 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional(readOnly = true)
-    public TicketDetailsDTO getUserTicket(UUID userPublicId, UUID ticketPublicId) {
-        return ticketQueryRepository.findByUserPublicIdAndTicketPublicId(userPublicId, ticketPublicId);
+    public TicketDetailsDTO getUserTicket(UUID ticketPublicId) {
+        return ticketQueryRepository.findByTicketPublicId(ticketPublicId);
     }
 
     @Override
@@ -147,8 +155,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
-        TicketDetailsDTO ticket = ticketQueryRepository.findByUserPublicIdAndTicketPublicId(userPublicId,
-                createCommentDTO.ticketPublicId());
+        TicketDetailsDTO ticket = ticketQueryRepository.findByTicketPublicId(createCommentDTO.ticketPublicId());
         ReadUserDTO user = userService.getUserByUUID(userPublicId);
         // Only an elevated user or the issuer of the given ticket can post a comment
         if (!hasElevatedPermissions(user.role()) || !userPublicId.equals(ticket.issuerPublicId())) {

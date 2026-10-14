@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
 import { ApiResponse } from '../core/model/response/api.response';
-import { PageTicket, TicketFilters } from '../core/model/ticket.model';
+import { PageTicket, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
 import { CreateTicketRequest } from '../core/model/request/create-ticket.request';
 import { getFormData } from '../shared/utils/request';
@@ -26,6 +26,10 @@ export class TicketService {
 
   public createTicket(formData: FormData): Observable<ApiResponse<PageTicket>> {
     return this.http.post<ApiResponse<PageTicket>>(`${this.server}/ticket/create`, formData);
+  }
+
+  public getTicket(ticketPublicId: string): Observable<ApiResponse<Ticket>> {
+    return this.http.get<ApiResponse<Ticket>>(`${this.server}/ticket/${ticketPublicId}`);
   }
 
   public getDashboardData(): any {

@@ -63,7 +63,7 @@ public class TicketResource {
         PageTicketDTO ticket = this.ticketService.createTicket(UUID.fromString(authentication.getName()),
                 payload,
                 files);
-        return ResponseEntity.created(getUri(ticket.ticketPublicId())).body(getResponse(
+        return ResponseEntity.created(getUri(ticket.getTicketPublicId())).body(getResponse(
                 ticket,
                 "Ticket created successfully.",
                 HttpStatus.CREATED
@@ -73,14 +73,13 @@ public class TicketResource {
     @GetMapping("/{ticketPublicId}")
     public ResponseEntity<ApiResponse<TicketDTO>> getTicket(@NotNull Authentication authentication,
                                                             @PathVariable("ticketPublicId") UUID ticketPublicId) {
-        TicketDetailsDTO userTicket = ticketService.getUserTicket(UUID.fromString(authentication.getName()),
-                ticketPublicId);
-        List<CommentDTO> ticketComments = ticketService.getTicketComments(UUID.fromString(authentication.getName()));
+        TicketDetailsDTO userTicket = ticketService.getUserTicket(ticketPublicId);
+        List<CommentDTO> ticketComments = ticketService.getTicketComments(ticketPublicId);
         List<AttachmentDTO> ticketFiles = ticketService.getTicketFiles(ticketPublicId);
         List<TaskDTO> ticketTasks = ticketService.getTicketTasks(ticketPublicId);
         List<TicketUserDTO> techSupports = userService.getTechSupports();
         TicketUserDTO assignee = userService.getAssignee(ticketPublicId);
-        ReadUserDTO connectedUser = userService.getUserByUUID(UUID.fromString(authentication.getName()));
+        ReadUserDTO issuerTicket = userService.getUserByUUID(userTicket.issuerPublicId());
 
         return ResponseEntity.ok().body(getResponse(
                 new TicketDTO(userTicket,
@@ -89,7 +88,7 @@ public class TicketResource {
                         ticketTasks,
                         techSupports,
                         assignee,
-                        connectedUser),
+                        issuerTicket),
                 "Ticket retrieved.",
                 HttpStatus.OK
         ));

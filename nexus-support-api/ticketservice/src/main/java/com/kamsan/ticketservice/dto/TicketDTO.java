@@ -8,5 +8,5 @@ public record TicketDTO(TicketDetailsDTO ticket,
                         List<TaskDTO> tasks,
                         List<TicketUserDTO> techSupports,
                         TicketUserDTO assignee,
-                        ReadUserDTO connectedUser) {
+                        ReadUserDTO issuerTicket) {
 }

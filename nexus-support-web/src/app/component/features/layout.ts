@@ -1,13 +1,11 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { AuthService } from '../../auth/auth.service';
 import { StorageService } from '../../service/storage.service';
+import { TicketStore } from '../../store/ticket.store';
 import { Footer } from './footer/footer';
 import { Navbar } from './navbar/navbar';
-import { AuthStore } from '../../store/auth.store';
-import { AuthService } from '../../auth/auth.service';
-import { TicketStore } from '../../store/ticket.store';
 
 @Component({
   selector: 'app-layout',
@@ -27,8 +25,7 @@ export class Layout {
     effect(() => {
       const errorTicketStore = this.ticketStore.ticketStoreError();
       if (errorTicketStore) {
-        const message =
-          errorTicketStore.message || errorTicketStore.error.detail || errorTicketStore.error;
+        const message = errorTicketStore.error.detail || errorTicketStore.message;
         this.toast.error(message);
       }
     });
