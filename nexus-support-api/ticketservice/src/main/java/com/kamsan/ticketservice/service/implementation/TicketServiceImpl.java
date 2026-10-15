@@ -11,6 +11,7 @@ import com.kamsan.ticketservice.repository.TicketQueryRepository;
 import com.kamsan.ticketservice.service.TicketService;
 import com.kamsan.ticketservice.service.UserService;
 import com.kamsan.ticketservice.sharedkernel.exception.ApiException;
+import com.kamsan.ticketservice.utils.DateFormatter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -124,7 +125,7 @@ public class TicketServiceImpl implements TicketService {
         if (!updateTicketDTO.issuerPublicId().equals(userPublicId)) {
             throw new ApiException("You can not update a ticket that does not belong to you.");
         }
-        int update = this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO);
+        int update = this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO, DateFormatter.toOffsetDateTime(updateTicketDTO.dueDate()));
         if (update == 0) throw new ApiException("Ticket not found or not authorized");
     }
 

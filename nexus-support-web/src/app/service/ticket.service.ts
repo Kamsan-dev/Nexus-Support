@@ -3,11 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
+import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 import { ApiResponse } from '../core/model/response/api.response';
 import { PageTicket, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
-import { CreateTicketRequest } from '../core/model/request/create-ticket.request';
-import { getFormData } from '../shared/utils/request';
 
 @Injectable({
   providedIn: 'root',
@@ -30,6 +29,10 @@ export class TicketService {
 
   public getTicket(ticketPublicId: string): Observable<ApiResponse<Ticket>> {
     return this.http.get<ApiResponse<Ticket>>(`${this.server}/ticket/${ticketPublicId}`);
+  }
+
+  public updateTicket(request: UpdateTicketRequest): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>(`${this.server}/ticket/update`, request);
   }
 
   public getDashboardData(): any {

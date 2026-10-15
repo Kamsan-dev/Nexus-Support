@@ -16,11 +16,18 @@ import {
   TicketStatusLabel,
 } from '../../../../enum/ticket-status';
 import { AuthStore } from '../../../../store/auth.store';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+} from '@angular/forms';
 import { TicketDetails } from '../../../../core/model/ticket.model';
 import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -34,6 +41,7 @@ export class TicketDetail {
   protected readonly authStore = inject(AuthStore);
   private activatedRoute = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
+  private toastService = inject(HotToastService);
   protected readonly ticketTypeLabel = TicketTypeLabel;
   protected readonly ticketPriorityLabel = TicketPriorityLabel;
   protected readonly ticketStatusLabel = TicketStatusLabel;
@@ -51,14 +59,12 @@ export class TicketDetail {
 
   //form
   ticketForm!: FormGroup;
+  initialTicket!: TicketDetails;
 
   constructor() {
     effect(() => {
-      const ticket = this.ticketStore.ticketDetail();
-      if (ticket && !this.ticketForm) {
-        this.initTicketForm(ticket);
-        console.log(ticket);
-      }
+      this.initFormAfterTicketLoading();
+      this.listenToUpdateTicket();
     });
   }
 
@@ -72,10 +78,28 @@ export class TicketDetail {
   onEditTicketFormClick = (event: MouseEvent | TouchEvent, type: 'edit' | 'cancel'): void => {
     event.stopImmediatePropagation();
     if (type === 'edit') this.ticketForm.enable();
-    else this.ticketForm.disable();
+    else {
+      this.initTicketForm(this?.initialTicket);
+    }
+  };
+
+  onTicketFormSubmitClick = (event: MouseEvent | TouchEvent): void => {
+    event.stopImmediatePropagation();
+    if (this.ticketForm.invalid) {
+      this.ticketForm.markAllAsDirty();
+      return;
+    } else {
+      console.log(this.ticketForm.value);
+      this.ticketStore.updateTicket({
+        ticketPublicId: this.ticket()!.ticketPublicId,
+        issuerPublicId: this.ticket()!.issuerPublicId,
+        ...this.ticketForm.value,
+      });
+    }
   };
 
   private initTicketForm(ticket: TicketDetails): void {
+    this.initialTicket = ticket;
     this.ticketForm = this.fb.group({
       title: [ticket.title, Validators.required],
       description: [ticket.description, Validators.required],
@@ -89,5 +113,24 @@ export class TicketDetail {
       ],
     });
     this.ticketForm.disable();
+  }
+
+  private initFormAfterTicketLoading(): void {
+    const ticket = this.ticketStore.ticketDetail();
+    if (ticket && !this.ticketForm) {
+      this.initTicketForm(ticket);
+    }
+  }
+
+  private listenToUpdateTicket(): void {
+    if (this.ticketStore.ticketUpdated()) {
+      this.toastService.success('Ticket modifié avec succès !');
+      this.ticketStore.resetTicketUpdated();
+      this.ticketForm.disable();
+    }
+  }
+
+  get f(): { [key: string]: AbstractControl } {
+    return this.ticketForm.controls;
   }
 }

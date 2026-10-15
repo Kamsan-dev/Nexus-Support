@@ -222,15 +222,15 @@ public class TicketQueryRepository {
                    .update();
     }
 
-    public int updateTicket(UUID userPublicId, UpdateTicketDTO request) {
+    public int updateTicket(UUID userPublicId, UpdateTicketDTO request, OffsetDateTime dueDate) {
         return jdbc.sql(UPDATE_TICKET_QUERY)
                    .param("ticketPublicId", request.ticketPublicId())
                    .param("title", request.title())
                    .param("description", request.description())
-                   .param("type", request.type())
-                   .param("status", request.status())
-                   .param("priority", request.priority())
-                   .param("dueDate", request.dueDate())
+                   .param("type", request.type().getValue(), Types.VARCHAR)
+                   .param("status", request.status().getValue(), Types.VARCHAR)
+                   .param("priority", request.priority().getValue(), Types.VARCHAR)
+                   .param("dueDate", dueDate)
                    .param("progress", request.progress())
                    .param("userPublicId", userPublicId)
                    .update();

@@ -142,12 +142,17 @@
               </h5>
               <button
                 (click)="onEditTicketFormClick($event, 'edit')"
-                class="text-blue-700 border border-solid border-gray-200 hover:bg-gray-200 font-medium rounded-lg p-2"
+                [disabled]="this.ticketForm.enabled"
+                class="disabled:text-gray-300 disabled:cursor-auto cursor-pointer text-blue-700 border border-solid border-gray-200 hover:bg-gray-200 font-medium rounded-lg p-2"
               >
                 <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
               </button>
             </div>
-            <form class="flex flex-col gap-4 pt-4" [formGroup]="ticketForm" (ngSubmit)="(null)">
+            <form
+              class="flex flex-col gap-4 pt-4"
+              [formGroup]="ticketForm"
+              (ngSubmit)="onTicketFormSubmitClick($event)"
+            >
               <input type="hidden" name="ticketUuid" required />
               <div class="relative">
                 <label class="flex items-center mb-2 text-gray-600 text-sm font-medium"> Title </label>
@@ -155,21 +160,33 @@
                   type="text"
                   autocomplete="off"
                   name="title"
-                  class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+                  [ngClass]="[f['title'].invalid && f['title'].dirty ? 'border-red-500' : 'border-gray-200']"
+                  class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
                   placeholder="Ticket title"
                   formControlName="title"
                 />
+                @if (f['title'].invalid && f['title'].dirty) {
+                  <div class="mt-2 font-normal text-red-500">Title is required</div>
+                }
               </div>
               <div class="relative">
-                <label class="flex items-center mb-2 text-gray-600 text-sm font-medium" for="bio"> Description </label>
+                <label class="flex items-center mb-2 text-gray-600 text-sm font-medium" for="description">
+                  Description
+                </label>
                 <textarea
                   name="description"
                   formControlName="description"
                   placeholder="Ticket description"
+                  [ngClass]="[
+                    f['description'].invalid && f['description'].dirty ? 'border-red-500' : 'border-gray-200',
+                  ]"
                   cols=""
                   [rows]="5"
-                  class="disabled:bg-gray-100 disabled:border-none text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border border-gray-300 p-2 w-full"
+                  class="disabled:bg-gray-100 disabled:border-none text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border p-2 w-full"
                 ></textarea>
+                @if (f['description'].invalid && f['description'].dirty) {
+                  <div class="mt-2 font-normal text-red-500">A description is required</div>
+                }
               </div>
               <div class="flex flex-col md:flex-row items-start gap-3">
                 <div class="block w-full md:w-1/2">
@@ -240,9 +257,13 @@
                   <input
                     type="number"
                     name="progress"
+                    [ngClass]="[f['progress'].invalid && f['progress'].dirty ? 'border-red-500' : 'border-gray-200']"
                     formControlName="progress"
-                    class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+                    class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
                   />
+                  @if (f['progress'].invalid && f['progress'].dirty) {
+                    <div class="mt-2 font-normal text-red-500">A valid progress value is required</div>
+                  }
                 </div>
                 <div class="block w-full md:w-1/2">
                   <label for="countries" class="mb-2 text-sm font-medium text-gray-600 w-full flex items-center">
@@ -250,7 +271,7 @@
                   </label>
                   <input
                     type="text"
-                    [value]="ticket()?.createdAt | date: 'mediumDate'"
+                    [value]="ticket()?.createdAt | date: 'd MMMM y'"
                     name="createdAt"
                     disabled
                     autocomplete="off"
@@ -263,13 +284,15 @@
                 <button
                   (click)="onEditTicketFormClick($event, 'cancel')"
                   type="button"
-                  class="text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+                  [disabled]="this.ticketForm.disabled"
+                  class="cursor-pointer disabled:bg-gray-300 disabled:cursor-auto text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  class="disabled:bg-gray-300 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+                  [disabled]="this.ticketForm.disabled || this.ticketForm.pristine"
+                  class="cursor-pointer disabled:bg-gray-300 disabled:cursor-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
                 >
                   Update Ticket
                 </button>
@@ -425,7 +448,7 @@
                   </div>
                   <div class="flex items-center justify-between">
                     <h5 class="text-xl font-semibold text-gray-900 leading-8">
-                      {{ ticket()?.dueDate | date: 'mediumDate' }}
+                      {{ ticket()?.dueDate | date: 'd MMMM y' }}
                     </h5>
                   </div>
                   <h6 class="text-xs font-normal text-gray-500">Due Date</h6>

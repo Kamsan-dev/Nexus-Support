@@ -226,27 +226,27 @@ public class TicketQuery {
 
     public static final String UPDATE_TICKET_QUERY = """
             UPDATE tickets t
-            SET t.title = :title,
-            t.description = :description,
-            t.progress = :progress,
-            t.type_id = typ.type_id,
-            t.priority_id = p.priority_id,
-            t.status_id = s.status_id,
-            t.due_date = :dueDate,
-            t.updated_at = NOW()
+            SET title = :title,
+                description = :description,
+                progress = :progress,
+                type_id = typ.type_id,
+                priority_id = p.priority_id,
+                status_id = s.status_id,
+                due_date = :dueDate,
+                updated_at = NOW()
             FROM users u
             JOIN statuses s ON s.status = :status
             JOIN types typ ON typ.type = :type
             JOIN priorities p ON p.priority = :priority
             WHERE t.ticket_public_id = :ticketPublicId
-            AND u.user_id = t.issuer_id
-            AND u.user_public_id = :userPublicId
+              AND u.user_id = t.issuer_id
+              AND u.user_public_id = :userPublicId;
             """;
 
     public static final String UPDATE_ASSIGNEE_TICKET_QUERY = """
             UPDATE tickets t
-            t.assignee_id = a.user_id
-            t.updated_at = NOW()
+                assignee_id = a.user_id,
+                updated_at = NOW()
             LEFT JOIN users a ON a.user_public_id = :assigneePublicId
             WHERE t.ticket_public_id = :ticketPublicId
             """;

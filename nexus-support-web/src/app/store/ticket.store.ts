@@ -5,10 +5,9 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { delay, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { defaultTicketQueryFilter, QueryRequest } from '../core/model/request/query-request';
+import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 import { PageTicket, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { TicketService } from '../service/ticket.service';
-import { User } from '../core/model/user.model';
-import { TicketDetail } from '../component/features/tickets/ticket-detail/ticket-detail';
 
 interface TicketState {
   loading: boolean;
@@ -20,6 +19,7 @@ interface TicketState {
   totalTickets: number;
   lastCreatedticketPublicId: string | undefined;
   ticketCreated: boolean;
+  ticketUpdated: boolean;
   ticket: Ticket | undefined;
 }
 
@@ -33,6 +33,7 @@ const initialTicketState: TicketState = {
   totalTickets: 0,
   lastCreatedticketPublicId: undefined,
   ticketCreated: false,
+  ticketUpdated: false,
   ticket: undefined,
 };
 
@@ -73,7 +74,7 @@ export const TicketStore = signalStore(
     ),
     createTicket: rxMethod<FormData>(
       pipe(
-        tap(() => patchState(store, { error: null })),
+        tap(() => patchState(store, { loading: true, error: null })),
         exhaustMap((formData) =>
           ticketService.createTicket(formData).pipe(
             tapResponse({
@@ -81,11 +82,13 @@ export const TicketStore = signalStore(
                 patchState(store, {
                   ticketCreated: true,
                   tickets: [response.data, ...store.tickets()],
+                  loading: false,
                 });
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, {
                   error: error,
+                  loading: false,
                 });
               },
             }),
@@ -117,8 +120,34 @@ export const TicketStore = signalStore(
         ),
       ),
     ),
+    updateTicket: rxMethod<UpdateTicketRequest>(
+      pipe(
+        tap(() => patchState(store, { loading: true, error: null })),
+        exhaustMap((request) =>
+          ticketService.updateTicket(request).pipe(
+            tapResponse({
+              next: (response) => {
+                patchState(store, {
+                  loading: false,
+                  ticketUpdated: true,
+                });
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, {
+                  error: error,
+                  loading: false,
+                });
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetTicketCreated(): void {
       patchState(store, { ticketCreated: false });
+    },
+    resetTicketUpdated(): void {
+      patchState(store, { ticketUpdated: false });
     },
   })),
   withComputed((store) => ({
