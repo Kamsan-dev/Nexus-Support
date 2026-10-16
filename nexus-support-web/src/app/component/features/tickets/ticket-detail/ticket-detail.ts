@@ -1,33 +1,16 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  Inject,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, Inject, inject, signal } from '@angular/core';
 import { TicketStore } from '../../../../store/ticket.store';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import {
-  TicketStatusColor,
-  TicketStatusEnum,
-  TicketStatusLabel,
-} from '../../../../enum/ticket-status';
+import { TicketStatusColor, TicketStatusEnum, TicketStatusLabel } from '../../../../enum/ticket-status';
 import { AuthStore } from '../../../../store/auth.store';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-  AbstractControl,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { TicketDetails } from '../../../../core/model/ticket.model';
 import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { TicketDetailsStore } from '../../../../store/ticket-details.store';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -35,13 +18,15 @@ import { HotToastService } from '@ngxpert/hot-toast';
   templateUrl: './ticket-detail.html',
   styleUrl: './ticket-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [TicketDetailsStore],
 })
 export class TicketDetail {
-  protected readonly ticketStore = inject(TicketStore);
+  protected readonly ticketStore = inject(TicketDetailsStore);
   protected readonly authStore = inject(AuthStore);
   private activatedRoute = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private toastService = inject(HotToastService);
+
   protected readonly ticketTypeLabel = TicketTypeLabel;
   protected readonly ticketPriorityLabel = TicketPriorityLabel;
   protected readonly ticketStatusLabel = TicketStatusLabel;
@@ -51,9 +36,7 @@ export class TicketDetail {
   protected readonly ticketStatusColor = TicketStatusColor;
 
   ticketPublicIdParam = signal<string | null>(null);
-  ticketNumber = computed(() =>
-    this.ticketStore.ticket()?.ticket.ticketPublicId.substring(0, 8).toUpperCase(),
-  );
+  ticketNumber = computed(() => this.ticketStore.ticket()?.ticket.ticketPublicId.substring(0, 8).toUpperCase());
   issuer = computed(() => this.ticketStore.issuerTicket());
   ticket = computed(() => this.ticketStore.ticketDetail());
 
@@ -65,6 +48,7 @@ export class TicketDetail {
     effect(() => {
       this.initFormAfterTicketLoading();
       this.listenToUpdateTicket();
+      this.listenToErrorStore();
     });
   }
 
@@ -89,7 +73,6 @@ export class TicketDetail {
       this.ticketForm.markAllAsDirty();
       return;
     } else {
-      console.log(this.ticketForm.value);
       this.ticketStore.updateTicket({
         ticketPublicId: this.ticket()!.ticketPublicId,
         issuerPublicId: this.ticket()!.issuerPublicId,
@@ -107,10 +90,7 @@ export class TicketDetail {
       type: [ticket.type, Validators.required],
       status: [ticket.status, Validators.required],
       progress: [ticket.progress, [Validators.required, Validators.min(0), Validators.max(100)]],
-      dueDate: [
-        ticket.dueDate ? ticket.dueDate.toString().substring(0, 10) : '',
-        Validators.required,
-      ],
+      dueDate: [ticket.dueDate ? ticket.dueDate.toString().substring(0, 10) : '', Validators.required],
     });
     this.ticketForm.disable();
   }
@@ -127,6 +107,14 @@ export class TicketDetail {
       this.toastService.success('Ticket modifié avec succès !');
       this.ticketStore.resetTicketUpdated();
       this.ticketForm.disable();
+    }
+  }
+
+  private listenToErrorStore(): void {
+    const error = this.ticketStore.error();
+    if (error) {
+      const message = error.error.detail || error.message;
+      this.toastService.error(message);
     }
   }
 
