@@ -245,10 +245,11 @@ public class TicketQuery {
 
     public static final String UPDATE_ASSIGNEE_TICKET_QUERY = """
             UPDATE tickets t
-                assignee_id = a.user_id,
+            SET assignee_id = a.user_id,
                 updated_at = NOW()
-            LEFT JOIN users a ON a.user_public_id = :assigneePublicId
-            WHERE t.ticket_public_id = :ticketPublicId
+            FROM users a
+            WHERE a.user_public_id = :assigneePublicId
+            AND t.ticket_public_id = :ticketPublicId
             """;
 
     public static final String INSERT_TICKET_TASK_QUERY = """

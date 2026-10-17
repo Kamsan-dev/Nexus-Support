@@ -1,20 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, effect, Inject, inject, signal } from '@angular/core';
-import { TicketStore } from '../../../../store/ticket.store';
-import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { TicketStatusColor, TicketStatusEnum, TicketStatusLabel } from '../../../../enum/ticket-status';
-import { AuthStore } from '../../../../store/auth.store';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
-import { TicketDetails } from '../../../../core/model/ticket.model';
-import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
-import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, TemplateRef, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { Task, TicketDetails } from '../../../../core/model/ticket.model';
+import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
+import { TicketStatusColor, TicketStatusEnum, TicketStatusLabel } from '../../../../enum/ticket-status';
+import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
+import { AuthStore } from '../../../../store/auth.store';
 import { TicketDetailsStore } from '../../../../store/ticket-details.store';
+import { DialogService } from '@ngneat/dialog';
+import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
 
 @Component({
   selector: 'app-ticket-detail',
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, FormsModule, TaskFormModal],
   templateUrl: './ticket-detail.html',
   styleUrl: './ticket-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +27,9 @@ export class TicketDetail {
   private activatedRoute = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private toastService = inject(HotToastService);
+
+  private dialogService = inject(DialogService);
+  private readonly TASK_FORM_MODAL_ID = 'taskFormModal';
 
   protected readonly ticketTypeLabel = TicketTypeLabel;
   protected readonly ticketPriorityLabel = TicketPriorityLabel;
@@ -43,6 +47,10 @@ export class TicketDetail {
   //form
   ticketForm!: FormGroup;
   initialTicket!: TicketDetails;
+
+  //tasks
+  taskFormMode = signal<'create' | 'edit'>('create');
+  selectedTask = signal<Task | null>(null);
 
   constructor() {
     effect(() => {
@@ -79,6 +87,22 @@ export class TicketDetail {
         ...this.ticketForm.value,
       });
     }
+  };
+
+  onAssigneeSelectClick = (event: string): void => {
+    if (event === 'no_selection') return;
+    this.ticketStore.updateTicketAssignee({ ticketPublicId: this.ticket()?.ticketPublicId!, assigneePublicId: event });
+  };
+
+  onAddNewTaskClick = (event: TouchEvent | MouseEvent): void => {
+    event.stopImmediatePropagation();
+
+    this.taskFormMode.set('create');
+    this.selectedTask.set(null);
+
+    this.dialogService.open(TaskFormModal, {
+      id: this.TASK_FORM_MODAL_ID,
+    });
   };
 
   private initTicketForm(ticket: TicketDetails): void {

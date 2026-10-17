@@ -1,3 +1,5 @@
+import { HttpParams } from '@angular/common/http';
+
 export function getFormData(request: any, files: File[] | null): FormData {
   const formData = new FormData();
   for (const property in request) {
@@ -34,4 +36,14 @@ export function formatFileSize(size: number): string {
   quotient = quotient < units.length ? quotient : units.length - 1;
   size = size / 1000 ** quotient;
   return `${+size.toFixed(2)} ${units[quotient]}`;
+}
+
+export function toHttpParams<T extends object>(params: T): HttpParams {
+  return Object.entries(params).reduce((httpParams, [key, value]) => {
+    if (value !== null && value !== undefined) {
+      return httpParams.set(key, String(value));
+    }
+
+    return httpParams;
+  }, new HttpParams());
 }

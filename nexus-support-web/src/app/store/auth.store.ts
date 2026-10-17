@@ -1,12 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { computed, inject } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
-import { UserService } from '../service/user.service';
-import { Profile } from '../core/model/user.model';
-import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { tapResponse } from '@ngrx/operators';
+import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
+import { Profile } from '../core/model/user.model';
+import { UserService } from '../service/user.service';
 import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 
 interface AuthState {

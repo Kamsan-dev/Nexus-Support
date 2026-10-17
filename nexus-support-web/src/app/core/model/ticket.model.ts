@@ -96,6 +96,6 @@ export interface Ticket {
   attachments: Attachment[];
   tasks: Task[];
   techSupports: TicketUser[];
-  assignee: TicketUser;
+  assignee: TicketUser | null;
   issuerTicket: User;
 }

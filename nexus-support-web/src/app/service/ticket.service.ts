@@ -7,6 +7,7 @@ import { UpdateTicketRequest } from '../core/model/request/update-ticket.request
 import { ApiResponse } from '../core/model/response/api.response';
 import { PageTicket, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
+import { toHttpParams } from '../shared/utils/request';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +16,7 @@ export class TicketService {
   private http = inject(HttpClient);
   private readonly server: string = environment.API_URL;
 
-  public getTickets(
-    pageRequest: Pagination,
-    filters: TicketFilters = {},
-  ): Observable<ApiResponse<Page<PageTicket>>> {
+  public getTickets(pageRequest: Pagination, filters: TicketFilters = {}): Observable<ApiResponse<Page<PageTicket>>> {
     let params = createPaginationOption(pageRequest, filters);
     return this.http.get<ApiResponse<Page<PageTicket>>>(`${this.server}/ticket/list`, { params });
   }
@@ -33,6 +31,11 @@ export class TicketService {
 
   public updateTicket(request: UpdateTicketRequest): Observable<ApiResponse<void>> {
     return this.http.put<ApiResponse<void>>(`${this.server}/ticket/update`, request);
+  }
+
+  public updateTicketAssignee(assigneePublicId: string, ticketPublicId: string): Observable<ApiResponse<void>> {
+    const params = toHttpParams({ assigneePublicId, ticketPublicId });
+    return this.http.patch<ApiResponse<void>>(`${this.server}/ticket/update/assignee`, null, { params });
   }
 
   public getDashboardData(): any {

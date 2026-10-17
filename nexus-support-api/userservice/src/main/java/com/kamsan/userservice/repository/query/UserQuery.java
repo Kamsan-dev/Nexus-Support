@@ -57,7 +57,7 @@ public class UserQuery {
             FROM users u
             JOIN user_roles ur ON ur.user_id = u.user_id
             JOIN roles r ON ur.role_id = r.role_id
-            WHERE r.name = 'TECH_SUPPORTS'
+            WHERE r.name = 'TECH_SUPPORT'
             """;
 
     public static final String SELECT_DEVICES_QUERY = """
