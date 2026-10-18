@@ -1,3 +1,5 @@
+import { ValidatorFn } from '@angular/forms';
+
 export enum TicketStatusEnum {
   NEW = 'NEW',
   IN_PROGRESS = 'IN_PROGRESS',

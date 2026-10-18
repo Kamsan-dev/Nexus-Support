@@ -5,10 +5,11 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, delay, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
-import { Ticket } from '../core/model/ticket.model';
+import { Task, Ticket } from '../core/model/ticket.model';
 import { TicketService } from '../service/ticket.service';
 import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { CreateTaskRequest } from '../core/model/request/create-task.request';
 
 interface TicketDetailsState {
   ticketUpdated: boolean;
@@ -21,6 +22,7 @@ const state: TicketDetailsState = {
 };
 
 export const TicketDetailsStore = signalStore(
+  { providedIn: 'root' },
   withState(state),
   withRequestStatus(),
   withMethods((store, ticketService = inject(TicketService), toastService = inject(HotToastService)) => ({
@@ -75,7 +77,7 @@ export const TicketDetailsStore = signalStore(
             tapResponse({
               next: (response) => {
                 const assignee = store.ticket()?.techSupports.find((assignee) => assignee.userPublicId === request.assigneePublicId);
-                (patchState(store, setFulfilled(), {
+                patchState(store, setFulfilled(), {
                   ticket: {
                     ...store.ticket()!,
                     ticket: {
@@ -84,8 +86,35 @@ export const TicketDetailsStore = signalStore(
                     },
                     assignee: assignee!,
                   },
-                }),
-                  toastService.success('Ticket assignee updated successfully'));
+                });
+                toastService.success('Ticket assignee updated successfully');
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    createTask: rxMethod<CreateTaskRequest>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          ticketService.createTask(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  ticket: {
+                    ...currentTicket,
+                    tasks: [response.data, ...currentTicket.tasks],
+                  },
+                });
+                toastService.success(response.message);
               },
               error: (error: HttpErrorResponse) => {
                 patchState(store, setError(error));

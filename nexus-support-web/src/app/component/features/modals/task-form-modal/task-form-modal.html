@@ -1,9 +1,14 @@
-{{ test() }}
 <div id="taskmodal" class="justify-center items-center">
   <div class="relative w-full max-w-2xl max-h-full">
     <div class="relative bg-white rounded-lg">
       <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-        <h3 class="text-xl font-semibold text-gray-900">Create Task</h3>
+        <h3 class="text-xl font-semibold text-gray-900">
+          @if (data.mode === 'create') {
+            Create Task
+          } @else {
+            Edit task by {{ data.task?.assigneeFirstName }} {{ data.task?.assigneeLastName }}
+          }
+        </h3>
         <button
           (click)="this.dialogRef.close()"
           type="button"
@@ -15,54 +20,62 @@
         </button>
       </div>
       <div class="p-4 md:p-5 space-y-4">
-        <form>
+        <form [formGroup]="taskForm" (ngSubmit)="onFormSubmit($event)">
           <input type="hidden" name="ticketUuid" required />
           <div class="mb-6">
-            <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
+            <label for="name" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
             <input
               type="text"
               name="name"
-              class="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              formControlName="name"
+              class="border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              [ngClass]="[f['name'].invalid && f['name'].dirty ? 'border-red-500' : 'border-gray-200']"
               placeholder="Example: Finish creating customer report"
-              required
             />
+            @if (f['name'].invalid && f['name'].dirty) {
+              <div class="mt-2 font-normal text-red-500">You need to provide a name for the task</div>
+            }
           </div>
           <div class="mb-6">
             <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Description</label>
             <textarea
               name="description"
               id="description"
+              formControlName="description"
               placeholder="Example: I need to finish creating customer sales report by Tuesday and send it to customer"
               cols=""
               rows=""
-              class="p-2 text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border border-gray-300 w-full h-20"
-              required
+              class="p-2 text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border w-full h-20"
+              [ngClass]="[f['description'].invalid && f['description'].dirty ? 'border-red-500' : 'border-gray-200']"
             ></textarea>
+            @if (f['description'].invalid && f['description'].dirty) {
+              <div class="mt-2 font-normal text-red-500">Description is required</div>
+            }
           </div>
           <div class="mb-6">
-            <label for="type" class="block mb-2 text-sm font-medium text-gray-900">Status</label>
+            <label for="status" class="block mb-2 text-sm font-medium text-gray-900">Status</label>
             <select
               name="status"
-              required
+              formControlName="status"
+              [ngClass]="[f['status'].invalid && f['status'].touched ? 'border-red-500' : 'border-gray-200']"
               class="w-full rounded-md border-0 ml-0 px-2 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-full0 sm:text-sm sm:leading-6"
             >
-              <option>NEW</option>
-              <option>IN PROGRESS</option>
-              <option>IN REVIEW</option>
-              <option>COMPLETED</option>
-              <option>IMPEDED</option>
-              <option>ASSIGNED</option>
-              <option>CLOSED</option>
-              <option>PENDING</option>
+              @if (data.mode === 'create') {
+                <option disabled value="no_selection">Select a type</option>
+              }
+              @for (status of ticketStatus; track $index) {
+                <option [value]="status">{{ ticketStatusLabel[status] }}</option>
+              }
             </select>
           </div>
           <div class="flex items-center justify-end gap-3 mt-3 border-t border-gray-200">
             <button
               type="submit"
+              [disabled]="taskForm.invalid"
               data-modal-hide="taskmodal"
               class="disabled:bg-gray-300 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 mt-3"
             >
-              Create Task
+              {{ data.mode === 'create' ? 'Create Task' : 'Edit task' }}
             </button>
           </div>
         </form>

@@ -152,11 +152,11 @@ public class TicketResource {
     }
 
     @PreAuthorize("hasAuthority('task:create')")
-    @PutMapping("/task/")
-    ResponseEntity<ApiResponse<UUID>> createTask(@NotNull Authentication authentication,
+    @PutMapping("/task")
+    ResponseEntity<ApiResponse<TaskDTO>> createTask(@NotNull Authentication authentication,
                                                  @RequestBody CreateTaskDTO createTaskDTO) {
-        UUID task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);
-        return ResponseEntity.created(getUri(task)).body(getResponse(
+        TaskDTO task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);
+        return ResponseEntity.created(getUri(task.taskPublicId())).body(getResponse(
                 task,
                 "Task added successfully.",
                 HttpStatus.CREATED

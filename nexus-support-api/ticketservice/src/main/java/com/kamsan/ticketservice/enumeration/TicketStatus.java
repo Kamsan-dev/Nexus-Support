@@ -4,8 +4,8 @@ import lombok.Getter;
 @Getter
 public enum TicketStatus {
     NEW("NEW"),
-    IN_PROGRESS("IN PROGRESS"),
-    IN_REVIEW("IN REVIEW"),
+    IN_PROGRESS("IN_PROGRESS"),
+    IN_REVIEW("IN_REVIEW"),
     COMPLETED("COMPLETED"),
     IMPEDED("IMPEDED"),
     CLOSED("CLOSED"),

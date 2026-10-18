@@ -250,7 +250,7 @@ public class TicketQueryRepository {
                    .param("taskPublicId", TicketUtils.randomUUID.get())
                    .param("name", request.name())
                    .param("description", request.description())
-                   .param("status", request.status())
+                   .param("status", request.status().getValue(), Types.VARCHAR)
                    .query((rs, rowNum) -> new TaskDTO(
                            rs.getObject("task_public_id", UUID.class),
                            request.ticketPublicId(),

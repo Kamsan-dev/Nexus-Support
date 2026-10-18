@@ -280,9 +280,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public UUID createTask(UUID userPublicId, CreateTaskDTO createTaskDTO) {
-        TaskDTO taskDTO = ticketQueryRepository.insertNewTask(userPublicId, createTaskDTO);
-        return taskDTO.taskPublicId();
+    public TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO) {
+        return ticketQueryRepository.insertNewTask(userPublicId, createTaskDTO);
     }
 
     @Override

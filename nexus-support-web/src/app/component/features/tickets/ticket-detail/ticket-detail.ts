@@ -15,11 +15,10 @@ import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
 
 @Component({
   selector: 'app-ticket-detail',
-  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, FormsModule, TaskFormModal],
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, FormsModule],
   templateUrl: './ticket-detail.html',
   styleUrl: './ticket-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [TicketDetailsStore],
 })
 export class TicketDetail {
   protected readonly ticketStore = inject(TicketDetailsStore);
@@ -47,10 +46,6 @@ export class TicketDetail {
   //form
   ticketForm!: FormGroup;
   initialTicket!: TicketDetails;
-
-  //tasks
-  taskFormMode = signal<'create' | 'edit'>('create');
-  selectedTask = signal<Task | null>(null);
 
   constructor() {
     effect(() => {
@@ -96,12 +91,24 @@ export class TicketDetail {
 
   onAddNewTaskClick = (event: TouchEvent | MouseEvent): void => {
     event.stopImmediatePropagation();
-
-    this.taskFormMode.set('create');
-    this.selectedTask.set(null);
-
     this.dialogService.open(TaskFormModal, {
       id: this.TASK_FORM_MODAL_ID,
+      data: {
+        mode: 'create',
+        ticketPublicId: this.ticket()?.ticketPublicId,
+      },
+    });
+  };
+  onEditTaskClick = (event: TouchEvent | MouseEvent, task: Task): void => {
+    event.stopImmediatePropagation();
+    console.log(task);
+    this.dialogService.open(TaskFormModal, {
+      id: this.TASK_FORM_MODAL_ID,
+      data: {
+        mode: 'edit',
+        ticketPublicId: this.ticket()?.ticketPublicId,
+        task: task,
+      },
     });
   };
 

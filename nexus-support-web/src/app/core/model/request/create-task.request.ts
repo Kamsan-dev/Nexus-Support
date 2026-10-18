@@ -1,0 +1,8 @@
+import { TicketStatusEnum } from '../../../enum/ticket-status';
+
+export interface CreateTaskRequest {
+  ticketPublicId: string;
+  name: string;
+  description: string;
+  status: TicketStatusEnum;
+}
