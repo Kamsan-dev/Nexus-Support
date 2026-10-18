@@ -59,7 +59,7 @@
       </div>
     </div>
   </div>
-} @else if (ticketStore.fulfilled()) {
+} @else if (ticketStore.fulfilled() && ticketStore.ticket()) {
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
       <a class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
@@ -127,7 +127,7 @@
             <div class="flex flex-row justify-between items-center pb-4 border-b border-solid border-gray-200">
               <h5 class="text-base font-semibold text-gray-900">
                 Status :
-                <span class="font-medium w-fit px-1.5 py-0.5 rounded" [ngClass]="ticketStatusColor[ticket()?.status!]">
+                <span class="inline-flex items-center font-medium pl-2 pr-2.5 rounded-full py-1" [ngClass]="ticketStatusColor[ticket()?.status!]">
                   {{ ticketStatusLabel[ticket()?.status!] }}
                 </span>
               </h5>
@@ -278,68 +278,78 @@
                 Comments ({{ ticketStore.currentTicket()?.comments?.length }})
               </h5>
               <div class="mt-6">
-                <form class="mb-8">
-                  <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Post comment</label>
+                <form [formGroup]="commentForm" class="mb-8" (ngSubmit)="onSubmitComment($event)">
+                  <label for="comment" class="mb-2 text-sm font-medium text-gray-900 sr-only">Post comment</label>
                   <div class="flex items-center justify-between gap-x-2">
                     <input
                       type="text"
                       name="comment"
+                      formControlName="comment"
                       autocomplete="off"
                       class="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Add a comment"
-                      required
                     />
                     <input type="hidden" value="ticket.ticketUuid" name="ticketUuid" autocomplete="off" required- />
                     <button
                       type="submit"
-                      class="disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
+                      [disabled]="commentForm.invalid || commentForm.pristine"
+                      class="cursor-pointer disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
                     >
                       Post
                     </button>
                   </div>
                 </form>
-                <div class="mt-4 flex items-start gap-2.5">
-                  <img
-                    class="w-8 h-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
-                    alt="Junior RT"
-                    loading="lazy"
-                  />
-                  <div class="w-full">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <span class="mr-2 text-sm font-semibold text-gray-900">Junior RT</span>
-                        <span class="text-sm font-normal text-gray-500">Dec 2nd 2024, 10:58:03 PM</span>
-                        <span class="ml-1 text-xs font-normal text-gray-500">Edited</span>
-                      </div>
-                      <div class="flex items-center justify-between gap-2">
-                        <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                          Edit
-                        </button>
-                        <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                          Save
-                        </button>
-                        <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                          Delete
-                        </button>
-                        <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                    <div class="border-gray-200">
-                      <p class="bg-gray-100 rounded-e-xl rounded-es-xl text-sm font-normal text-gray-900 px-2 py-4">Hello</p>
-                      <input
-                        type="text"
-                        autofocus
-                        name="commentUpdate"
-                        class="block w-full px-2 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
-                        placeholder="Edit comment"
+                @if (ticketStore.commentsList()!.length > 0) {
+                  @for (comment of ticketStore.commentsList(); track comment.commentPublicId) {
+                    <div class="mt-4 flex items-start gap-2.5">
+                      <img
+                        [src]="comment.imageUrl"
+                        [alt]="'Profile image of user ' + comment.lastName"
+                        class="w-12 h-12 aspect-square object-cover rounded-full"
+                        loading="lazy"
                       />
+                      <div class="w-full">
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <span class="mr-2 text-sm font-semibold text-gray-900">{{ comment.firstName }} {{ comment.lastName }}</span>
+                            <span class="text-sm font-normal text-gray-500">{{ comment.createdAt | date: 'd MMM y, HH:mm:ss' }}</span>
+                            @if (comment.isEdited) {
+                              <span class="ml-1 text-xs font-normal text-gray-500">Edited</span>
+                            }
+                          </div>
+                          @if (comment.userPublicId === authStore.user()?.userPublicId) {
+                            <div class="flex items-center justify-between gap-2">
+                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
+                                Edit
+                              </button>
+                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
+                                Delete
+                              </button>
+                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
+                                Save
+                              </button>
+                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
+                                Cancel
+                              </button>
+                            </div>
+                          }
+                        </div>
+                        <div class="border-gray-200">
+                          <p class="bg-gray-100 rounded-e-xl rounded-es-xl text-sm font-normal text-gray-900 px-2 py-4">{{ comment.comment }}</p>
+                          <input
+                            type="text"
+                            autofocus
+                            name="commentUpdate"
+                            class="block w-full px-2 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+                            placeholder="Edit comment"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <p class="flex flex-row justify-center items-center mb-3">No comments found</p>
+                  }
+                } @else {
+                  <p class="flex flex-row justify-center items-center mb-3 text-gray-500 text-sm font-normal">No comments found</p>
+                }
               </div>
             </div>
           </div>
@@ -630,7 +640,7 @@
                 </div>
               }
               @if (ticketStore.tasksList()?.length === 0) {
-                <p class="flex flex-row items-center justify-center mb-3">No tasks found</p>
+                <p class="flex flex-row items-center justify-center mb-3 text-gray-500 text-sm font-normal">No tasks found</p>
               }
             </div>
           </div>

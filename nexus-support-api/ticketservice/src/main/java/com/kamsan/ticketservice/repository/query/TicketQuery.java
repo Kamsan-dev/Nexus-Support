@@ -151,21 +151,36 @@ public class TicketQuery {
             """;
 
     public static final String INSERT_COMMENT_TICKET_QUERY = """
-            INSERT INTO comments (
-                 comment_public_id,
-                 user_id,
-                 ticket_id,
-                 comment
-                 )
-             SELECT
-                 :commentPublicId,
-                 u.user_id,
-                 t.ticket_id,
-                 :comment
-             FROM users u
-             JOIN tickets t ON t.ticket_public_id = :ticketPublicId
-             WHERE u.user_public_id = :userPublicId
-             RETURNING comment_public_id
+            WITH comment AS (
+                INSERT INTO comments (
+                     comment_public_id,
+                     user_id,
+                     ticket_id,
+                     comment
+                     )
+                 SELECT
+                     :commentPublicId,
+                     u.user_id,
+                     t.ticket_id,
+                     :comment
+                 FROM users u
+                 JOIN tickets t ON t.ticket_public_id = :ticketPublicId
+                 WHERE u.user_public_id = :userPublicId
+                 RETURNING *
+            )
+            SELECT
+                c.comment_public_id,
+                u.user_public_id,
+                u.first_name,
+                u.last_name,
+                u.image_url,
+                c.comment,
+                c.updated_at,
+                c.created_at,
+                c.created_at <> c.updated_at AS is_edited
+            FROM comment c
+            JOIN tickets t ON t.ticket_id = c.ticket_id
+            JOIN users u ON c.user_id = u.user_id
             """;
 
     public static final String INSERT_FILE_TICKET_QUERY = """
@@ -225,22 +240,44 @@ public class TicketQuery {
             """;
 
     public static final String UPDATE_TICKET_QUERY = """
-            UPDATE tickets t
-            SET title = :title,
-                description = :description,
-                progress = :progress,
-                type_id = typ.type_id,
-                priority_id = p.priority_id,
-                status_id = s.status_id,
-                due_date = :dueDate,
-                updated_at = NOW()
-            FROM users u
-            JOIN statuses s ON s.status = :status
-            JOIN types typ ON typ.type = :type
-            JOIN priorities p ON p.priority = :priority
-            WHERE t.ticket_public_id = :ticketPublicId
-              AND u.user_id = t.issuer_id
-              AND u.user_public_id = :userPublicId;
+            WITH ticket AS (
+                UPDATE tickets t
+                SET title = :title,
+                    description = :description,
+                    progress = :progress,
+                    type_id = typ.type_id,
+                    priority_id = p.priority_id,
+                    status_id = s.status_id,
+                    due_date = :dueDate,
+                    updated_at = NOW()
+                FROM users u
+                JOIN statuses s ON s.status = :status
+                JOIN types typ ON typ.type = :type
+                JOIN priorities p ON p.priority = :priority
+                WHERE t.ticket_public_id = :ticketPublicId
+                  AND u.user_id = t.issuer_id
+                  AND u.user_public_id = :userPublicId
+                RETURNING t.*
+            )
+            SELECT
+                t.ticket_public_id,
+                a.user_public_id AS assignee_public_id,
+                u.user_public_id AS issuer_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM ticket t
+            JOIN users u ON u.user_id = t.issuer_id
+            LEFT JOIN users a ON a.user_id = t.assignee_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id;
             """;
 
     public static final String UPDATE_ASSIGNEE_TICKET_QUERY = """

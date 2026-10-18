@@ -4,6 +4,7 @@ import com.kamsan.ticketservice.domain.ApiResponse;
 import com.kamsan.ticketservice.dto.*;
 import com.kamsan.ticketservice.enumeration.TicketStatus;
 import com.kamsan.ticketservice.enumeration.TicketType;
+import com.kamsan.ticketservice.model.Comment;
 import com.kamsan.ticketservice.model.Task;
 import com.kamsan.ticketservice.service.TicketService;
 import com.kamsan.ticketservice.service.UserService;
@@ -96,11 +97,12 @@ public class TicketResource {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Void>> updateTicket(@NotNull Authentication authentication,
+    public ResponseEntity<ApiResponse<TicketDetailsDTO>> updateTicket(@NotNull Authentication authentication,
                                                           @RequestBody @Valid UpdateTicketDTO updateTicketDTO) {
-        this.ticketService.updateTicket(UUID.fromString(authentication.getName()), updateTicketDTO);
+        TicketDetailsDTO ticketUpdated = this.ticketService.updateTicket(UUID.fromString(authentication.getName()),
+                updateTicketDTO);
         return ResponseEntity.ok().body(getResponse(
-                null,
+                ticketUpdated,
                 "Ticket updated successfully.",
                 HttpStatus.OK
         ));
@@ -119,11 +121,11 @@ public class TicketResource {
         ));
     }
 
-    @PostMapping("/comment/")
-    ResponseEntity<ApiResponse<UUID>> createComment(@NotNull Authentication authentication,
+    @PostMapping("/comment")
+    ResponseEntity<ApiResponse<CommentDTO>> createComment(@NotNull Authentication authentication,
                                                     @RequestBody CreateCommentDTO createCommentDTO) {
-        UUID comment = ticketService.createComment(UUID.fromString(authentication.getName()), createCommentDTO);
-        return ResponseEntity.created(getUri(comment)).body(getResponse(
+        CommentDTO comment = ticketService.createComment(UUID.fromString(authentication.getName()), createCommentDTO);
+        return ResponseEntity.created(getUri(comment.commentPublicId())).body(getResponse(
                 comment,
                 "Comment added successfully.",
                 HttpStatus.CREATED

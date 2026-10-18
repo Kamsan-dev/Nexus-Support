@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
 import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 import { ApiResponse } from '../core/model/response/api.response';
-import { PageTicket, Task, Ticket, TicketFilters } from '../core/model/ticket.model';
+import { Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
 import { toHttpParams } from '../shared/utils/request';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
@@ -16,6 +16,8 @@ import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/crea
 export class TicketService {
   private http = inject(HttpClient);
   private readonly server: string = environment.API_URL;
+
+  // --- TICKET ---
 
   public getTickets(pageRequest: Pagination, filters: TicketFilters = {}): Observable<ApiResponse<Page<PageTicket>>> {
     let params = createPaginationOption(pageRequest, filters);
@@ -30,8 +32,8 @@ export class TicketService {
     return this.http.get<ApiResponse<Ticket>>(`${this.server}/ticket/${ticketPublicId}`);
   }
 
-  public updateTicket(request: UpdateTicketRequest): Observable<ApiResponse<void>> {
-    return this.http.put<ApiResponse<void>>(`${this.server}/ticket/update`, request);
+  public updateTicket(request: UpdateTicketRequest): Observable<ApiResponse<TicketDetails>> {
+    return this.http.put<ApiResponse<TicketDetails>>(`${this.server}/ticket/update`, request);
   }
 
   public updateTicketAssignee(assigneePublicId: string, ticketPublicId: string): Observable<ApiResponse<void>> {
@@ -39,6 +41,7 @@ export class TicketService {
     return this.http.patch<ApiResponse<void>>(`${this.server}/ticket/update/assignee`, null, { params });
   }
 
+  // --- TASK ---
   public createTask(request: CreateTaskRequest): Observable<ApiResponse<Task>> {
     return this.http.put<ApiResponse<Task>>(`${this.server}/ticket/task`, request);
   }
@@ -50,6 +53,12 @@ export class TicketService {
 
   public updateTask(request: UpdateTaskRequest): Observable<ApiResponse<Task>> {
     return this.http.put<ApiResponse<Task>>(`${this.server}/ticket/task/update`, request);
+  }
+
+  // --- COMMENT  ---
+
+  public addComment(ticketPublicId: string, comment: string): Observable<ApiResponse<Comment>> {
+    return this.http.post<ApiResponse<Comment>>(`${this.server}/ticket/comment`, { ticketPublicId, comment });
   }
 
   public getDashboardData(): any {

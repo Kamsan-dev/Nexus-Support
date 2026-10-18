@@ -53,10 +53,18 @@ export const TicketDetailsStore = signalStore(
           ticketService.updateTicket(request).pipe(
             tapResponse({
               next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
                 patchState(
                   store,
                   {
                     ticketUpdated: true,
+                    ticket: {
+                      ...currentTicket,
+                      ticket: response.data,
+                    },
                   },
                   setFulfilled(),
                 );
@@ -178,6 +186,33 @@ export const TicketDetailsStore = signalStore(
         ),
       ),
     ),
+    addComment: rxMethod<{ ticketPublicId: string; comment: string }>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          ticketService.addComment(request.ticketPublicId, request.comment).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  ticket: {
+                    ...currentTicket,
+                    comments: [response.data, ...currentTicket.comments],
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetTicketUpdated(): void {
       patchState(store, { ticketUpdated: false });
     },
@@ -188,5 +223,6 @@ export const TicketDetailsStore = signalStore(
     currentTicket: computed(() => store.ticket()),
     techSupports: computed(() => store.ticket()?.techSupports),
     tasksList: computed(() => store.ticket()?.tasks),
+    commentsList: computed(() => store.ticket()?.comments),
   })),
 );

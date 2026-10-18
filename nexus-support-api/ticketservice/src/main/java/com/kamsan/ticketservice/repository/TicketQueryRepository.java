@@ -164,13 +164,24 @@ public class TicketQueryRepository {
                    .list();
     }
 
-    public UUID insertNewComment(UUID userPublicId, CreateCommentDTO request) {
+    public CommentDTO insertNewComment(UUID userPublicId, CreateCommentDTO request) {
         return jdbc.sql(INSERT_COMMENT_TICKET_QUERY)
                    .param("ticketPublicId", request.ticketPublicId())
                    .param("userPublicId", userPublicId)
                    .param("commentPublicId", TicketUtils.randomUUID.get())
                    .param("comment", request.comment())
-                   .query(UUID.class)
+                   .query((rs, rowNum) -> new CommentDTO(
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class),
+                           rs.getObject("comment_public_id", UUID.class),
+                           rs.getObject("user_public_id", UUID.class),
+                           request.ticketPublicId(),
+                           rs.getString("comment"),
+                           rs.getBoolean("is_edited"),
+                           rs.getString("first_name"),
+                           rs.getString("last_name"),
+                           rs.getString("image_url")
+                   ))
                    .single();
     }
 
@@ -222,7 +233,7 @@ public class TicketQueryRepository {
                    .update();
     }
 
-    public int updateTicket(UUID userPublicId, UpdateTicketDTO request, OffsetDateTime dueDate) {
+    public TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO request, OffsetDateTime dueDate) {
         return jdbc.sql(UPDATE_TICKET_QUERY)
                    .param("ticketPublicId", request.ticketPublicId())
                    .param("title", request.title())
@@ -233,7 +244,21 @@ public class TicketQueryRepository {
                    .param("dueDate", dueDate)
                    .param("progress", request.progress())
                    .param("userPublicId", userPublicId)
-                   .update();
+                   .query((rs, rowNum) -> new TicketDetailsDTO(
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class),
+                           rs.getObject("ticket_public_id", UUID.class),
+                           rs.getObject("issuer_public_id", UUID.class),
+                           rs.getObject("assignee_public_id", UUID.class),
+                           rs.getString("title"),
+                           rs.getString("description"),
+                           rs.getInt("progress"),
+                           TicketStatus.valueOf(rs.getString("status")),
+                           TicketPriority.valueOf(rs.getString("priority")),
+                           TicketType.valueOf(rs.getString("type")),
+                           rs.getObject("due_date", OffsetDateTime.class)
+                   ))
+                   .single();
     }
 
     public int updateAssigneeForTicket(UUID assigneePublicId, UUID ticketPublicId) {

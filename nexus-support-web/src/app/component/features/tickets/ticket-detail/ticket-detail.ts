@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, TemplateRef, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
@@ -45,6 +45,7 @@ export class TicketDetail {
 
   //form
   ticketForm!: FormGroup;
+  commentForm!: FormGroup;
   initialTicket!: TicketDetails;
 
   constructor() {
@@ -116,6 +117,23 @@ export class TicketDetail {
     this.ticketStore.deleteTask(task.taskPublicId);
   };
 
+  onSubmitComment(event: MouseEvent | TouchEvent): void {
+    event.stopImmediatePropagation();
+    console.log('toast');
+    if (this.commentForm.invalid) {
+      return;
+    }
+
+    const comment = this.commentForm.getRawValue().comment as string;
+
+    this.ticketStore.addComment({
+      ticketPublicId: this.ticket()!.ticketPublicId,
+      comment: comment.trim(),
+    });
+
+    this.commentForm.reset();
+  }
+
   private initTicketForm(ticket: TicketDetails): void {
     this.initialTicket = ticket;
     this.ticketForm = this.fb.group({
@@ -128,6 +146,10 @@ export class TicketDetail {
       dueDate: [ticket.dueDate ? ticket.dueDate.toString().substring(0, 10) : '', Validators.required],
     });
     this.ticketForm.disable();
+
+    this.commentForm = this.fb.nonNullable.group({
+      comment: ['', [Validators.required, Validators.maxLength(2000)]],
+    });
   }
 
   private initFormAfterTicketLoading(): void {

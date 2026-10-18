@@ -121,12 +121,11 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO) {
+    public TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO) {
         if (!updateTicketDTO.issuerPublicId().equals(userPublicId)) {
             throw new ApiException("You can not update a ticket that does not belong to you.");
         }
-        int update = this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO, DateFormatter.toOffsetDateTime(updateTicketDTO.dueDate()));
-        if (update == 0) throw new ApiException("Ticket not found or not authorized");
+        return this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO, DateFormatter.toOffsetDateTime(updateTicketDTO.dueDate()));
     }
 
     @Override
@@ -155,14 +154,14 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
+    public CommentDTO createComment(UUID userPublicId, CreateCommentDTO createCommentDTO) {
         TicketDetailsDTO ticket = ticketQueryRepository.findByTicketPublicId(createCommentDTO.ticketPublicId());
         ReadUserDTO user = userService.getUserByUUID(userPublicId);
         // Only an elevated user or the issuer of the given ticket can post a comment
         if (!hasElevatedPermissions(user.role()) || !userPublicId.equals(ticket.issuerPublicId())) {
             throw new ApiException("Insufficient permissions.");
         }
-        UUID commentPublicId = ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
+        CommentDTO commentDTO = ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
         if (!ticket.issuerPublicId().equals(userPublicId)) {
             publisher.publishEvent(new Event(COMMENT_CREATED, Map.of(
                     "date", shortDate(ticket.createdAt()),
@@ -175,7 +174,7 @@ public class TicketServiceImpl implements TicketService {
             )
             ));
         }
-        return commentPublicId;
+        return commentDTO;
     }
 
     @Override

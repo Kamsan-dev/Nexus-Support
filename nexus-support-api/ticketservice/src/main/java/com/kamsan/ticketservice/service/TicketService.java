@@ -21,7 +21,7 @@ public interface TicketService {
 
     List<TaskDTO> getTicketTasks(UUID ticketPublicId);
 
-    UUID createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
+    CommentDTO createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
 
     void updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
 
@@ -35,7 +35,7 @@ public interface TicketService {
 
     List<AttachmentDTO> uploadFiles(UUID userPublicId, UUID ticketPublicId, List<MultipartFile> files);
 
-    void updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
+    TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO);
 
     void updateAssignee(UUID userPublicId, UUID assigneePublicId, UUID ticketPublicId);
 

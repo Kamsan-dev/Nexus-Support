@@ -8,7 +8,7 @@ public record CommentDTO(
         OffsetDateTime updatedAt,
         UUID commentPublicId,
         UUID userPublicId,
-        UUID ticketPublcId,
+        UUID ticketPublicId,
         String comment,
         boolean isEdited,
         String firstName,
