@@ -285,12 +285,11 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO) {
+    public TaskDTO updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO) {
         if (!updateTaskDTO.assigneePublicId().equals(userPublicId)) {
             throw new ApiException("Insufficient permissions.");
         }
-        int update = ticketQueryRepository.updateTask(userPublicId, updateTaskDTO);
-        if (update == 0) throw new ApiException("Assignee or Task not found.");
+        return ticketQueryRepository.updateTask(userPublicId, updateTaskDTO);
     }
 
     @Override

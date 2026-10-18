@@ -1,7 +1,6 @@
 package com.kamsan.ticketservice.service;
 
 import com.kamsan.ticketservice.dto.*;
-import com.kamsan.ticketservice.model.Task;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +41,7 @@ public interface TicketService {
 
     TaskDTO createTask(UUID userPublicId, CreateTaskDTO createTaskDTO);
 
-    void updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO);
+    TaskDTO updateTask(UUID userPublicId, UpdateTaskDTO updateTaskDTO);
 
     void deleteTask(UUID userPublicId, UUID taskPublicId);
 

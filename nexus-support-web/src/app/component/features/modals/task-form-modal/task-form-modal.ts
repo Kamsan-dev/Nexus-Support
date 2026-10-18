@@ -43,6 +43,14 @@ export class TaskFormModal {
     if (this.data.mode === 'create') {
       this.ticketStore.createTask({ ticketPublicId: this.data.ticketPublicId, ...this.taskForm.value });
     }
+
+    if (this.data.mode === 'edit') {
+      this.ticketStore.updateTask({
+        taskPublicId: this.data.task.taskPublicId,
+        assigneePublicId: this.data.task.assigneePublicId,
+        ...this.taskForm.value,
+      });
+    }
   };
 
   get f(): { [key: string]: AbstractControl } {

@@ -340,16 +340,36 @@ public class TicketQuery {
             """;
 
     public static final String UPDATE_TASK_QUERY = """
-            UPDATE tasks t
-            SET t.description = :description,
-            t.name = :name,
-            t.status_id = s.status_id,
-            t.updated_at = NOW()
-            FROM users u
-            JOIN statuses s ON s.stasus = :status
-            WHERE t.task_public_id = :taskPublicId
-            AND u.user_id = t.assignee_id
-            AND u.user_public_id = :userPublicId
+            WITH task AS (
+                UPDATE tasks t
+                SET description = :description,
+                    name = :name,
+                    status_id = s.status_id,
+                    updated_at = NOW()
+                FROM users u
+                JOIN statuses s ON s.status = :status
+                WHERE t.task_public_id = :taskPublicId
+                AND u.user_id = t.assignee_id
+                AND u.user_public_id = :userPublicId
+                RETURNING t.*
+            )
+            SELECT
+                i.task_public_id,
+                i.name,
+                i.description,
+                s.status,
+                i.due_date,
+                a.first_name AS assigneeFirstName,
+                a.last_name AS assigneeLastName,
+                a.image_url AS assigneeImageUrl,
+                i.created_at,
+                i.updated_at,
+                t.ticket_public_id,
+                a.user_public_id AS assigneePublicId
+            FROM task i
+            JOIN statuses s ON s.status_id = i.status_id
+            JOIN users a ON a.user_id = i.assignee_id
+            JOIN tickets t ON t.ticket_id = i.ticket_id
             """;
 
     public static final String DELETE_TASK_QUERY = """

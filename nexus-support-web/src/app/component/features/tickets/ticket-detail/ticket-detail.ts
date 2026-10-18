@@ -106,10 +106,14 @@ export class TicketDetail {
       id: this.TASK_FORM_MODAL_ID,
       data: {
         mode: 'edit',
-        ticketPublicId: this.ticket()?.ticketPublicId,
         task: task,
       },
     });
+  };
+
+  onDeleteTaskClick = (event: TouchEvent | MouseEvent, task: Task): void => {
+    event.stopImmediatePropagation();
+    this.ticketStore.deleteTask(task.taskPublicId);
   };
 
   private initTicketForm(ticket: TicketDetails): void {

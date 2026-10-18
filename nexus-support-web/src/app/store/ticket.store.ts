@@ -7,10 +7,9 @@ import { delay, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { defaultTicketQueryFilter, QueryRequest } from '../core/model/request/query-request';
 import { PageTicket, TicketFilters } from '../core/model/ticket.model';
 import { TicketService } from '../service/ticket.service';
+import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 
 interface TicketState {
-  loading: boolean;
-  error: HttpErrorResponse | null;
   tickets: PageTicket[];
   currentPage: number;
   query: QueryRequest<TicketFilters>;
@@ -20,8 +19,6 @@ interface TicketState {
 }
 
 const initialTicketState: TicketState = {
-  loading: false,
-  error: null,
   tickets: [],
   currentPage: 0,
   query: defaultTicketQueryFilter,
@@ -34,19 +31,19 @@ export const TicketStore = signalStore(
   { providedIn: 'root' },
 
   withState(initialTicketState),
+  withRequestStatus(),
 
   withMethods((store, ticketService = inject(TicketService)) => ({
     getTickets: rxMethod<QueryRequest<TicketFilters>>(
       pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
+        tap(() => patchState(store, setLoading())),
         delay(0),
 
         switchMap(({ pageRequest, filters = {} }) =>
           ticketService.getTickets(pageRequest, filters).pipe(
             tapResponse({
               next: (response) => {
-                patchState(store, {
-                  loading: false,
+                patchState(store, setFulfilled(), {
                   tickets: response.data.content,
                   query: { pageRequest, filters },
                   currentPage: response.data.pageable.pageNumber,
@@ -55,10 +52,7 @@ export const TicketStore = signalStore(
                 });
               },
               error: (error: HttpErrorResponse) => {
-                patchState(store, {
-                  loading: false,
-                  error: error,
-                });
+                patchState(store, setError(error));
               },
             }),
           ),
@@ -67,22 +61,19 @@ export const TicketStore = signalStore(
     ),
     createTicket: rxMethod<FormData>(
       pipe(
-        tap(() => patchState(store, { loading: true, error: null })),
+        tap(() => patchState(store, setLoading())),
         exhaustMap((formData) =>
           ticketService.createTicket(formData).pipe(
             tapResponse({
               next: (response) => {
-                patchState(store, {
+                patchState(store, setFulfilled(), {
                   ticketCreated: true,
                   tickets: [response.data, ...store.tickets()],
-                  loading: false,
+                  totalTickets: store.totalTickets() + 1,
                 });
               },
               error: (error: HttpErrorResponse) => {
-                patchState(store, {
-                  error: error,
-                  loading: false,
-                });
+                patchState(store, setError(error));
               },
             }),
           ),
@@ -94,7 +85,6 @@ export const TicketStore = signalStore(
     },
   })),
   withComputed((store) => ({
-    countTickets: computed(() => store.totalTickets()),
     statusQuery: computed(() => store.query()?.filters?.status),
     typeQuery: computed(() => store.query()?.filters?.type),
     currentQuery: computed(() => store.query()),

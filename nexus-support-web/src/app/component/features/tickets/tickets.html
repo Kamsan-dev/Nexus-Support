@@ -1,5 +1,5 @@
 <div class="flex flex-wrap justify-between items-center md:flex-nowrap space-y-2 md:space-y-0">
-  <h3 class="text-xl font-bold">Tickets ({{ ticketStore.countTickets() }})</h3>
+  <h3 class="text-xl font-bold">Tickets ({{ ticketStore.totalTickets() }})</h3>
   <div class="flex flex-wrap md:flex-nowrap justify-between items-center space-x-0 md:space-x-4 space-y-2 md:space-y-0">
     <fa-icon [icon]="'rotate-left'" class="fa-fw" (click)="onResetFilters()"></fa-icon>
     <select
@@ -39,9 +39,7 @@
   @if (ticketStore.loading()) {
     <div class="mt-5 grid gap-y-10 gap-x-6 md:grid-cols-3 xl:grid-cols-3">
       @for (ticketCard of [1, 2, 3, 4, 5, 6, 7, 8]; track $index) {
-        <div
-          class="p-4 animate-pulse flex flex-col rounded-xl bg-white border border-solid border-gray-200 overflow-auto"
-        >
+        <div class="p-4 animate-pulse flex flex-col rounded-xl bg-white border border-solid border-gray-200 overflow-auto">
           <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
           <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
           <div class="h-2 bg-gray-200 rounded-full w-full mb-2.5"></div>
@@ -54,10 +52,10 @@
       }
     </div>
   }
-  @if (!ticketStore.loading() && ticketStore.countTickets() == 0) {
+  @if (ticketStore.fulfilled() && ticketStore.totalTickets() == 0) {
     <p class="text-lg font-semibold flex justify-center items-center">No tickets found</p>
   }
-  @if (!ticketStore.loading() && ticketStore.countTickets() > 0) {
+  @if (ticketStore.fulfilled() && ticketStore.totalTickets() > 0) {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6">
       @for (ticket of ticketStore.tickets(); track $index) {
         <app-ticket-card
@@ -105,11 +103,7 @@
 
           <li
             (click)="onPaginationClick($event, 0, 'next')"
-            [ngClass]="[
-              ticketStore.totalPages() - 1 == ticketStore.currentPage()
-                ? 'pointer-events-none opacity-40'
-                : 'cursor-pointer',
-            ]"
+            [ngClass]="[ticketStore.totalPages() - 1 == ticketStore.currentPage() ? 'pointer-events-none opacity-40' : 'cursor-pointer']"
           >
             <a
               class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 bg-white border border-blue-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"

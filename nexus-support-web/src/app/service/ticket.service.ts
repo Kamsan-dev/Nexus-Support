@@ -8,7 +8,7 @@ import { ApiResponse } from '../core/model/response/api.response';
 import { PageTicket, Task, Ticket, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
 import { toHttpParams } from '../shared/utils/request';
-import { CreateTaskRequest } from '../core/model/request/create-task.request';
+import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
 
 @Injectable({
   providedIn: 'root',
@@ -41,6 +41,15 @@ export class TicketService {
 
   public createTask(request: CreateTaskRequest): Observable<ApiResponse<Task>> {
     return this.http.put<ApiResponse<Task>>(`${this.server}/ticket/task`, request);
+  }
+
+  public deleteTask(taskPublicId: string): Observable<ApiResponse<void>> {
+    const params = toHttpParams({ taskPublicId });
+    return this.http.delete<ApiResponse<void>>(`${this.server}/ticket/task/delete`, { params });
+  }
+
+  public updateTask(request: UpdateTaskRequest): Observable<ApiResponse<Task>> {
+    return this.http.put<ApiResponse<Task>>(`${this.server}/ticket/task/update`, request);
   }
 
   public getDashboardData(): any {

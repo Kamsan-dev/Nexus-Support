@@ -268,14 +268,15 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public int updateTask(UUID userPublicId, UpdateTaskDTO request) {
+    public TaskDTO updateTask(UUID userPublicId, UpdateTaskDTO request) {
         return jdbc.sql(UPDATE_TASK_QUERY)
                    .param("taskPublicId", request.taskPublicId())
                    .param("userPublicId", userPublicId)
                    .param("name", request.name())
                    .param("description", request.description())
-                   .param("status", request.status())
-                   .update();
+                   .param("status", request.status().getValue(), Types.VARCHAR)
+                   .query(TaskDTO.class)
+                   .single();
     }
 
     public int deleteTask(UUID userPublicId, UUID taskPublicId) {

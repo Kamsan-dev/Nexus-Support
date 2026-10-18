@@ -6,3 +6,11 @@ export interface CreateTaskRequest {
   description: string;
   status: TicketStatusEnum;
 }
+
+export interface UpdateTaskRequest {
+  taskPublicId: string;
+  assigneePublicId: string;
+  name: string;
+  description: string;
+  status: TicketStatusEnum;
+}

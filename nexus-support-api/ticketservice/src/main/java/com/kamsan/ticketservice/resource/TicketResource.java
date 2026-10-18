@@ -4,6 +4,7 @@ import com.kamsan.ticketservice.domain.ApiResponse;
 import com.kamsan.ticketservice.dto.*;
 import com.kamsan.ticketservice.enumeration.TicketStatus;
 import com.kamsan.ticketservice.enumeration.TicketType;
+import com.kamsan.ticketservice.model.Task;
 import com.kamsan.ticketservice.service.TicketService;
 import com.kamsan.ticketservice.service.UserService;
 import com.kamsan.ticketservice.service.implementation.TicketReportPdfService;
@@ -165,11 +166,11 @@ public class TicketResource {
 
     @PreAuthorize("hasAuthority('task:update')")
     @PutMapping("/task/update")
-    public ResponseEntity<ApiResponse<Void>> updateTask(@NotNull Authentication authentication,
+    public ResponseEntity<ApiResponse<TaskDTO>> updateTask(@NotNull Authentication authentication,
                                                         @RequestBody @Valid UpdateTaskDTO updateTaskDTO) {
-        this.ticketService.updateTask(UUID.fromString(authentication.getName()), updateTaskDTO);
+        TaskDTO task = this.ticketService.updateTask(UUID.fromString(authentication.getName()), updateTaskDTO);
         return ResponseEntity.ok().body(getResponse(
-                null,
+                task,
                 "Task updated successfully.",
                 HttpStatus.OK
         ));
