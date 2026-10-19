@@ -122,8 +122,12 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketDetailsDTO updateTicket(UUID userPublicId, UpdateTicketDTO updateTicketDTO) {
+//        ReadUserDTO user = userService.getUserByUUID(userPublicId);
+//        if (!hasElevatedPermissions(user.role()) && !updateTicketDTO.issuerPublicId().equals(userPublicId)) {
+//            throw new ApiException("Insufficient permissions.");
+//        }
         if (!updateTicketDTO.issuerPublicId().equals(userPublicId)) {
-            throw new ApiException("You can not update a ticket that does not belong to you.");
+            throw new ApiException("Insufficient permissions.");
         }
         return this.ticketQueryRepository.updateTicket(userPublicId, updateTicketDTO, DateFormatter.toOffsetDateTime(updateTicketDTO.dueDate()));
     }

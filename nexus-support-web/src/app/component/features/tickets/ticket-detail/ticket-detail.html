@@ -1,65 +1,4 @@
-@if (ticketStore.loading()) {
-  <div class="container mx-auto">
-    <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-4">
-      <main class="xl:col-span-2 lg:col-span-2 w-full">
-        <div role="status" class="animate-pulse bg-white mt-5 rounded-lg p-2 border border-solid border-gray-200">
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
-          <span class="sr-only">Loading...</span>
-        </div>
-      </main>
-      <div class="rounded-xl h-fit mt-5">
-        <div role="status" class="animate-pulse bg-white rounded-lg p-2 border border-solid border-gray-200">
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
-          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-    </div>
-  </div>
-} @else if (!ticketStore.loading() && ticketStore.ticket()) {
+@if (ticketStore.ticket()) {
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
       <a class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
@@ -131,10 +70,7 @@
                   {{ ticketStatusLabel[ticket()?.status!] }}
                 </span>
               </h5>
-              @if (
-                authStore.hasAnyRole([Role.MANAGER, Role.TECH_SUPPORT, Role.ADMIN, Role.SUPER_ADMIN]) ||
-                authStore.user()?.userPublicId === ticket()?.issuerPublicId
-              ) {
+              @if (authStore.user()?.userPublicId === ticket()?.issuerPublicId) {
                 <button
                   (click)="onEditTicketFormClick($event, 'edit')"
                   [disabled]="this.ticketForm.enabled"
@@ -269,10 +205,18 @@
                 </button>
                 <button
                   type="submit"
-                  [disabled]="this.ticketForm.disabled || this.ticketForm.pristine"
-                  class="cursor-pointer disabled:bg-gray-300 disabled:cursor-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+                  [disabled]="ticketForm.disabled || ticketForm.pristine || ticketStore.loading()"
+                  class="inline-flex items-center gap-2 cursor-pointer disabled:bg-gray-300 disabled:cursor-auto text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
                 >
-                  Update Ticket
+                  @if (ticketStore.loading()) {
+                    <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    Updating...
+                  } @else {
+                    Update Ticket
+                  }
                 </button>
               </div>
             </form>
@@ -302,7 +246,7 @@
                       <button
                         type="submit"
                         [disabled]="commentForm.invalid || commentForm.pristine"
-                        class="cursor-pointer disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
+                        class="disabled:cursor-auto cursor-pointer disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
                       >
                         Post
                       </button>
@@ -364,7 +308,14 @@
 
                         <div class="border-gray-200">
                           @if (editingCommentId() !== comment.commentPublicId) {
-                            <p class="bg-gray-100 rounded-e-xl rounded-es-xl text-sm font-normal text-gray-900 px-2 py-4">{{ comment.comment }}</p>
+                            <p
+                              [ngClass]="[
+                                comment.userPublicId === authStore.user()?.userPublicId ? 'bg-blue-50 border border-blue-200' : 'bg-gray-100',
+                              ]"
+                              class="rounded-e-xl text-sm font-normal text-gray-900 px-2 py-4"
+                            >
+                              {{ comment.comment }}
+                            </p>
                           }
                           @if (editingCommentId() === comment.commentPublicId) {
                             <input
@@ -477,7 +428,9 @@
           </div>
           <div class="rounded-xl p-4 bg-white border border-solid border-gray-200">
             <div class="flex items-center justify-between pb-4 border-b border-solid border-gray-200">
-              <h5 class="text-base font-semibold text-gray-900">Assigned To</h5>
+              <h5 class="text-base font-semibold text-gray-900">
+                {{ ticket()?.assigneePublicId === null ? 'This ticked has not been assigned yet' : 'This ticket is assigned to' }}
+              </h5>
             </div>
             <div class="mt-4 flex items-center justify-between rounded-md">
               @let assignee = ticketStore.ticket()?.assignee;
@@ -678,6 +631,73 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+} @else if (ticketStore.loading()) {
+  <div class="container mx-auto">
+    <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-4">
+      <main class="xl:col-span-2 lg:col-span-2 w-full">
+        <div role="status" class="animate-pulse bg-white mt-5 rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </main>
+      <div class="rounded-xl h-fit mt-5">
+        <div role="status" class="animate-pulse bg-white rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="container mx-auto">
+    <div class="flex justify-center">
+      <p>Something went wrong when loading the ticket.</p>
     </div>
   </div>
 }

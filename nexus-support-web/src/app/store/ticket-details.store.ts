@@ -52,6 +52,7 @@ export const TicketDetailsStore = signalStore(
     updateTicket: rxMethod<UpdateTicketRequest>(
       pipe(
         tap(() => patchState(store, setLoading())),
+        delay(1000),
         exhaustMap((request) =>
           ticketService.updateTicket(request).pipe(
             tapResponse({
