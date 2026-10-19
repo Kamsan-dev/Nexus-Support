@@ -4,7 +4,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, Reac
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HotToastService } from '@ngxpert/hot-toast';
-import { Task, TicketDetails } from '../../../../core/model/ticket.model';
+import { Comment, Task, TicketDetails } from '../../../../core/model/ticket.model';
 import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { TicketStatusColor, TicketStatusEnum, TicketStatusLabel } from '../../../../enum/ticket-status';
 import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
@@ -12,6 +12,7 @@ import { AuthStore } from '../../../../store/auth.store';
 import { TicketDetailsStore } from '../../../../store/ticket-details.store';
 import { DialogService } from '@ngneat/dialog';
 import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
+import { RoleEnum } from '../../../../enum/role';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -37,6 +38,7 @@ export class TicketDetail {
   protected readonly ticketTypes = Object.values(TicketTypeEnum);
   protected readonly ticketStatus = Object.values(TicketStatusEnum);
   protected readonly ticketStatusColor = TicketStatusColor;
+  protected readonly Role = RoleEnum;
 
   ticketPublicIdParam = signal<string | null>(null);
   ticketNumber = computed(() => this.ticketStore.ticket()?.ticket.ticketPublicId.substring(0, 8).toUpperCase());
@@ -48,11 +50,16 @@ export class TicketDetail {
   commentForm!: FormGroup;
   initialTicket!: TicketDetails;
 
+  //comment
+  editingCommentId = signal<string | null>(null);
+  editingValueComment = '';
+
   constructor() {
     effect(() => {
       this.initFormAfterTicketLoading();
       this.listenToUpdateTicket();
       this.listenToErrorStore();
+      this.listenToUpdateComment();
     });
   }
 
@@ -63,6 +70,7 @@ export class TicketDetail {
     }
   }
 
+  // MAIN FORM
   onEditTicketFormClick = (event: MouseEvent | TouchEvent, type: 'edit' | 'cancel'): void => {
     event.stopImmediatePropagation();
     if (type === 'edit') this.ticketForm.enable();
@@ -85,10 +93,14 @@ export class TicketDetail {
     }
   };
 
+  // ASSIGNEE
+
   onAssigneeSelectClick = (event: string): void => {
     if (event === 'no_selection') return;
     this.ticketStore.updateTicketAssignee({ ticketPublicId: this.ticket()?.ticketPublicId!, assigneePublicId: event });
   };
+
+  // TASK
 
   onAddNewTaskClick = (event: TouchEvent | MouseEvent): void => {
     event.stopImmediatePropagation();
@@ -117,6 +129,8 @@ export class TicketDetail {
     this.ticketStore.deleteTask(task.taskPublicId);
   };
 
+  // COMMENT
+
   onSubmitComment(event: MouseEvent | TouchEvent): void {
     event.stopImmediatePropagation();
     console.log('toast');
@@ -134,6 +148,35 @@ export class TicketDetail {
     this.commentForm.reset();
   }
 
+  onEditCommentClick = (event: TouchEvent | MouseEvent, comment: Comment): void => {
+    event.stopImmediatePropagation();
+    this.editingCommentId.set(comment.commentPublicId);
+    this.editingValueComment = comment.comment;
+  };
+
+  onCancelCommentClick = (event: TouchEvent | MouseEvent): void => {
+    event.stopImmediatePropagation();
+    this.editingCommentId.set(null);
+    this.editingValueComment = '';
+  };
+
+  onSaveCommentClick = (event: TouchEvent | MouseEvent, comment: Comment): void => {
+    event.stopImmediatePropagation();
+    this.ticketStore.editComment({
+      commentPublicId: comment.commentPublicId,
+      ownerCommentPublicId: comment.userPublicId,
+      ticketPublicId: this.ticket()!.ticketPublicId,
+      comment: this.editingValueComment,
+    });
+  };
+
+  onDeleteCommentClick = (event: TouchEvent | MouseEvent, commentPublicId: string): void => {
+    event.stopImmediatePropagation();
+    this.ticketStore.deleteComment(commentPublicId);
+  };
+
+  // PRIVATE METHOD
+
   private initTicketForm(ticket: TicketDetails): void {
     this.initialTicket = ticket;
     this.ticketForm = this.fb.group({
@@ -147,8 +190,14 @@ export class TicketDetail {
     });
     this.ticketForm.disable();
 
+    // Keep comment value if user cancel any edit on main form.
+    let comment = null;
+    if (this.commentForm) {
+      comment = this.commentForm.getRawValue().comment as string;
+    }
+
     this.commentForm = this.fb.nonNullable.group({
-      comment: ['', [Validators.required, Validators.maxLength(2000)]],
+      comment: [comment == null ? '' : comment, [Validators.required, Validators.maxLength(2000)]],
     });
   }
 
@@ -164,6 +213,13 @@ export class TicketDetail {
       this.toastService.success('Ticket modifié avec succès !');
       this.ticketStore.resetTicketUpdated();
       this.ticketForm.disable();
+    }
+  }
+
+  private listenToUpdateComment(): void {
+    if (this.ticketStore.commentUpdated()) {
+      this.editingCommentId.set(null);
+      this.editingValueComment = '';
     }
   }
 

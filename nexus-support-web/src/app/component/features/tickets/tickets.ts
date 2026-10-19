@@ -69,11 +69,7 @@ export class Tickets {
     });
   };
 
-  onPaginationClick = (
-    event: MouseEvent | TouchEvent,
-    index: number,
-    buttonType: 'previous' | 'next' | undefined = undefined,
-  ): void => {
+  onPaginationClick = (event: MouseEvent | TouchEvent, index: number, buttonType: 'previous' | 'next' | undefined = undefined): void => {
     event.stopImmediatePropagation();
     let page = this.ticketStore.currentPage();
     if (buttonType == 'previous') page--;
@@ -91,55 +87,46 @@ export class Tickets {
   private updateFilter(filter: Partial<TicketFilters>, field: 'type' | 'status'): void {
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: { [field]: filter[field] },
+      queryParams: { [field]: filter[field], page: 1 },
       queryParamsHandling: 'merge',
     });
   }
 
   private listenToQueryParams(): void {
-    this.activatedRoute.queryParamMap
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => {
-        const pageParam = params.get('page');
-        const size = Number(params.get('size') ?? this.ticketStore.query.pageRequest.size());
-        const statusParam = params.get('status') ?? this.ticketStore.statusQuery();
-        const typeParam = params.get('type') ?? this.ticketStore.typeQuery();
-        const filter = params.get('filter') ?? undefined;
+    this.activatedRoute.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const pageParam = params.get('page');
+      const size = Number(params.get('size') ?? this.ticketStore.query.pageRequest.size());
+      const statusParam = params.get('status') ?? this.ticketStore.statusQuery();
+      const typeParam = params.get('type') ?? this.ticketStore.typeQuery();
+      const filter = params.get('filter') ?? undefined;
 
-        const page =
-          pageParam !== null ? Number(pageParam) - 1 : this.ticketStore.query.pageRequest.page();
+      const page = pageParam !== null ? Number(pageParam) - 1 : this.ticketStore.query.pageRequest.page();
 
-        const status =
-          statusParam && statusParam !== 'all'
-            ? parseEnum(TicketStatusEnum, statusParam)
-            : undefined;
+      const status = statusParam && statusParam !== 'all' ? parseEnum(TicketStatusEnum, statusParam) : undefined;
 
-        const type =
-          typeParam && typeParam !== 'all' ? parseEnum(TicketTypeEnum, typeParam) : undefined;
-        this.ticketStore.getTickets({
-          pageRequest: {
-            page: page < 0 ? 0 : page,
-            size,
-          },
-          filters: {
-            status: status,
-            type: type,
-            filter: filter ? filter : undefined,
-          },
-        });
+      const type = typeParam && typeParam !== 'all' ? parseEnum(TicketTypeEnum, typeParam) : undefined;
+      this.ticketStore.getTickets({
+        pageRequest: {
+          page: page < 0 ? 0 : page,
+          size,
+        },
+        filters: {
+          status: status,
+          type: type,
+          filter: filter ? filter : undefined,
+        },
       });
+    });
   }
 
   private listenToFilterChanges(): void {
-    this.inputSubject
-      .pipe(debounceTime(500), distinct(), takeUntilDestroyed(this.destroyRef))
-      .subscribe((filter) => {
-        //this.ticketStore.setCurrentPage(query.pageRequest.page);
-        this.router.navigate([], {
-          relativeTo: this.activatedRoute,
-          queryParams: { filter: filter.trim() || null },
-          queryParamsHandling: 'merge',
-        });
+    this.inputSubject.pipe(debounceTime(500), distinct(), takeUntilDestroyed(this.destroyRef)).subscribe((filter) => {
+      //this.ticketStore.setCurrentPage(query.pageRequest.page);
+      this.router.navigate([], {
+        relativeTo: this.activatedRoute,
+        queryParams: { filter: filter.trim() || null, page: 1 },
+        queryParamsHandling: 'merge',
       });
+    });
   }
 }

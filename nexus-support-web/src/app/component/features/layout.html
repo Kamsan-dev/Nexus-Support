@@ -1,7 +1,11 @@
-<app-navbar />
-<div class="mt-20">
-  <div class="container mx-auto">
-    <router-outlet />
+<div class="min-h-screen flex flex-col">
+  <app-navbar />
+
+  <div class="mt-20 flex-1">
+    <div class="container mx-auto">
+      <router-outlet />
+    </div>
   </div>
+
+  <app-footer />
 </div>
-<app-footer />

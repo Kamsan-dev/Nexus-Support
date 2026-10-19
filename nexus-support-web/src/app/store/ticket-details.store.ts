@@ -10,14 +10,17 @@ import { TicketService } from '../service/ticket.service';
 import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
+import { UpdateCommentRequest } from '../core/model/request/update-comment.request';
 
 interface TicketDetailsState {
   ticketUpdated: boolean;
+  commentUpdated: boolean;
   ticket: Ticket | null;
 }
 
 const state: TicketDetailsState = {
   ticketUpdated: false,
+  commentUpdated: false,
   ticket: null,
 };
 
@@ -213,8 +216,67 @@ export const TicketDetailsStore = signalStore(
         ),
       ),
     ),
+    editComment: rxMethod<UpdateCommentRequest>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          ticketService.editComment(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  commentUpdated: true,
+                  ticket: {
+                    ...currentTicket,
+                    comments: currentTicket.comments.map((c) => (c.commentPublicId === request.commentPublicId ? response.data : c)),
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    deleteComment: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((commentPublicId) =>
+          ticketService.deleteComment(commentPublicId).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  commentUpdated: true,
+                  ticket: {
+                    ...currentTicket,
+                    comments: currentTicket.comments.filter((c) => c.commentPublicId !== commentPublicId),
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetTicketUpdated(): void {
       patchState(store, { ticketUpdated: false });
+    },
+    resetCommentUpdated(): void {
+      patchState(store, { commentUpdated: false });
     },
   })),
   withComputed((store) => ({

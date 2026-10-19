@@ -5,6 +5,7 @@ import com.kamsan.ticketservice.enumeration.TicketPriority;
 import com.kamsan.ticketservice.enumeration.TicketStatus;
 import com.kamsan.ticketservice.enumeration.TicketType;
 import com.kamsan.ticketservice.model.Attachment;
+import com.kamsan.ticketservice.model.Comment;
 import com.kamsan.ticketservice.utils.TicketUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -218,12 +219,24 @@ public class TicketQueryRepository {
                    .update();
     }
 
-    public int updateComment(UUID userPublicId, UUID commentPublicId, String comment) {
+    public CommentDTO updateComment(UUID userPublicId, UpdateCommentDTO request) {
         return jdbc.sql(UPDATE_COMMENT_QUERY)
-                   .param("commentPublicId", commentPublicId)
+                   .param("commentPublicId", request.commentPublicId())
                    .param("userPublicId", userPublicId)
-                   .param("comment", comment)
-                   .update();
+                   .param("comment", request.comment())
+                   .query((rs, rowNum) -> new CommentDTO(
+                           rs.getObject("created_at", OffsetDateTime.class),
+                           rs.getObject("updated_at", OffsetDateTime.class),
+                           rs.getObject("comment_public_id", UUID.class),
+                           rs.getObject("user_public_id", UUID.class),
+                           request.ticketPublicId(),
+                           rs.getString("comment"),
+                           rs.getBoolean("is_edited"),
+                           rs.getString("first_name"),
+                           rs.getString("last_name"),
+                           rs.getString("image_url")
+                   ))
+                   .single();
     }
 
     public int deleteComment(UUID userPublicId, UUID commentPublicId) {

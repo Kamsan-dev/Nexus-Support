@@ -133,11 +133,12 @@ public class TicketResource {
     }
 
     @PatchMapping("/comment/update")
-    public ResponseEntity<ApiResponse<Void>> updateComment(@NotNull Authentication authentication,
+    public ResponseEntity<ApiResponse<CommentDTO>> updateComment(@NotNull Authentication authentication,
                                                            @RequestBody @Valid UpdateCommentDTO updateCommentDTO) {
-        this.ticketService.updateComment(UUID.fromString(authentication.getName()), updateCommentDTO);
+        CommentDTO comment = this.ticketService.updateComment(UUID.fromString(authentication.getName()),
+                updateCommentDTO);
         return ResponseEntity.ok().body(getResponse(
-                null,
+                comment,
                 "Comment updated successfully.",
                 HttpStatus.OK
         ));

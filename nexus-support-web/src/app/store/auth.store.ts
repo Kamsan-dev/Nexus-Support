@@ -6,6 +6,7 @@ import { catchError, EMPTY, pipe, switchMap, tap } from 'rxjs';
 import { Profile } from '../core/model/user.model';
 import { UserService } from '../service/user.service';
 import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
+import { RoleEnum } from '../enum/role';
 
 interface AuthState {
   profile: Profile | undefined;
@@ -44,16 +45,22 @@ export const AuthStore = signalStore(
         ),
       ),
     ),
-  })),
-  withMethods((store) => ({
     hasAnyAuthorities(authorities: string): boolean {
       if (store.profile === undefined) return false;
       let splitAuthorities = store.profile()?.user.authorities.split(',');
       return splitAuthorities?.includes(authorities) ?? false;
     },
+    hasAnyRole(roles: RoleEnum[]): boolean {
+      const profile = store.profile();
+      if (!profile) {
+        return false;
+      }
+      return roles.includes(profile.user.role);
+    },
   })),
   withComputed((store) => ({
     user: computed(() => store.profile()?.user ?? undefined),
     devices: computed(() => store.profile()?.devices ?? []),
+    roleConnectedUser: computed(() => store.profile()?.user.role),
   })),
 );

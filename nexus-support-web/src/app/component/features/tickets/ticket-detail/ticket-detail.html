@@ -59,7 +59,7 @@
       </div>
     </div>
   </div>
-} @else if (ticketStore.fulfilled() && ticketStore.ticket()) {
+} @else if (!ticketStore.loading() && ticketStore.ticket()) {
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
       <a class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
@@ -131,13 +131,18 @@
                   {{ ticketStatusLabel[ticket()?.status!] }}
                 </span>
               </h5>
-              <button
-                (click)="onEditTicketFormClick($event, 'edit')"
-                [disabled]="this.ticketForm.enabled"
-                class="disabled:text-gray-300 disabled:cursor-auto cursor-pointer text-blue-700 border border-solid border-gray-200 hover:bg-gray-200 font-medium rounded-lg p-2"
-              >
-                <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
-              </button>
+              @if (
+                authStore.hasAnyRole([Role.MANAGER, Role.TECH_SUPPORT, Role.ADMIN, Role.SUPER_ADMIN]) ||
+                authStore.user()?.userPublicId === ticket()?.issuerPublicId
+              ) {
+                <button
+                  (click)="onEditTicketFormClick($event, 'edit')"
+                  [disabled]="this.ticketForm.enabled"
+                  class="disabled:text-gray-300 disabled:cursor-auto cursor-pointer text-blue-700 border border-solid border-gray-200 hover:bg-gray-200 font-medium rounded-lg p-2"
+                >
+                  <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
+                </button>
+              }
             </div>
             <form class="flex flex-col gap-4 pt-4" [formGroup]="ticketForm" (ngSubmit)="onTicketFormSubmitClick($event)">
               <input type="hidden" name="ticketUuid" required />
@@ -278,27 +283,33 @@
                 Comments ({{ ticketStore.currentTicket()?.comments?.length }})
               </h5>
               <div class="mt-6">
-                <form [formGroup]="commentForm" class="mb-8" (ngSubmit)="onSubmitComment($event)">
-                  <label for="comment" class="mb-2 text-sm font-medium text-gray-900 sr-only">Post comment</label>
-                  <div class="flex items-center justify-between gap-x-2">
-                    <input
-                      type="text"
-                      name="comment"
-                      formControlName="comment"
-                      autocomplete="off"
-                      class="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Add a comment"
-                    />
-                    <input type="hidden" value="ticket.ticketUuid" name="ticketUuid" autocomplete="off" required- />
-                    <button
-                      type="submit"
-                      [disabled]="commentForm.invalid || commentForm.pristine"
-                      class="cursor-pointer disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
-                    >
-                      Post
-                    </button>
-                  </div>
-                </form>
+                @if (
+                  authStore.hasAnyRole([Role.MANAGER, Role.TECH_SUPPORT, Role.ADMIN, Role.SUPER_ADMIN]) ||
+                  authStore.user()?.userPublicId === ticket()?.issuerPublicId
+                ) {
+                  <form [formGroup]="commentForm" class="mb-8" (ngSubmit)="onSubmitComment($event)">
+                    <label for="comment" class="mb-2 text-sm font-medium text-gray-900 sr-only">Post comment</label>
+                    <div class="flex items-center justify-between gap-x-2">
+                      <input
+                        type="text"
+                        name="comment"
+                        formControlName="comment"
+                        autocomplete="off"
+                        class="block w-full p-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Add a comment"
+                      />
+                      <input type="hidden" value="ticket.ticketUuid" name="ticketUuid" autocomplete="off" required- />
+                      <button
+                        type="submit"
+                        [disabled]="commentForm.invalid || commentForm.pristine"
+                        class="cursor-pointer disabled:bg-gray-300 disabled:border-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-3"
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </form>
+                }
+
                 @if (ticketStore.commentsList()!.length > 0) {
                   @for (comment of ticketStore.commentsList(); track comment.commentPublicId) {
                     <div class="mt-4 flex items-start gap-2.5">
@@ -319,30 +330,51 @@
                           </div>
                           @if (comment.userPublicId === authStore.user()?.userPublicId) {
                             <div class="flex items-center justify-between gap-2">
-                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                                Edit
-                              </button>
-                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                                Delete
-                              </button>
-                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                                Save
-                              </button>
-                              <button class="rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline">
-                                Cancel
-                              </button>
+                              @if (editingCommentId() !== comment.commentPublicId) {
+                                <button
+                                  (click)="onEditCommentClick($event, comment)"
+                                  class="cursor-pointer rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  (click)="onDeleteCommentClick($event, comment.commentPublicId)"
+                                  class="cursor-pointer rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline"
+                                >
+                                  Delete
+                                </button>
+                              } @else {
+                                <button
+                                  (click)="onSaveCommentClick($event, comment)"
+                                  [disabled]="comment.comment === editingValueComment"
+                                  class="disabled:cursor-auto disabled:text-gray-300 cursor-pointer rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  (click)="onCancelCommentClick($event)"
+                                  class="cursor-pointer rounded-md py-0.5 px-1 text-xs font-medium text-gray-600 transition-all duration-300 hover:underline"
+                                >
+                                  Cancel
+                                </button>
+                              }
                             </div>
                           }
                         </div>
+
                         <div class="border-gray-200">
-                          <p class="bg-gray-100 rounded-e-xl rounded-es-xl text-sm font-normal text-gray-900 px-2 py-4">{{ comment.comment }}</p>
-                          <input
-                            type="text"
-                            autofocus
-                            name="commentUpdate"
-                            class="block w-full px-2 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
-                            placeholder="Edit comment"
-                          />
+                          @if (editingCommentId() !== comment.commentPublicId) {
+                            <p class="bg-gray-100 rounded-e-xl rounded-es-xl text-sm font-normal text-gray-900 px-2 py-4">{{ comment.comment }}</p>
+                          }
+                          @if (editingCommentId() === comment.commentPublicId) {
+                            <input
+                              type="text"
+                              name="commentUpdate"
+                              [(ngModel)]="editingValueComment"
+                              class="block w-full px-2 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+                              placeholder="Edit comment"
+                            />
+                          }
                         </div>
                       </div>
                     </div>

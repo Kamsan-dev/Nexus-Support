@@ -9,6 +9,7 @@ import { Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters } from 
 import { mockData } from './mock/mock-data';
 import { toHttpParams } from '../shared/utils/request';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
+import { UpdateCommentRequest } from '../core/model/request/update-comment.request';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +60,15 @@ export class TicketService {
 
   public addComment(ticketPublicId: string, comment: string): Observable<ApiResponse<Comment>> {
     return this.http.post<ApiResponse<Comment>>(`${this.server}/ticket/comment`, { ticketPublicId, comment });
+  }
+
+  public editComment(request: UpdateCommentRequest): Observable<ApiResponse<Comment>> {
+    return this.http.patch<ApiResponse<Comment>>(`${this.server}/ticket/comment/update`, request);
+  }
+
+  public deleteComment(commentPublicId: string): Observable<ApiResponse<void>> {
+    const params = toHttpParams({ commentPublicId });
+    return this.http.delete<ApiResponse<void>>(`${this.server}/ticket/comment/delete`, { params });
   }
 
   public getDashboardData(): any {

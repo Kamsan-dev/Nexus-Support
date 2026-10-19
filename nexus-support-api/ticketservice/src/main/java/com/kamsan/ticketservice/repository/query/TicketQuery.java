@@ -223,13 +223,29 @@ public class TicketQuery {
             WHERE file_public_id = :filePublicId
             """;
     public static final String UPDATE_COMMENT_QUERY = """
-            UPDATE comments c
-            SET comment = :comment,
-            updated_at = NOW()
-            FROM users u
-            WHERE c.comment_public_id = :commentPublicId
-            AND u.user_id = c.user_id
-            AND u.user_public_id = :userPublicId
+            WITH comment AS (
+                UPDATE comments c
+                SET comment = :comment,
+                updated_at = NOW()
+                FROM users u
+                WHERE c.comment_public_id = :commentPublicId
+                AND u.user_id = c.user_id
+                AND u.user_public_id = :userPublicId
+                RETURNING c.*
+            )
+            SELECT
+                c.comment_public_id,
+                u.user_public_id,
+                u.first_name,
+                u.last_name,
+                u.image_url,
+                c.comment,
+                c.updated_at,
+                c.created_at,
+                c.created_at <> c.updated_at AS is_edited
+            FROM comment c
+            JOIN tickets t ON t.ticket_id = c.ticket_id
+            JOIN users u ON c.user_id = u.user_id
             """;
     public static final String DELETE_COMMENT_QUERY = """
             DELETE FROM comments c

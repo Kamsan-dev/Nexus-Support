@@ -158,7 +158,7 @@ public class TicketServiceImpl implements TicketService {
         TicketDetailsDTO ticket = ticketQueryRepository.findByTicketPublicId(createCommentDTO.ticketPublicId());
         ReadUserDTO user = userService.getUserByUUID(userPublicId);
         // Only an elevated user or the issuer of the given ticket can post a comment
-        if (!hasElevatedPermissions(user.role()) || !userPublicId.equals(ticket.issuerPublicId())) {
+        if (!hasElevatedPermissions(user.role()) && !userPublicId.equals(ticket.issuerPublicId())) {
             throw new ApiException("Insufficient permissions.");
         }
         CommentDTO commentDTO = ticketQueryRepository.insertNewComment(userPublicId, createCommentDTO);
@@ -178,14 +178,12 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void updateComment(UUID connectedUser, UpdateCommentDTO updateCommentDTO) {
+    public CommentDTO updateComment(UUID connectedUser, UpdateCommentDTO updateCommentDTO) {
         if (!updateCommentDTO.ownerCommentPublicId().equals(connectedUser)) {
             throw new ApiException("You can not update a comment that does not belong to you.");
         }
-        int update = ticketQueryRepository.updateComment(connectedUser,
-                updateCommentDTO.commentPublicId(),
-                updateCommentDTO.comment());
-        if (update == 0) throw new ApiException("Comment not found or not authorized");
+        return ticketQueryRepository.updateComment(connectedUser,
+                updateCommentDTO);
     }
 
     @Override
@@ -227,7 +225,7 @@ public class TicketServiceImpl implements TicketService {
             if (files != null && !files.isEmpty()) {
                 var user = userService.getUserByUUID(userPublicId);
                 TicketDetailsDTO ticket = ticketQueryRepository.findByTicketPublicId(ticketPublicId);
-                if (!hasElevatedPermissions(user.role()) || !ticket.issuerPublicId().equals(userPublicId)) {
+                if (!hasElevatedPermissions(user.role()) && !ticket.issuerPublicId().equals(userPublicId)) {
                     throw new ApiException("Insufficient permissions.");
                 }
                 for (MultipartFile file : files) {

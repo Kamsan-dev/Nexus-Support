@@ -23,7 +23,7 @@ public interface TicketService {
 
     CommentDTO createComment(UUID userPublicId, CreateCommentDTO createCommentDTO);
 
-    void updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
+    CommentDTO updateComment(UUID userPublicID, UpdateCommentDTO updateCommentDTO);
 
     void deleteComment(UUID userPublicId, UUID commentPublicId);
 

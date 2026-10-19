@@ -5,5 +5,6 @@ import java.util.UUID;
 public record UpdateCommentDTO(
         UUID ownerCommentPublicId,
         UUID commentPublicId,
+        UUID ticketPublicId,
         String comment) {
 }
