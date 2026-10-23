@@ -1,4 +1,5 @@
 @if (ticketStore.ticket()) {
+  @let files = ticketStore.ticket()?.attachments;
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
       <a (click)="goBack()" class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
@@ -190,7 +191,6 @@
                     disabled
                     autocomplete="off"
                     class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
-                    required
                   />
                 </div>
               </div>
@@ -406,7 +406,7 @@
                   </div>
                   <div class="flex items-center justify-between">
                     <h5 class="text-xl font-semibold text-gray-900 leading-8">
-                      {{ ticketStore.currentTicket()?.attachments?.length }}
+                      {{ files?.length }}
                     </h5>
                   </div>
                   <h6 class="text-xs font-normal text-gray-500">Attachments</h6>
@@ -474,69 +474,49 @@
             <div class="flex items-center justify-between pb-4 border-b border-solid border-gray-200">
               <h5 class="text-base font-semibold text-gray-900">Attachments ({{ ticketStore.currentTicket()?.attachments?.length }})</h5>
               <button
-                class="flex items-center rounded-md bg-blue-600 hover:bg-blue-700 py-2.5 p-3 gap-1.5 text-xs font-medium text-white transition-all duration-300"
+                (click)="filesInput.click()"
+                class="cursor-pointer flex items-center rounded-md bg-blue-600 hover:bg-blue-700 py-2.5 p-3 gap-1.5 text-xs font-medium text-white transition-all duration-300"
               >
                 Upload
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"
-                  />
-                </svg>
+                <fa-icon [icon]="'upload'" class="fa-fw text-sm" />
+                <input
+                  #filesInput
+                  type="file"
+                  name="file"
+                  accept="application/pdf,image/*"
+                  multiple
+                  class="hidden"
+                  (change)="uploadFiles($any($event.target.files))"
+                />
               </button>
             </div>
             <div class="mt-6 flex flex-col gap-6">
-              @if (ticketStore.currentTicket() && ticketStore.currentTicket()?.attachments!.length > 0) {
-                @for (file of ticketStore.currentTicket()?.attachments; track file.name) {
+              @if (ticketStore.currentTicket() && ticketStore.currentTicket()!.attachments.length > 0) {
+                @for (file of files; track file.name) {
                   <div class="flex items-center justify-between gap-3 w-full border border-solid border-gray-300 rounded-md p-2.5">
                     <div class="flex items-center gap-3">
                       <div class="">
                         <div class="w-10 h-10 rounded-md bg-gray-200 p-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="size-6"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
-                            />
-                          </svg>
+                          <fa-icon [icon]="'paperclip'" class="fa-fw text-xl" />
                         </div>
                       </div>
                       <div class="block">
-                        <h6 class="text-xs font-semibold text-gray-900 mb-0.5">screenshot.png</h6>
-                        <p class="text-xs font-normal text-gray-500">25 &middot; Jan 28 2025</p>
+                        <h6 class="text-xs font-semibold text-gray-900 mb-0.5">{{ file.name }}</h6>
+                        <p class="text-xs font-normal text-gray-500">{{ file.formattedSize }} &middot; {{ file.createdAt | date: 'mediumDate' }}</p>
                       </div>
                     </div>
                     <div class="flex items-center gap-3">
-                      <button class="rounded-lg bg-gray-100 p-2 transition-all duration-300 hover:bg-gray-200 hover:text-gray-900">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.6"
-                          stroke="#111827"
-                          class="size-4"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                          />
-                        </svg>
+                      <button
+                        (click)="downloadFile(file.filePublicId)"
+                        class="cursor-pointer rounded-lg bg-gray-100 p-2 transition-all duration-300 hover:bg-gray-200 hover:text-gray-900"
+                      >
+                        <fa-icon [icon]="'download'" class="fa-fw text-sm" />
                       </button>
-                      <button class="rounded-lg bg-gray-100 p-2 transition-all duration-300 hover:bg-gray-200 hover:text-gray-900">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" class="size-4">
-                          <path d="M4 4L12 12M12 4L4 12" stroke="#111827" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></path>
-                        </svg>
+                      <button
+                        (click)="deleteFile(file.filePublicId, file.name)"
+                        class="cursor-pointer rounded-lg bg-gray-100 p-2 transition-all duration-300 hover:bg-gray-200 hover:text-gray-900"
+                      >
+                        <fa-icon [icon]="'xmark'" class="fa-fw text-sm" />
                       </button>
                     </div>
                   </div>
@@ -702,5 +682,3 @@
     </div>
   </div>
 }
-
-<input type="file" name="file" accept="*/*" multiple class="hidden" />

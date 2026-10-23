@@ -276,6 +276,84 @@ export const TicketDetailsStore = signalStore(
         ),
       ),
     ),
+    deleteFile: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((filePublicId) =>
+          ticketService.deleteFile(filePublicId).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  ticket: {
+                    ...currentTicket,
+                    attachments: currentTicket.attachments.filter((a) => a.filePublicId !== filePublicId),
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    uploadFiles: rxMethod<FormData>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((formData) =>
+          ticketService.uploadFiles(formData).pipe(
+            tapResponse({
+              next: (response) => {
+                const currentTicket = store.ticket();
+                if (!currentTicket) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  ticket: {
+                    ...currentTicket,
+                    attachments: [...response.data, ...currentTicket.attachments],
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    downloadFile: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((filePublicId) =>
+          ticketService.downloadFile(filePublicId).pipe(
+            tapResponse({
+              next: (response) => {
+                const url = URL.createObjectURL(response);
+                const link = document.createElement('a');
+
+                link.href = url;
+                link.download = filePublicId;
+                link.click();
+
+                URL.revokeObjectURL(url);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetTicketUpdated(): void {
       patchState(store, { ticketUpdated: false });
     },

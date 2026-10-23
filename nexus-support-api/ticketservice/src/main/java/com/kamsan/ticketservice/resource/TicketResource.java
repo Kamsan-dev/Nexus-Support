@@ -4,6 +4,7 @@ import com.kamsan.ticketservice.domain.ApiResponse;
 import com.kamsan.ticketservice.dto.*;
 import com.kamsan.ticketservice.enumeration.TicketStatus;
 import com.kamsan.ticketservice.enumeration.TicketType;
+import com.kamsan.ticketservice.model.Attachment;
 import com.kamsan.ticketservice.model.Comment;
 import com.kamsan.ticketservice.model.Task;
 import com.kamsan.ticketservice.service.TicketService;
@@ -15,10 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
@@ -195,12 +194,14 @@ public class TicketResource {
             value = "/file/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    ResponseEntity<ApiResponse<UUID>> uploadFile(@NotNull Authentication authentication,
-                                                 @RequestParam("ticketPublicId") UUID ticketPublicId,
-                                                 @RequestParam("files") List<MultipartFile> files) {
-        ticketService.uploadFiles(UUID.fromString(authentication.getName()), ticketPublicId, files);
+    ResponseEntity<ApiResponse<List<AttachmentDTO>>> uploadFile(@NotNull Authentication authentication,
+                                                            @RequestParam("ticketPublicId") UUID ticketPublicId,
+                                                            @RequestParam("files") List<MultipartFile> files) {
+        List<AttachmentDTO> attachment = ticketService.uploadFiles(UUID.fromString(authentication.getName()),
+                ticketPublicId,
+                files);
         return ResponseEntity.ok().body(getResponse(
-                null,
+                attachment,
                 "Files uploaded successfully.",
                 HttpStatus.OK
         ));
@@ -218,16 +219,24 @@ public class TicketResource {
     }
 
     @GetMapping("/file/download/{filePublicId}")
-    public ResponseEntity<UrlResource> downloadFile(@NotNull Authentication authentication,
-                                                    @PathVariable("filePublicId") UUID filePublicId) throws IOException {
-        var path = this.ticketService.downloadFile(filePublicId);
+    public ResponseEntity<UrlResource> downloadFile(@NotNull Authentication authentication, @PathVariable UUID filePublicId) throws IOException {
+        var path = ticketService.downloadFile(filePublicId);
         var resource = new UrlResource(path.toUri());
+
+        var contentType = Files.probeContentType(path);
+        if (contentType == null) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
         var headers = new HttpHeaders();
-        headers.add(FILE_NAME_HEADER, resource.getFilename());
-        headers.add(HttpHeaders.CONTENT_DISPOSITION,
-                String.format("attachment;%s=%s", FILE_NAME_HEADER, resource.getFilename()));
-        return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(path)))
-                             .headers(headers).body(resource);
+        headers.setContentDisposition(
+                ContentDisposition.attachment()
+                                  .filename(resource.getFilename(), StandardCharsets.UTF_8)
+                                  .build()
+        );
+        return ResponseEntity.ok()
+                             .contentType(MediaType.parseMediaType(contentType))
+                             .headers(headers)
+                             .body(resource);
     }
 
     @PostMapping("/report")

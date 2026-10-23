@@ -44,11 +44,13 @@ export interface Comment {
 
 export interface Attachment {
   ticketPublicId: string;
+  filePublicId: string;
   name: string;
   size: number;
   formattedSize: string;
   extension: string;
   uri: string;
+  createdAt: Date;
 }
 
 export interface Task {

@@ -186,16 +186,17 @@ public class TicketQueryRepository {
                    .single();
     }
 
-    public void insertNewFile(UUID ticketPublicId, AttachmentDTO request) {
-        jdbc.sql(INSERT_FILE_TICKET_QUERY)
+    public OffsetDateTime insertNewFile(UUID ticketPublicId, AttachmentDTO request) {
+        return jdbc.sql(INSERT_FILE_TICKET_QUERY)
             .param("ticketPublicId", ticketPublicId)
-            .param("filePublicId", TicketUtils.randomUUID.get())
-            .param("extension", request.extension())
-            .param("formattedSize", request.formattedSize())
-            .param("name", request.name())
-            .param("size", request.size())
-            .param("uri", request.uri())
-            .update();
+            .param("filePublicId", request.getFilePublicId())
+            .param("extension", request.getExtension())
+            .param("formattedSize", request.getFormattedSize())
+            .param("name", request.getName())
+            .param("size", request.getSize())
+            .param("uri", request.getUri())
+            .query(OffsetDateTime.class)
+            .single();
     }
 
     public List<Attachment> getFilesForTicket(UUID ticketPublicId) {
@@ -206,7 +207,7 @@ public class TicketQueryRepository {
     }
 
     public Attachment findFileByPublicId(UUID filePublicId) {
-        return jdbc.sql(SELECT_FILES_TICKET_QUERY)
+        return jdbc.sql(SELECT_FILE_QUERY)
                    .param("filePublicId", filePublicId)
                    .query(Attachment.class)
                    .single();

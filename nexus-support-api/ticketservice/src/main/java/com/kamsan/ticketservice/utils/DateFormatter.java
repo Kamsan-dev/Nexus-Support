@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateFormatter {
 
-    private static final ZoneId PARIS_ZONE = ZoneId.of("Europe/Paris");
+    public static final ZoneId PARIS_ZONE = ZoneId.of("Europe/Paris");
 
     public static String shortDate(OffsetDateTime date) {
         DateTimeFormatter formatter =

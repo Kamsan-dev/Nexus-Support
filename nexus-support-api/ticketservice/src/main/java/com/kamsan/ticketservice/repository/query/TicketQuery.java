@@ -203,6 +203,7 @@ public class TicketQuery {
                 :uri
             FROM tickets t
             WHERE t.ticket_public_id = :ticketPublicId
+            RETURNING created_at
             """;
 
     public static final String SELECT_FILES_TICKET_QUERY = """

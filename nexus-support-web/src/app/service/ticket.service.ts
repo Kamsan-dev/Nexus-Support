@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
 import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 import { ApiResponse } from '../core/model/response/api.response';
-import { Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters } from '../core/model/ticket.model';
+import { Attachment, Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters } from '../core/model/ticket.model';
 import { mockData } from './mock/mock-data';
 import { toHttpParams } from '../shared/utils/request';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
@@ -69,6 +69,20 @@ export class TicketService {
   public deleteComment(commentPublicId: string): Observable<ApiResponse<void>> {
     const params = toHttpParams({ commentPublicId });
     return this.http.delete<ApiResponse<void>>(`${this.server}/ticket/comment/delete`, { params });
+  }
+
+  // --- FILES ---
+  public deleteFile(filePublicId: string): Observable<ApiResponse<void>> {
+    const params = toHttpParams({ filePublicId });
+    return this.http.delete<ApiResponse<void>>(`${this.server}/ticket/file/delete`, { params });
+  }
+
+  public uploadFiles(request: FormData): Observable<ApiResponse<Array<Attachment>>> {
+    return this.http.post<ApiResponse<Array<Attachment>>>(`${this.server}/ticket/file/upload`, request);
+  }
+
+  public downloadFile(filePublicId: string) {
+    return this.http.get(`${this.server}/ticket/file/download/${filePublicId}`, { responseType: 'blob' });
   }
 
   public getDashboardData(): any {

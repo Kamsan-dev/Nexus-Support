@@ -14,6 +14,7 @@ import { AuthStore } from '../../../../store/auth.store';
 import { TicketDetailsStore } from '../../../../store/ticket-details.store';
 import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
 import { ModalService } from '../../../../service/modal.service';
+import { getFormData } from '../../../../shared/utils/request';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -210,6 +211,38 @@ export class TicketDetail {
         }
         this.ticketStore.deleteComment(commentPublicId);
       });
+  };
+
+  // files
+
+  downloadFile = (filePublicId: string) => {
+    this.ticketStore.downloadFile(filePublicId);
+  };
+
+  deleteFile = (filePublicId: string, name: string) => {
+    this.modalService
+      .open(this.viewRef, {
+        title: 'Delete file',
+        message: `Are you sure you want to delete file ${name} ?`,
+        subtitle: 'This action cannot be undone.',
+        type: 'warning',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.ticketStore.deleteFile(filePublicId);
+      });
+  };
+
+  uploadFiles = (files: FileList) => {
+    let filesToSave: File[] = [];
+    Array.from(files).forEach((file) => {
+      filesToSave.push(file);
+    });
+
+    const formData = getFormData({ ticketPublicId: this.ticket()?.ticketPublicId }, filesToSave);
+    this.ticketStore.uploadFiles(formData);
   };
 
   // PRIVATE METHOD

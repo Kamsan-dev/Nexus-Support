@@ -12,6 +12,7 @@ import com.kamsan.ticketservice.service.TicketService;
 import com.kamsan.ticketservice.service.UserService;
 import com.kamsan.ticketservice.sharedkernel.exception.ApiException;
 import com.kamsan.ticketservice.utils.DateFormatter;
+import com.kamsan.ticketservice.utils.TicketUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -81,11 +83,13 @@ public class TicketServiceImpl implements TicketService {
             try {
                 for (MultipartFile file : files) {
                     AttachmentDTO attachment = new AttachmentDTO(ticket.getTicketPublicId(),
+                            null,
                             ticket.getTicketPublicId() + "_" + file.getOriginalFilename(),
                             file.getSize(),
                             byteCountToDisplaySize(file.getSize()),
                             getExtension(file.getOriginalFilename()),
-                            getFileUri(file.getOriginalFilename()));
+                            getFileUri(file.getOriginalFilename()),
+                           null);
 
                     saveTicketFile(ticket.getTicketPublicId(), attachment);
                     // Save bytes on R2 : TODO
@@ -214,14 +218,17 @@ public class TicketServiceImpl implements TicketService {
     public Path downloadFile(UUID filePublicId) {
         try {
             var attachment = ticketQueryRepository.findFileByPublicId(filePublicId);
+            log.info(attachment.getName());
             var filePath = Paths.get(ticketProperties.filesDirectory())
                                 .toAbsolutePath()
                                 .normalize()
                                 .resolve(attachment.getName());
+            log.info("download file : file path : {}", filePath);
             if (!Files.exists(filePath))
                 throw new ApiException(String.format("File %s not found on the server.", attachment.getName()));
             return filePath;
         } catch (Exception e) {
+            log.info(e.getMessage());
             throw new ApiException("Unable to download this file. Please try again later.");
         }
     }
@@ -239,13 +246,14 @@ public class TicketServiceImpl implements TicketService {
                 for (MultipartFile file : files) {
                     AttachmentDTO attachment = new AttachmentDTO(
                             ticket.ticketPublicId(),
+                            TicketUtils.randomUUID.get(),
                             ticketPublicId + "_" + file.getOriginalFilename(),
                             file.getSize(),
                             byteCountToDisplaySize(file.getSize()),
                             getExtension(file.getOriginalFilename()),
-                            getFileUri(file.getOriginalFilename()));
-
-                    saveTicketFile(ticket.ticketPublicId(), attachment);
+                            getFileUri(file.getOriginalFilename()),
+                            null);
+                    attachment.setCreatedAt(ticketQueryRepository.insertNewFile(ticketPublicId, attachment));
 
                     // saving locally
                     if (environment.matchesProfiles("dev")) {
@@ -262,7 +270,7 @@ public class TicketServiceImpl implements TicketService {
 
                 if (!ticket.issuerPublicId().equals(userPublicId)) {
                     var filenames = fileList.stream()
-                                            .map(AttachmentDTO::name)
+                                            .map(AttachmentDTO::getName)
                                             .collect(Collectors.joining(", "));
                     publisher.publishEvent(new Event(FILE_UPLOADED, Map.of(
                             "date", shortDate(ticket.updatedAt()),
