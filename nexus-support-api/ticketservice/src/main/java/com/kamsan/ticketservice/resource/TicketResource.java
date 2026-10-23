@@ -191,7 +191,10 @@ public class TicketResource {
         ));
     }
 
-    @PostMapping("/file/upload")
+    @PostMapping(
+            value = "/file/upload",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     ResponseEntity<ApiResponse<UUID>> uploadFile(@NotNull Authentication authentication,
                                                  @RequestParam("ticketPublicId") UUID ticketPublicId,
                                                  @RequestParam("files") List<MultipartFile> files) {
@@ -199,7 +202,7 @@ public class TicketResource {
         return ResponseEntity.ok().body(getResponse(
                 null,
                 "Files uploaded successfully.",
-                HttpStatus.CREATED
+                HttpStatus.OK
         ));
     }
 

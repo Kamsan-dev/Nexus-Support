@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
@@ -54,6 +55,7 @@ public class TicketServiceImpl implements TicketService {
     private final ApplicationEventPublisher publisher;
     private final TicketMapper ticketMapper;
     private final TicketProperties ticketProperties;
+    private final Environment environment;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,13 +91,15 @@ public class TicketServiceImpl implements TicketService {
                     // Save bytes on R2 : TODO
 
                     // saving locally
-                    var filename = cleanPath(ticket.getTicketPublicId() + "_" + file.getOriginalFilename());
-                    log.info("filename as clean path : {}", filename);
-                    var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
-                                                   .toAbsolutePath()
-                                                   .normalize();
-                    log.info("file storage URI : {}", fileStorageLocation);
-                    Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+                    if (environment.matchesProfiles("dev")) {
+                        var filename = cleanPath(ticket.getTicketPublicId() + "_" + file.getOriginalFilename());
+                        log.info("filename as clean path : {}", filename);
+                        var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
+                                                       .toAbsolutePath()
+                                                       .normalize();
+                        log.info("file storage URI : {}", fileStorageLocation);
+                        Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+                    }
                 }
 
                 ticket.setFileCount(files.size());
@@ -154,7 +158,7 @@ public class TicketServiceImpl implements TicketService {
     @Transactional(readOnly = true)
     public List<AttachmentDTO> getTicketFiles(UUID ticketPublicId) {
         List<Attachment> filesForTicket = ticketQueryRepository.getFilesForTicket(ticketPublicId);
-        return filesForTicket.stream().map(ticketMapper::attachmentToAttachmentDTO).toList();
+        return filesForTicket.stream().map(file -> ticketMapper.attachmentToAttachmentDTO(file, ticketPublicId)).toList();
     }
 
     @Override
@@ -235,20 +239,24 @@ public class TicketServiceImpl implements TicketService {
                 for (MultipartFile file : files) {
                     AttachmentDTO attachment = new AttachmentDTO(
                             ticket.ticketPublicId(),
-                            file.getOriginalFilename(),
+                            ticketPublicId + "_" + file.getOriginalFilename(),
                             file.getSize(),
                             byteCountToDisplaySize(file.getSize()),
                             getExtension(file.getOriginalFilename()),
                             getFileUri(file.getOriginalFilename()));
 
                     saveTicketFile(ticket.ticketPublicId(), attachment);
-                    var filename = cleanPath(file.getOriginalFilename());
-                    log.info("filename as clean path : {}", filename);
-                    var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
-                                                   .toAbsolutePath()
-                                                   .normalize();
-                    log.info("file storage URI : {}", fileStorageLocation);
-                    Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+
+                    // saving locally
+                    if (environment.matchesProfiles("dev")) {
+                        var filename = cleanPath(ticketPublicId + "_" + file.getOriginalFilename());
+                        log.info("filename as clean path : {}", filename);
+                        var fileStorageLocation = Paths.get(ticketProperties.filesDirectory(), filename)
+                                                       .toAbsolutePath()
+                                                       .normalize();
+                        log.info("file storage URI : {}", fileStorageLocation);
+                        Files.copy(file.getInputStream(), fileStorageLocation, REPLACE_EXISTING);
+                    }
                     fileList.add(attachment);
                 }
 

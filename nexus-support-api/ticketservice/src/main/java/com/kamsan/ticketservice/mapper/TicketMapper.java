@@ -4,9 +4,9 @@ import com.kamsan.ticketservice.dto.AttachmentDTO;
 import com.kamsan.ticketservice.dto.TicketDetailsDTO;
 import com.kamsan.ticketservice.model.Attachment;
 import com.kamsan.ticketservice.model.Ticket;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
+
+import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface TicketMapper {
@@ -14,7 +14,14 @@ public interface TicketMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     TicketDetailsDTO ticketToTicketDTO(Ticket ticket);
 
-    AttachmentDTO attachmentToAttachmentDTO(Attachment attachment);
+    @Mapping(
+            target = "ticketPublicId",
+            expression = "java(ticketPublicId)"
+    )
+    AttachmentDTO attachmentToAttachmentDTO(
+            Attachment attachment,
+            UUID ticketPublicId
+    );
 
 //    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 //    void updateUser(UpdateUserDTO updateUserDTO, @MappingTarget User user);

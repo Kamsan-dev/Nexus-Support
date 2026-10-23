@@ -78,13 +78,7 @@
             class="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
           >
             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-              <svg
-                class="w-8 h-8 mb-3 text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 16"
-              >
+              <svg class="w-8 h-8 mb-3 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                 <path
                   stroke="currentColor"
                   stroke-linecap="round"
@@ -98,13 +92,7 @@
               </p>
               <p class="text-xs text-gray-500">PDF, DOC, PNG, JPG or GIF (MAX. 800x400px)</p>
             </div>
-            <input
-              id="dropzone-file"
-              type="file"
-              class="hidden"
-              multiple
-              (change)="onFileChange($any($event.target.files))"
-            />
+            <input id="dropzone-file" type="file" class="hidden" multiple (change)="onFileChange($any($event.target.files))" />
           </label>
         </div>
 
@@ -120,11 +108,7 @@
                     <p class="text-xs text-gray-500">{{ file.size }}</p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  class="text-gray-400 hover:text-red-500 transition cursor-pointer"
-                  (click)="removeFile($event, file)"
-                >
+                <button type="button" class="text-gray-400 hover:text-red-500 transition cursor-pointer" (click)="removeFile($event, file)">
                   <fa-icon [icon]="'xmark'" class="fa-fw"></fa-icon>
                 </button>
               </div>

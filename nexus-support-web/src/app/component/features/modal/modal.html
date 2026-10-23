@@ -1,0 +1,71 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" role="presentation" (click)="close()">
+  <section
+    class="w-fit min-w-sm max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-description"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="p-6 sm:p-7">
+      <!-- Icon -->
+      <div class="flex mb-5 justify-between item-center gap-4">
+        <div
+          class="flex size-12 items-center justify-center rounded-xl"
+          [ngClass]="{
+            'bg-emerald-50 text-emerald-600': type() === 'success',
+            'bg-amber-50 text-amber-600': type() === 'warning',
+            'bg-red-50 text-red-600': type() === 'danger',
+          }"
+        >
+          @switch (type()) {
+            @case ('success') {
+              <fa-icon [icon]="'check-circle'" class="text-xl shrink-0"></fa-icon>
+            }
+            @case ('warning') {
+              <fa-icon [icon]="'triangle-exclamation'" class="text-xl shrink-0"></fa-icon>
+            }
+            @case ('danger') {
+              <fa-icon [icon]="'trash-can'" class="text-xl shrink-0"></fa-icon>
+            }
+          }
+        </div>
+
+        <!-- Content -->
+        <div id="modal-title" class="flex justify-center items-center">
+          <span class="text-lg font-semibold tracking-tight text-gray-900">{{ message() }}</span>
+        </div>
+      </div>
+
+      @if (subtitle()) {
+        <p id="modal-description" class="mt-2 leading-6 text-gray-500">
+          {{ subtitle() }}
+        </p>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="rounded-2xl flex flex-col-reverse gap-3 border-t border-gray-100 bg-gray-50/70 px-6 py-4 sm:flex-row sm:justify-end sm:px-7">
+      <button
+        type="button"
+        class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+        [ngClass]="{
+          'bg-emerald-600 hover:bg-emerald-700 focus-visible:outline-emerald-600': type() === 'success',
+          'bg-amber-500 hover:bg-amber-600 focus-visible:outline-amber-500': type() === 'warning',
+          'bg-red-600 hover:bg-red-700 focus-visible:outline-red-600': type() === 'danger',
+        }"
+        (click)="submit($event)"
+      >
+        Confirm
+      </button>
+    </div>
+  </section>
+</div>

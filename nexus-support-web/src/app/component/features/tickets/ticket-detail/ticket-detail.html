@@ -1,7 +1,7 @@
 @if (ticketStore.ticket()) {
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
-      <a class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
+      <a (click)="goBack()" class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
         </svg>
@@ -455,6 +455,7 @@
                   <div class="max-w-sm mx-auto">
                     <label for="role" class="text-sm font-medium text-gray-600"> Choose Assignee </label>
                     <select
+                      [disabled]="!authStore.hasAnyAuthorities('ticket:assignee')"
                       [ngModel]="ticket()?.assigneePublicId ?? 'no_selection'"
                       (ngModelChange)="onAssigneeSelectClick($event)"
                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"

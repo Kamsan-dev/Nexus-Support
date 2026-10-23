@@ -1,18 +1,19 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, signal, TemplateRef, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, Location } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, ViewContainerRef } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DialogService } from '@ngneat/dialog';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { Comment, Task, TicketDetails } from '../../../../core/model/ticket.model';
+import { RoleEnum } from '../../../../enum/role';
 import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { TicketStatusColor, TicketStatusEnum, TicketStatusLabel } from '../../../../enum/ticket-status';
 import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
 import { AuthStore } from '../../../../store/auth.store';
 import { TicketDetailsStore } from '../../../../store/ticket-details.store';
-import { DialogService } from '@ngneat/dialog';
 import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
-import { RoleEnum } from '../../../../enum/role';
+import { ModalService } from '../../../../service/modal.service';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -27,18 +28,12 @@ export class TicketDetail {
   private activatedRoute = inject(ActivatedRoute);
   private fb = inject(FormBuilder);
   private toastService = inject(HotToastService);
+  private modalService = inject(ModalService);
+  private location = inject(Location);
+  private viewRef = inject(ViewContainerRef);
 
   private dialogService = inject(DialogService);
   private readonly TASK_FORM_MODAL_ID = 'taskFormModal';
-
-  protected readonly ticketTypeLabel = TicketTypeLabel;
-  protected readonly ticketPriorityLabel = TicketPriorityLabel;
-  protected readonly ticketStatusLabel = TicketStatusLabel;
-  protected readonly ticketPriorities = Object.values(TicketPriorityEnum);
-  protected readonly ticketTypes = Object.values(TicketTypeEnum);
-  protected readonly ticketStatus = Object.values(TicketStatusEnum);
-  protected readonly ticketStatusColor = TicketStatusColor;
-  protected readonly Role = RoleEnum;
 
   ticketPublicIdParam = signal<string | null>(null);
   ticketNumber = computed(() => this.ticketStore.ticket()?.ticket.ticketPublicId.substring(0, 8).toUpperCase());
@@ -54,12 +49,23 @@ export class TicketDetail {
   editingCommentId = signal<string | null>(null);
   editingValueComment = '';
 
+  // enums
+  protected readonly ticketTypeLabel = TicketTypeLabel;
+  protected readonly ticketPriorityLabel = TicketPriorityLabel;
+  protected readonly ticketStatusLabel = TicketStatusLabel;
+  protected readonly ticketPriorities = Object.values(TicketPriorityEnum);
+  protected readonly ticketTypes = Object.values(TicketTypeEnum);
+  protected readonly ticketStatus = Object.values(TicketStatusEnum);
+  protected readonly ticketStatusColor = TicketStatusColor;
+  protected readonly Role = RoleEnum;
+
   constructor() {
     effect(() => {
       this.initFormAfterTicketLoading();
       this.listenToUpdateTicket();
       this.listenToErrorStore();
       this.listenToUpdateComment();
+      this.listenToTaskCreation();
     });
   }
 
@@ -69,6 +75,14 @@ export class TicketDetail {
       this.ticketStore.getTicket(this.ticketPublicIdParam()!);
     }
   }
+
+  goBack = () => {
+    this.location.back();
+  };
+
+  closeModal = () => {
+    this.dialogService.closeAll();
+  };
 
   // MAIN FORM
   onEditTicketFormClick = (event: MouseEvent | TouchEvent, type: 'edit' | 'cancel'): void => {
@@ -126,23 +140,34 @@ export class TicketDetail {
 
   onDeleteTaskClick = (event: TouchEvent | MouseEvent, task: Task): void => {
     event.stopImmediatePropagation();
-    this.ticketStore.deleteTask(task.taskPublicId);
+    this.modalService
+      .open(this.viewRef, {
+        title: 'Delete task',
+        message: 'Are you sure you want to delete this task ?',
+        subtitle: 'This action cannot be undone.',
+        type: 'warning',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.ticketStore.deleteTask(task.taskPublicId);
+      });
   };
 
   // COMMENT
 
   onSubmitComment(event: MouseEvent | TouchEvent): void {
     event.stopImmediatePropagation();
-    console.log('toast');
-    if (this.commentForm.invalid) {
+    const comment = (this.commentForm.getRawValue().comment as string).trim();
+    if (this.commentForm.invalid || comment.length < 2) {
       return;
     }
 
-    const comment = this.commentForm.getRawValue().comment as string;
-
     this.ticketStore.addComment({
       ticketPublicId: this.ticket()!.ticketPublicId,
-      comment: comment.trim(),
+      comment: comment,
     });
 
     this.commentForm.reset();
@@ -172,7 +197,19 @@ export class TicketDetail {
 
   onDeleteCommentClick = (event: TouchEvent | MouseEvent, commentPublicId: string): void => {
     event.stopImmediatePropagation();
-    this.ticketStore.deleteComment(commentPublicId);
+    this.modalService
+      .open(this.viewRef, {
+        title: 'Delete comment',
+        message: 'Are you sure you want to delete your comment ?',
+        subtitle: 'This action cannot be undone.',
+        type: 'warning',
+      })
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+        this.ticketStore.deleteComment(commentPublicId);
+      });
   };
 
   // PRIVATE METHOD
@@ -228,6 +265,13 @@ export class TicketDetail {
     if (error) {
       const message = error.error.detail || error.message;
       this.toastService.error(message);
+    }
+  }
+
+  private listenToTaskCreation(): void {
+    if (this.ticketStore.taskCreated()) {
+      this.closeModal();
+      this.ticketStore.resetTaskCreated();
     }
   }
 

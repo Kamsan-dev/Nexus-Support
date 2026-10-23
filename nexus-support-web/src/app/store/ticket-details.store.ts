@@ -15,12 +15,14 @@ import { UpdateCommentRequest } from '../core/model/request/update-comment.reque
 interface TicketDetailsState {
   ticketUpdated: boolean;
   commentUpdated: boolean;
+  taskCreated: boolean;
   ticket: Ticket | null;
 }
 
 const state: TicketDetailsState = {
   ticketUpdated: false,
   commentUpdated: false,
+  taskCreated: false,
   ticket: null,
 };
 
@@ -121,6 +123,7 @@ export const TicketDetailsStore = signalStore(
                   return;
                 }
                 patchState(store, setFulfilled(), {
+                  taskCreated: true,
                   ticket: {
                     ...currentTicket,
                     tasks: [response.data, ...currentTicket.tasks],
@@ -278,6 +281,9 @@ export const TicketDetailsStore = signalStore(
     },
     resetCommentUpdated(): void {
       patchState(store, { commentUpdated: false });
+    },
+    resetTaskCreated(): void {
+      patchState(store, { taskCreated: false });
     },
   })),
   withComputed((store) => ({

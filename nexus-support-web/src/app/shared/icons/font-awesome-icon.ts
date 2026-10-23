@@ -3,11 +3,14 @@ import {
   faChevronDown,
   faChevronLeft,
   faChevronRight,
+  faCircleCheck,
   faCircleNotch,
   faPaperclip,
   faRotateLeft,
   faSpinner,
   faTicket,
+  faTrashCan,
+  faTriangleExclamation,
   faXmark,
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
@@ -28,4 +31,7 @@ export const fontAwesomeIcons: IconDefinition[] = [
   faComment,
   faRotateLeft,
   faXmark,
+  faCircleCheck,
+  faTrashCan,
+  faTriangleExclamation,
 ];
