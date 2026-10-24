@@ -17,6 +17,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.kamsan.ticketservice.repository.query.TicketDashboardQuery.*;
 import static com.kamsan.ticketservice.repository.query.TicketQuery.*;
 import static com.kamsan.ticketservice.utils.QueryUtils.*;
 
@@ -381,4 +382,30 @@ public class TicketQueryRepository {
                    .query(PageTicketDTO.class)
                    .single();
     }
+
+    public List<TicketByStatusDTO> getTicketsByStatus() {
+        return jdbc.sql(TICKET_BY_STATUS_QUERY)
+                   .query(TicketByStatusDTO.class)
+                   .list();
+    }
+
+    public List<TicketByTypeDTO> getTicketsByType() {
+        return jdbc.sql(TICKET_BY_TYPE_QUERY)
+                   .query(TicketByTypeDTO.class)
+                   .list();
+    }
+
+    public Long getTicketNumber() {
+        return jdbc.sql(TICKET_COUNT_QUERY)
+                   .query(Long.class)
+                   .single();
+    }
+
+    public List<WeeklyTrendDTO> getTicketTrendWeekly() {
+        return jdbc.sql(TICKET_TREND_WEEKLY_QUERY)
+                   .query(WeeklyTrendDTO.class)
+                   .list();
+    }
+
+
 }

@@ -50,4 +50,6 @@ public interface TicketService {
     List<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
 
     void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO);
+
+    TicketDashboardStatsDTO getDashboardStatistics();
 }

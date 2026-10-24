@@ -345,4 +345,14 @@ public class TicketServiceImpl implements TicketService {
                 : ticketQueryRepository.generateReport(createReportDTO);
 
     }
+
+    @Override
+    public TicketDashboardStatsDTO getDashboardStatistics() {
+        var dashboard = new TicketDashboardStatsDTO();
+        dashboard.setTicketsByStatus(this.ticketQueryRepository.getTicketsByStatus());
+        dashboard.setTicketsByType(this.ticketQueryRepository.getTicketsByType());
+        dashboard.setTicketCount(this.ticketQueryRepository.getTicketNumber());
+        dashboard.setWeeklyTrends(this.ticketQueryRepository.getTicketTrendWeekly());
+        return dashboard;
+    }
 }

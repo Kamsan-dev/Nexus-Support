@@ -268,6 +268,16 @@ public class TicketResource {
                              .body(pdf);
     }
 
+    @GetMapping("/dashboard")
+    public ResponseEntity<ApiResponse<TicketDashboardStatsDTO>> getDashboardStats(@NotNull Authentication authentication) {
+        TicketDashboardStatsDTO dashboardStatistics = ticketService.getDashboardStatistics();
+        return ResponseEntity.ok().body(getResponse(
+                dashboardStatistics,
+                "Dashboard statistics retrieved.",
+                HttpStatus.OK
+        ));
+    }
+
     private URI getUri(UUID publicId) {
         return URI.create("/ticket/"+publicId);
     }

@@ -8,59 +8,48 @@ export const mockData = {
   ticketsByType: [
     {
       type: 'BUG',
-      label: 'Bug',
       count: 82,
     },
     {
       type: 'FEATURE',
-      label: 'Feature',
       count: 64,
     },
     {
       type: 'SUPPORT',
-      label: 'Support',
       count: 58,
     },
     {
       type: 'TASK',
-      label: 'Task',
       count: 44,
     },
   ],
   ticketsByStatus: [
     {
       status: 'NEW',
-      label: 'New',
       count: 28,
     },
     {
       status: 'IN_PROGRESS',
-      label: 'In progress',
       count: 54,
     },
     {
       status: 'IN_REVIEW',
-      label: 'In review',
       count: 30,
     },
     {
       status: 'COMPLETED',
-      label: 'Completed',
       count: 96,
     },
     {
       status: 'IMPEDED',
-      label: 'Impeded',
       count: 12,
     },
     {
       status: 'PENDING',
-      label: 'Pending',
       count: 22,
     },
     {
       status: 'CLOSED',
-      label: 'Closed',
       count: 6,
     },
   ],
