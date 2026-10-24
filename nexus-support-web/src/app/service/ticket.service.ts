@@ -10,6 +10,7 @@ import { mockData } from './mock/mock-data';
 import { toHttpParams } from '../shared/utils/request';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
 import { UpdateCommentRequest } from '../core/model/request/update-comment.request';
+import { TicketDashboardStats } from '../core/model/response/dashboard.model';
 
 @Injectable({
   providedIn: 'root',
@@ -85,7 +86,7 @@ export class TicketService {
     return this.http.get(`${this.server}/ticket/file/download/${filePublicId}`, { responseType: 'blob' });
   }
 
-  public getDashboardData(): any {
-    return mockData;
+  public getDashboardStats(): Observable<ApiResponse<TicketDashboardStats>> {
+    return this.http.get<ApiResponse<TicketDashboardStats>>(`${this.server}/ticket/dashboard`);
   }
 }

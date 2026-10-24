@@ -353,6 +353,7 @@ public class TicketServiceImpl implements TicketService {
         dashboard.setTicketsByType(this.ticketQueryRepository.getTicketsByType());
         dashboard.setTicketCount(this.ticketQueryRepository.getTicketNumber());
         dashboard.setWeeklyTrends(this.ticketQueryRepository.getTicketTrendWeekly());
+        dashboard.setOldestOpenTickets(this.ticketQueryRepository.getOldestOpenTickets());
         return dashboard;
     }
 }

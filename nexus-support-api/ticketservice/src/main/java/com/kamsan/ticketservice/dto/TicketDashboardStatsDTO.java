@@ -14,4 +14,5 @@ public class TicketDashboardStatsDTO {
     private List<TicketByStatusDTO> ticketsByStatus;
     private List<TicketByTypeDTO> ticketsByType;
     private List<WeeklyTrendDTO> weeklyTrends;
+    private List<TicketDetailsDTO> oldestOpenTickets;
 }

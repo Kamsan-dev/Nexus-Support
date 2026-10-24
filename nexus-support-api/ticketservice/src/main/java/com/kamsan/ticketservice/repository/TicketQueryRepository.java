@@ -407,5 +407,11 @@ public class TicketQueryRepository {
                    .list();
     }
 
+    public List<TicketDetailsDTO> getOldestOpenTickets(){
+        return jdbc.sql(SELECT_OLDEST_OPEN_TICKETS)
+                   .query(TicketDetailsDTO.class)
+                   .list();
+    }
+
 
 }

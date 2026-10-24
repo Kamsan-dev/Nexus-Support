@@ -41,4 +41,29 @@ public class TicketDashboardQuery {
             GROUP BY DATE_TRUNC('week', t.created_at)
             ORDER BY week_start;
             """;
+
+    public static final String SELECT_OLDEST_OPEN_TICKETS = """
+            SELECT
+                 t.ticket_public_id,
+                 a.user_public_id AS assignee_public_id,
+                 u.user_public_id AS issuer_public_id,
+                 t.title,
+                 t.description,
+                 t.progress,
+                 t.due_date,
+                 t.created_at,
+                 t.updated_at,
+                 s.status,
+                 typ.type,
+                 pr.priority
+             FROM tickets t
+             JOIN users u ON u.user_id = t.issuer_id
+             LEFT JOIN users a ON a.user_id = t.assignee_id
+             JOIN statuses s ON s.status_id = t.status_id
+             JOIN types typ ON typ.type_id = t.type_id
+             JOIN priorities pr ON pr.priority_id = t.priority_id
+             WHERE s.status NOT IN ('COMPLETED', 'CLOSED')
+             ORDER BY t.created_at DESC
+             LIMIT 5;
+            """;
 }
