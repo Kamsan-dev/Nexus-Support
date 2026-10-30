@@ -1,0 +1,177 @@
+<div class="p-4 mb-10 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
+  <div class="flex flex-row items-center justify-between">
+    <div class="flex flex-col items-center justify-start gap-3 sm:flex-row">
+      <h2 class="text-lg pb-2 font-semibold text-gray-800">Profile</h2>
+    </div>
+    <button
+      (click)="onEditFormClick($event, 'edit')"
+      class="disabled:text-gray-700 disabled:bg-gray-200 text-blue-700 border border-solid border-gray-200 overflow-auto hover:bg-gray-200 font-medium rounded-lg text-sm p-2"
+    >
+      <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
+    </button>
+  </div>
+  <div class="border-t border-solid border-gray-200 mt-3 w-full"></div>
+  <div class="flex items-center gap-4 mt-4">
+    <img
+      [src]="user().imageUrl"
+      [alt]="'Profile image of user ' + user().lastName"
+      class="object-cover size-24 rounded-full ring-4 ring-gray-300"
+      loading="lazy"
+    />
+    <button
+      type="button"
+      class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+    >
+      <fa-icon [icon]="'upload'" class="fa-fw" />
+      Upload Photo
+    </button>
+  </div>
+  <div class="items-center text-[#202142]">
+    <form [formGroup]="form" (ngSubmit)="onFormSubmit($event)" class="flex flex-col gap-4 pt-4">
+      <div class="flex flex-col md:flex-row items-start gap-3">
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="mb-2 text-sm font-medium text-gray-600 w-full flex items-center"> First Name </label>
+          <input
+            type="text"
+            autocomplete="off"
+            name="firstName"
+            formControlName="firstName"
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+            placeholder="First Name"
+          />
+        </div>
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="flex items-center mb-2 text-sm font-medium text-gray-600 w-full"> Last Name </label>
+          <input
+            type="text"
+            autocomplete="off"
+            name="lastName"
+            formControlName="lastName"
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+            placeholder="Last Name"
+          />
+        </div>
+      </div>
+      <div class="">
+        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium"> Email </label>
+        <input
+          type="text"
+          autocomplete="off"
+          name="email"
+          formControlName="email"
+          class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+          placeholder="Ex: I cannot log into my account"
+          required
+        />
+      </div>
+      <div class="">
+        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium"> Address </label>
+        <input
+          type="text"
+          autocomplete="off"
+          name="address"
+          formControlName="address"
+          class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+          placeholder="Ex: I cannot log into my account"
+          required
+        />
+      </div>
+      <div class="relative">
+        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium" for="bio"> Bio </label>
+        <textarea
+          name="bio"
+          formControlName="bio"
+          id="bio"
+          placeholder="Ex: I like cooking and playing video games"
+          cols=""
+          rows=""
+          class="disabled:bg-gray-100 disabled:border-none p-2 text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border border-gray-300 w-full h-20"
+        ></textarea>
+      </div>
+      <div class="relative w-full">
+        <label for="countries" class="flex items-center mb-2 text-sm font-medium text-gray-600 w-full"> Phone </label>
+        <input
+          type="text"
+          formControlName="phone"
+          autocomplete="off"
+          name="phone"
+          class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+          placeholder="Ex: 1234567890"
+        />
+      </div>
+      <div class="flex flex-col md:flex-row items-start gap-3">
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="mb-2 text-sm font-medium text-gray-600 w-full flex items-center"> Created on </label>
+          <input
+            type="text"
+            autocomplete="off"
+            [value]="user().createdAt | date: 'mediumDate'"
+            disabled
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+          />
+        </div>
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="mb-2 text-sm font-medium text-gray-600 w-full flex items-center"> Updated on </label>
+          <input
+            type="text"
+            autocomplete="off"
+            [value]="user().updatedAt | date: 'mediumDate'"
+            disabled
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row items-start gap-3">
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="mb-2 text-sm font-medium text-gray-600 w-full flex items-center"> Member ID </label>
+          <input
+            type="text"
+            autocomplete="off"
+            name="memberId"
+            [value]="user().memberId"
+            disabled
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+            placeholder="First Name"
+          />
+        </div>
+        <div class="block w-full md:w-1/2">
+          <label for="countries" class="flex items-center mb-2 text-sm font-medium text-gray-600 w-full"> Last Login </label>
+          <input
+            type="text"
+            autocomplete="off"
+            name="lastLogin"
+            [value]="'to define'"
+            disabled
+            class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
+            placeholder="Last Name"
+          />
+        </div>
+      </div>
+      <div class="flex flex-row items-end justify-end gap-3">
+        <button
+          (click)="onEditFormClick($event, 'cancel')"
+          [disabled]="this.form.disabled"
+          type="button"
+          class="disabled:bg-gray-300 text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="form.pristine || form.disabled || loading()"
+          class="disabled:bg-gray-300 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+        >
+          @if (loading()) {
+            <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+            Updating...
+          } @else {
+            Update Profile
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

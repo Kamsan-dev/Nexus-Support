@@ -84,9 +84,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId) {
-        var user = this.getUserByUUID(userPublicId);
+        var user = getUserByUUID(userPublicId);
         userMapper.updateUser(updateUserDTO, user);
-        return userMapper.userToReadUserDTO(userRepository.save(user));
+        loadSecurityDetails(user);
+        return userMapper.userToReadUserDTO(user);
     }
 
     @Override

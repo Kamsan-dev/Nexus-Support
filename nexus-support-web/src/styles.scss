@@ -5,3 +5,10 @@
 html {
   background-color: oklch(96.7% 0.003 264.542);
 }
+
+button {
+  cursor: pointer;
+  &:disabled {
+    cursor: auto;
+  }
+}

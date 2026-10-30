@@ -5,3 +5,11 @@ export enum RoleEnum {
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',
 }
+
+export const RoleLabel: Record<RoleEnum, string> = {
+  [RoleEnum.USER]: 'User',
+  [RoleEnum.TECH_SUPPORT]: 'Tech Support',
+  [RoleEnum.MANAGER]: 'Manager',
+  [RoleEnum.ADMIN]: 'Admin',
+  [RoleEnum.SUPER_ADMIN]: 'Super Admin',
+};

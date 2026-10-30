@@ -105,7 +105,7 @@
             <div class="font-medium text-md">{{ authStore.user()?.email }}</div>
           </div>
           <ul class="p-2 text-sm text-gray-700" aria-labelledby="dropdownHoverButton">
-            <li href="" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
+            <li [routerLink]="['/app/profile']" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                 <path
                   stroke-linecap="round"
@@ -115,7 +115,11 @@
               </svg>
               <div class="block px-4 py-2 text-gray-700" data-dropdown-trigger="click" data-dropdown-hide="usermenu">Profile</div>
             </li>
-            <li href="" fragment="password" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
+            <li
+              [routerLink]="['/app/profile']"
+              fragment="password"
+              class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                 <path
                   stroke-linecap="round"
@@ -125,7 +129,11 @@
               </svg>
               <div class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Password</div>
             </li>
-            <li href="" fragment="settings" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
+            <li
+              [routerLink]="['/app/profile']"
+              fragment="settings"
+              class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                 <path
                   stroke-linecap="round"

@@ -71,6 +71,6 @@ public class UserQuery {
                 ON u.user_id = d.user_id
             WHERE u.user_public_id = :userPublicId
             ORDER BY d.created_at DESC
-            LIMIT 10
+            LIMIT 5
             """;
 }

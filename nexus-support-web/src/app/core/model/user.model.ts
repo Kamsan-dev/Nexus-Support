@@ -12,7 +12,7 @@ export interface User {
   address?: string;
   qrCodeImageUri: string;
   isUsingMfa: boolean;
-  lastLogin: string;
+  lastLogin: string | null;
   createdAt: string;
   updatedAt: string;
   role: RoleEnum;
