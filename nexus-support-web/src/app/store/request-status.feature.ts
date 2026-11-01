@@ -35,3 +35,7 @@ export function setFulfilled(): RequestStatusState {
 export function setError(error: HttpErrorResponse | null): RequestStatusState {
   return { requestStatus: 'error', error: error };
 }
+
+export function clearError(): RequestStatusState {
+  return { requestStatus: 'idle', error: null };
+}

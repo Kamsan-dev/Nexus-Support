@@ -137,7 +137,7 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PatchMapping("/password")
+    @PatchMapping("/update/password")
     public ResponseEntity<ApiResponse<Void>> updatePassword(@NotNull Authentication authentication, @RequestBody ChangePasswordDTO changePasswordDTO) {
         userService.updatePassword(changePasswordDTO, UUID.fromString(authentication.getName()));
         return ResponseEntity.ok().body(getResponse(

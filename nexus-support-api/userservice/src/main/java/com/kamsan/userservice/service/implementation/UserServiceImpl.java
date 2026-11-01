@@ -180,7 +180,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public void updatePassword(ChangePasswordDTO changePasswordDTO, UUID userPublicId) {
         if (!Objects.equals(changePasswordDTO.newPassword(), changePasswordDTO.confirmNewPassword())) {
             throw new ApiException("Passwords don't match. Please try again");
@@ -196,6 +195,7 @@ public class UserServiceImpl implements UserService {
             throw new ApiException("Existing password is incorrect. Please try again");
         }
         credential.setPassword(encoder.encode(changePasswordDTO.newPassword()));
+        credentialRepository.save(credential);
     }
 
     @Override
@@ -304,26 +304,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ReadUserDTO toggleAccountExpired(UUID userPublicId) {
         User user = this.getUserByUUID(userPublicId);
         user.setAccountExpired(!user.isAccountExpired());
+        userRepository.save(user);
         return userMapper.userToReadUserDTO(user);
     }
 
     @Override
-    @Transactional
     public ReadUserDTO toggleAccountLocked(UUID userPublicId) {
         User user = this.getUserByUUID(userPublicId);
         user.setAccountLocked(!user.isAccountLocked());
+        userRepository.save(user);
         return userMapper.userToReadUserDTO(user);
     }
 
     @Override
-    @Transactional
     public ReadUserDTO toggleAccountEnabled(UUID userPublicId) {
         User user = this.getUserByUUID(userPublicId);
         user.setAccountEnabled(!user.isAccountEnabled());
+        userRepository.save(user);
         return userMapper.userToReadUserDTO(user);
     }
 

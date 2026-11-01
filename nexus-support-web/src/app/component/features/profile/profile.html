@@ -62,15 +62,15 @@
         </div>
         <div class="hidden lg:block mt-4 p-4 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
           <h2 class="text-lg pb-2 font-semibold text-gray-800 border-b border-solid border-gray-200">Recent Devices</h2>
-          @for (device of devices; track $index) {
+          @for (device of devices | slice: 0 - 3; track $index) {
             <div class="mt-4">
               <div class="p-3 mb-2.5 border border-gray-100 rounded-md items-center gap-2 px-2 bg-gray-100">
                 <div class="flex flex-col items-start justify-between gap-2 transition-all duration-500">
                   <div class="flex items-center gap-2">
                     <img src="https://cdn-icons-png.flaticon.com/512/548/548344.png" width="50" alt="device" class="rounded-md" />
                     <div>
-                      <p class="font-normal text-md text-gray-900">{{ device.client }}</p>
-                      <p class="font-normal text-sm text-gray-500">{{ device.machine }}</p>
+                      <p class="font-normal text-md text-gray-900">{{ device.machine }}</p>
+                      <p class="font-normal text-sm text-gray-500">{{ device.client }}</p>
                     </div>
                   </div>
                   <div class="text-sm font-medium text-gray-900">IP Address: {{ device.ipAddress }}</div>
@@ -93,10 +93,19 @@
           (resetProfileUpdate)="onResetProfileUpdate()"
         />
         <div id="password" class="p-4 mb-10 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
-          <h2 class="text-lg pb-2 font-semibold text-gray-800 border-b border-solid border-gray-200">Password</h2>
+          <div class="flex tems-center justify-between">
+            <h2 class="text-lg pb-2 font-semibold text-gray-800">Password</h2>
+            <button
+              (click)="onPasswordFormEditClick($event, 'edit')"
+              class="disabled:text-gray-700 disabled:bg-gray-200 text-blue-700 border border-solid border-gray-200 overflow-auto hover:bg-gray-200 font-medium rounded-lg text-sm p-2"
+            >
+              <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
+            </button>
+          </div>
+          <div class="border-t border-solid border-gray-200 mt-3 w-full"></div>
           <div class="grid items-start lg:grid-cols-2 gap-10">
             <div class="items-center">
-              <form class="flex flex-col gap-4 pt-4">
+              <form [formGroup]="formPassword" (ngSubmit)="onFormPasswordClick($event)" class="flex flex-col gap-4 pt-4">
                 <div class="">
                   <label class="flex items-center mb-2 text-gray-600 text-sm font-medium">
                     Current Password
@@ -110,11 +119,14 @@
                   <input
                     type="password"
                     name="currentPassword"
+                    formControlName="currentPassword"
                     class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
                     placeholder="Current password"
                     autocomplete="off"
-                    required
                   />
+                  @if (f['currentPassword'].invalid && f['currentPassword'].dirty) {
+                    <div class="mt-2 font-normal text-red-500">Enter your current password</div>
+                  }
                 </div>
                 <div class="">
                   <label class="flex items-center mb-2 text-gray-600 text-sm font-medium">
@@ -129,11 +141,14 @@
                   <input
                     type="password"
                     name="newPassword"
+                    formControlName="newPassword"
                     class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
                     placeholder="New password"
                     autocomplete="off"
-                    required
                   />
+                  @if (f['newPassword'].invalid && f['newPassword'].dirty) {
+                    <div class="mt-2 font-normal text-red-500">Please provide a new password</div>
+                  }
                 </div>
                 <div class="">
                   <label class="flex items-center mb-2 text-gray-600 text-sm font-medium">
@@ -148,21 +163,60 @@
                   <input
                     type="password"
                     name="confirmNewPassword"
+                    formControlName="confirmNewPassword"
                     class="disabled:bg-gray-100 disabled:border-none block w-full px-3 py-1.5 pr-8 text-sm font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none leading-relaxed"
                     placeholder="Confirm new password"
                     autocomplete="off"
-                    required
                   />
+                  @if (f['confirmNewPassword'].invalid && f['confirmNewPassword'].dirty) {
+                    @if (f['confirmNewPassword'].hasError('required')) {
+                      <div class="mt-2 font-normal text-red-500">Confirm password is required</div>
+                    } @else {
+                      <div class="mt-2 font-normal text-red-500">Passwords do not match</div>
+                    }
+                  }
                 </div>
-                <div class="flex flex-row items-end justify-end">
+                <div class="flex items-end justify-end gap-3">
+                  <button
+                    (click)="onPasswordFormEditClick($event, 'cancel')"
+                    [disabled]="this.formPassword.disabled"
+                    type="button"
+                    class="disabled:bg-gray-300 text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
+                  >
+                    Cancel
+                  </button>
                   <button
                     type="submit"
+                    [disabled]="formPassword.invalid || formPassword.pristine || formPassword.disabled || store.loading()"
                     class="disabled:bg-gray-300 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
                   >
-                    Update Password
+                    @if (store.loading()) {
+                      <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      </svg>
+                      Updating...
+                    } @else {
+                      Update password
+                    }
                   </button>
                 </div>
               </form>
+              @if (store.error()) {
+                <div class="mt-2 flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50">
+                  <p class="text-sm font-medium">
+                    {{ store.error()?.error.detail ?? store.error()!.message ?? 'Unable to update your password. Please try again.' }}
+                  </p>
+                  <button
+                    (click)="clearError($event)"
+                    type="button"
+                    class="ms-auto -mx-1.5 -my-1.5 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8"
+                    aria-label="Close"
+                  >
+                    <fa-icon [icon]="'xmark'" class="fa-fw" />
+                  </button>
+                </div>
+              }
             </div>
             <div class="divide-y divide-gray-200">
               <div class="flex gap-x-7 py-6">
@@ -197,9 +251,11 @@
           <div class="border-b border-solid border-gray-200 pb-8 mb-4">
             <h3 class="mb-1p text-lg font-medium text-gray-900">Account Locked</h3>
             <ul class="grid w-full gap-6 md:grid-cols-2">
-              <li class="cursor-pointer">
+              <li class="">
                 <div
-                  class="border border-green-600 text-green-600 bg-green-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="user.isAccountLocked && onToggleAccountLocked($event)"
+                  [ngClass]="[!user.isAccountLocked ? 'bg-green-100 border-green-600 text-green-600 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Unlocked</div>
@@ -216,7 +272,9 @@
               </li>
               <li class="cursor-pointer">
                 <div
-                  class="border border-red-600 text-red-600 bg-red-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="!user.isAccountLocked && onToggleAccountLocked($event)"
+                  [ngClass]="[user.isAccountLocked ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Locked</div>
@@ -238,7 +296,9 @@
             <ul class="grid w-full gap-6 md:grid-cols-2">
               <li class="cursor-pointer">
                 <div
-                  class="border border-green-600 text-green-600 bg-green-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="user.isAccountExpired && onToggleAccountExpired($event)"
+                  [ngClass]="[!user.isAccountExpired ? 'bg-green-100 border-green-600 text-green-600 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Not Expired</div>
@@ -255,7 +315,9 @@
               </li>
               <li class="cursor-pointer">
                 <div
-                  class="border border-red-600 text-red-600 bg-red-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="!user.isAccountExpired && onToggleAccountExpired($event)"
+                  [ngClass]="[user.isAccountExpired ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Expired</div>
@@ -277,7 +339,9 @@
             <ul class="grid w-full gap-6 md:grid-cols-2">
               <li class="cursor-pointer">
                 <div
-                  class="border border-green-600 text-green-600 bg-green-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="!user.isAccountEnabled && onToggleAccountEnabled($event)"
+                  [ngClass]="[user.isAccountEnabled ? 'border-green-600 text-green-600 bg-green-100 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Enabled</div>
@@ -290,7 +354,9 @@
               </li>
               <li class="cursor-pointer">
                 <div
-                  class="border border-red-600 text-red-600 bg-red-100 inline-flex items-center justify-between w-full p-2.5 rounded-lg cursor-pointer"
+                  (click)="user.isAccountEnabled && onToggleAccountEnabled($event)"
+                  [ngClass]="[!user.isAccountEnabled ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
                     <div class="w-full text-lg font-semibold">Disabled</div>
@@ -307,7 +373,12 @@
         <div class="p-4 mb-10 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
           <h2 class="text-lg pb-2 font-semibold text-gray-800 border-b border-solid border-gray-200">
             Two-Factor Authentication
-            <span class="text-green-600 border-green-900 bg-green-200 px-2 uppercase text-lg ml-2 font-bold p-1 rounded-md"> Enabled </span>
+            <span
+              [ngClass]="[user.isUsingMfa ? 'text-green-600 border-green-900 bg-green-200' : 'border-red-600 text-red-600 bg-red-100']"
+              class="px-2 uppercase text-lg ml-2 font-bold p-1 rounded-md"
+            >
+              {{ user.isUsingMfa ? 'Enabled' : 'Disabled' }}
+            </span>
           </h2>
           <p class="mt-4 text-sm text-gray-500">
             Two-factor authentication (2FA) is a security method that requires two forms of identification to access resources and data. It's a type

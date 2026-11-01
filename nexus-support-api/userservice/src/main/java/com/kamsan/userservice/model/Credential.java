@@ -1,13 +1,13 @@
 package com.kamsan.userservice.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "credentials")
+@EntityListeners(AuditingEntityListener.class)
 public class Credential {
     @Id
     private Long credentialId;
@@ -26,6 +27,11 @@ public class Credential {
     private String password;
     @Transient
     private boolean isExpired;
+
+    @CreatedDate
+    @Column(updatable = false)
     private OffsetDateTime createdAt;
+
+    @LastModifiedDate
     private OffsetDateTime updatedAt;
 }

@@ -5,12 +5,13 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, delay, EMPTY, exhaustMap, pipe, switchMap, tap } from 'rxjs';
 import { Profile } from '../core/model/user.model';
 import { UserService } from '../service/user.service';
-import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
+import { clearError, setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 import { RoleEnum } from '../enum/role';
 import { UpdateProfileRequest } from '../core/model/request/update-profile.request';
 import { ProfileService } from '../service/profile.service';
 import { tapResponse } from '@ngrx/operators';
 import { HotToastService } from '@ngxpert/hot-toast';
+import { UpdatePasswordRequest } from '../core/model/request/update-password.request';
 
 interface AuthState {
   profile: Profile | undefined;
@@ -80,6 +81,118 @@ export const AuthStore = signalStore(
         ),
       ),
     ),
+    updatePassword: rxMethod<UpdatePasswordRequest>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          profileService.updatePasswordUser(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled());
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    toggleAccountLocked: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          profileService.toggleAccountLocked(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      isAccountLocked: !profile.user.isAccountLocked,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    toggleAccountExpired: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          profileService.toggleAccountExpired(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      isAccountExpired: !profile.user.isAccountExpired,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    toggleAccountEnabled: rxMethod<string>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          profileService.toggleAccountEnabled(request).pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      isAccountEnabled: !profile.user.isAccountEnabled,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetProfileUpdated(): void {
       patchState(store, { profileUpdated: false });
     },
@@ -94,6 +207,9 @@ export const AuthStore = signalStore(
         return false;
       }
       return roles.includes(profile.user.role);
+    },
+    resetProfileError(): void {
+      patchState(store, clearError());
     },
   })),
   withComputed((store) => ({
