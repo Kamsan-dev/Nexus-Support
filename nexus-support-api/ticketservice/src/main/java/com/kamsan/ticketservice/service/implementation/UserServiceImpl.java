@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ReadUserDTO getUserByUUID(UUID userPublicId) {
         var response = restClient.get()
-                                 .uri(String.format("/user/%s", userPublicId))
+                                 .uri(String.format("/api/v1/users/%s", userPublicId))
                                  .retrieve()
                                  .body(ApiResponse.class);
         if (response != null) {
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public TicketUserDTO getAssignee(UUID ticketPublicId) {
         var response = restClient.get()
-                                 .uri(String.format("/user/assignee/%s", ticketPublicId))
+                                 .uri(String.format("/api/v1/users/assignee/%s", ticketPublicId))
                                  .retrieve()
                                  .body(ApiResponse.class);
         if (response != null) {
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<TicketUserDTO> getTechSupports() {
         var response = restClient.get()
-                                 .uri("/user/list/tech-supports")
+                                 .uri("/api/v1/users/list/tech-supports")
                                  .retrieve()
                                  .body(ApiResponse.class);
         if (response != null) {

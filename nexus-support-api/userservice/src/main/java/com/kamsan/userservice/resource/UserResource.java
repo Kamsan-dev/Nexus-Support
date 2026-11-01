@@ -32,7 +32,7 @@ import static com.kamsan.userservice.utils.RequestUtils.getResponse;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/v1/users")
 public class UserResource {
 
     private final UserService userService;

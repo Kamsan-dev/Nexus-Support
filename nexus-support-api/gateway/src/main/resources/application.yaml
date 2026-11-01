@@ -19,12 +19,12 @@ spring:
             - id: user-service
               uri: lb://USERSERVICE
               predicates:
-                - Path=/user/**
+                - Path=/api/v1/users/**
 
             - id: ticket-service
               uri: lb://TICKETSERVICE
               predicates:
-                - Path=/ticket/**
+                - Path=/api/v1/tickets/**
 
             - id: notification-service
               uri: lb://NOTIFICATIONSERVICE

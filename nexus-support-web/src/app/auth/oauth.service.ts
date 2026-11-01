@@ -51,6 +51,7 @@ export class OAuthService {
       state,
     });
 
+    console.log(`${this.authorizationEndpoint}?${params.toString()}`);
     window.location.href = `${this.authorizationEndpoint}?${params.toString()}`;
   }
 

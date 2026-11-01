@@ -34,7 +34,7 @@ import static com.kamsan.ticketservice.utils.RequestUtils.getResponse;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/ticket")
+@RequestMapping("/api/v1/tickets")
 public class TicketResource {
 
     private final UserService userService;
@@ -155,7 +155,7 @@ public class TicketResource {
     }
 
     @PreAuthorize("hasAuthority('task:create')")
-    @PutMapping("/task")
+    @PostMapping("/task")
     ResponseEntity<ApiResponse<TaskDTO>> createTask(@NotNull Authentication authentication,
                                                  @RequestBody CreateTaskDTO createTaskDTO) {
         TaskDTO task = ticketService.createTask(UUID.fromString(authentication.getName()), createTaskDTO);

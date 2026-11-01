@@ -11,9 +11,9 @@ import { UpdateProfileRequest } from '../core/model/request/update-profile.reque
 })
 export class ProfileService {
   private http = inject(HttpClient);
-  private readonly server: string = environment.API_URL;
+  private readonly server: string = `${environment.API_URL}/${environment.API_VERSION}`;
 
   public updateUserProfile(request: UpdateProfileRequest): Observable<ApiResponse<User>> {
-    return this.http.put<ApiResponse<User>>(`${this.server}/user/update`, request);
+    return this.http.put<ApiResponse<User>>(`${this.server}/users/update`, request);
   }
 }

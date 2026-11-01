@@ -35,7 +35,6 @@ public class ResourceServerConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.csrf(AbstractHttpConfigurer::disable)
-//            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers("/user/register/**",
                             "/user/verify/**",
@@ -52,42 +51,5 @@ public class ResourceServerConfig {
                             .jwkSetUri(jwkSetUri)
                             .jwtAuthenticationConverter(new JwtConverter())));
         return http.build();
-    }
-
-    //@Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        var corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(List.of("http://securedoc.com",
-                "http://localhost:3000",
-                "http://localhost:4200"));
-        corsConfiguration.setAllowedHeaders(Arrays.asList(ORIGIN,
-                ACCESS_CONTROL_ALLOW_ORIGIN,
-                CONTENT_TYPE,
-                ACCEPT,
-                AUTHORIZATION,
-                "X_REQUESTED_WITH",
-                ACCESS_CONTROL_REQUEST_METHOD,
-                ACCESS_CONTROL_REQUEST_HEADERS,
-                ACCESS_CONTROL_ALLOW_CREDENTIALS));
-        corsConfiguration.setExposedHeaders(Arrays.asList(ORIGIN,
-                ACCESS_CONTROL_ALLOW_ORIGIN,
-                CONTENT_TYPE,
-                ACCEPT,
-                AUTHORIZATION,
-                "X_REQUESTED_WITH",
-                ACCESS_CONTROL_REQUEST_METHOD,
-                ACCESS_CONTROL_REQUEST_HEADERS,
-                ACCESS_CONTROL_ALLOW_CREDENTIALS));
-        corsConfiguration.setAllowedMethods(Arrays.asList(GET.name(),
-                POST.name(),
-                PUT.name(),
-                PATCH.name(),
-                DELETE.name(),
-                OPTIONS.name()));
-        corsConfiguration.setMaxAge(3600L);
-        var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/", corsConfiguration);
-        return source;
     }
 }

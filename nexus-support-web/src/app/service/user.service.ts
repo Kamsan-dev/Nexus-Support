@@ -12,37 +12,32 @@ import { Profile } from '../core/model/user.model';
 })
 export class UserService {
   private http = inject(HttpClient);
-  private readonly server: string = environment.API_URL;
+  private readonly server: string = `${environment.API_URL}/${environment.API_VERSION}`;
 
   public register(request: CreateUserRequest): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.server}/user/register`, request);
+    return this.http.post<ApiResponse<null>>(`${this.server}/users/register`, request);
   }
 
   public verifyAccount(token: string): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(
-      `${this.server}/user/verify/account?token=${token}`,
-      null,
-    );
+    return this.http.post<ApiResponse<null>>(`${this.server}/users/verify/account?token=${token}`, null);
   }
 
   public getProfile(): Observable<ApiResponse<Profile>> {
-    return this.http.get<ApiResponse<Profile>>(`${this.server}/user/profile`);
+    return this.http.get<ApiResponse<Profile>>(`${this.server}/users/profile`);
   }
 
   //#region password management
 
   public resetPassword(formData: FormData): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.server}/user/reset/password`, formData);
+    return this.http.post<ApiResponse<null>>(`${this.server}/users/reset/password`, formData);
   }
 
   public verifyResetPasswordToken(token: string): Observable<ApiResponse<null>> {
-    return this.http.get<ApiResponse<null>>(
-      `${this.server}/user/reset/password/verify?token=${token}`,
-    );
+    return this.http.get<ApiResponse<null>>(`${this.server}/users/reset/password/verify?token=${token}`);
   }
 
   public resetPasswordConfirm(request: DoResetPasswordRequest): Observable<ApiResponse<null>> {
-    return this.http.post<ApiResponse<null>>(`${this.server}/user/reset/password/confirm`, request);
+    return this.http.post<ApiResponse<null>>(`${this.server}/users/reset/password/confirm`, request);
   }
 
   //#endregion

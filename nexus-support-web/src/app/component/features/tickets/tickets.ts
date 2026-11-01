@@ -121,7 +121,6 @@ export class Tickets {
 
   private listenToFilterChanges(): void {
     this.inputSubject.pipe(debounceTime(500), distinct(), takeUntilDestroyed(this.destroyRef)).subscribe((filter) => {
-      //this.ticketStore.setCurrentPage(query.pageRequest.page);
       this.router.navigate([], {
         relativeTo: this.activatedRoute,
         queryParams: { filter: filter.trim() || null, page: 1 },
