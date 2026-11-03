@@ -31,4 +31,8 @@ export class ProfileService {
   public toggleAccountLocked(userPublicId: string): Observable<ApiResponse<User>> {
     return this.http.patch<ApiResponse<User>>(`${this.server}/users/${userPublicId}/account/locked`, {});
   }
+
+  public updateRoleUser(userPublicId: string, roleName: string): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.server}/users/${userPublicId}/role`, roleName);
+  }
 }

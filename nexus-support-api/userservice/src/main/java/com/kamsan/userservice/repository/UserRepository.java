@@ -65,9 +65,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             """, nativeQuery = true)
     void updateUserSettings(@Param("userId") Long userId);
 
+    @Modifying
     @Query(value = """
-            UPDATE user_roles ur SET ur.role_id = :roleId
-            WHERE ur.user_id = :userId
+            UPDATE user_roles SET role_id = :roleId
+            WHERE user_id = :userId
             """, nativeQuery = true)
     void updateUserRole(Long userId, Long roleId);
 

@@ -334,12 +334,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ReadUserDTO updateRole(UUID userPublicId, UUID rolePublicId) {
+    public ReadUserDTO updateRole(UUID userPublicId, String roleName) {
         User user = this.getUserByUUID(userPublicId);
-        Role role = roleRepository.findByRolePublicId(rolePublicId)
+        Role role = roleRepository.findByName(roleName)
                                   .orElseThrow(() -> new ApiException(String.format(
-                                          "Unable to retrieve role with public id %s",
-                                          rolePublicId)));
+                                          "Unable to retrieve role with name %s",
+                                          roleName)));
         user.setRole(role.getName());
         user.setAuthorities(role.getAuthority());
         userRepository.updateUserRole(user.getUserId(), role.getRoleId());
@@ -389,7 +389,7 @@ public class UserServiceImpl implements UserService {
             );
             return ServletUriComponentsBuilder
                     .fromCurrentContextPath()
-                    .path("/user/image/" + fileName)
+                    .path("/api/v1/users/image/" + fileName)
                     .toUriString();
 
         } catch (Exception ex) {

@@ -59,6 +59,6 @@ public interface UserService {
 
     ReadUserDTO toggleCredentialsExpired(UUID userPublicId);
 
-    ReadUserDTO updateRole(UUID userPublicId, UUID rolePublicId);
+    ReadUserDTO updateRole(UUID userPublicId, String roleName);
 
 }

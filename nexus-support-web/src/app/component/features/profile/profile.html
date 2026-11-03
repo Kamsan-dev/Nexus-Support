@@ -415,14 +415,15 @@
                 </svg>
               </label>
               <select
+                [disabled]="!store.hasAnyRole([RoleEnum.ADMIN, RoleEnum.SUPER_ADMIN])"
                 name="role"
+                [ngModel]="user.role"
+                (ngModelChange)="onRoleUserChange($event)"
                 class="disabled:bg-gray-100 disabled:border-none border border-gray-300 text-gray-900 text-sm font-normal rounded-lg block w-full py-2 px-3 focus:outline-none"
               >
-                <option>USER</option>
-                <option>TECH_SUPPORT</option>
-                <option>MANAGER</option>
-                <option>ADMIN</option>
-                <option>SUPER_ADMIN</option>
+                @for (role of roles; track $index) {
+                  <option [value]="role">{{ roleLabel[role] }}</option>
+                }
               </select>
             </div>
           </div>
@@ -438,27 +439,6 @@
           <p class="mt-4 text-sm text-gray-500">
             Access management is usually provided as part of an identity and access management (IAM) solution. Whereas access management itself
             provides authentication tools to grant or deny user access, IAM solutions also include methods for managing user identity.
-          </p>
-        </div>
-        <div class="p-4 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
-          <h2 class="text-lg pb-2 font-semibold text-gray-800 border-b border-solid border-gray-200">Recent Devices</h2>
-          <div class="mt-4">
-            <div class="mb-2.5 border border-gray-100 rounded-md items-center gap-2 px-2 bg-gray-100">
-              <div class="flex flex-row items-center justify-between transition-all duration-500">
-                <div class="flex items-center gap-2">
-                  <img src="https://cdn-icons-png.flaticon.com/512/548/548344.png" width="50" alt="device" class="rounded-md" />
-                  <div>
-                    <p class="font-normal text-md text-gray-900">Google Chrome</p>
-                    <p class="font-normal text-sm text-gray-500">Firefox</p>
-                  </div>
-                </div>
-                <div class="text-sm font-medium text-gray-900">100.58.25.16</div>
-                <div class="text-sm font-medium text-gray-900">Jan 26 2025 10:56:09 AM</div>
-              </div>
-            </div>
-          </div>
-          <p class="mt-4 text-sm text-gray-500">
-            Detect unauthorized access, suspicious login from unusual IP address and devices designed to build trust and transparency.
           </p>
         </div>
       </main>

@@ -6,6 +6,7 @@ import com.kamsan.userservice.dto.*;
 import com.kamsan.userservice.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -200,10 +201,10 @@ public class UserResource {
      **/
 
     @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-    @PutMapping("/{userPublicId}/role")
-    public ResponseEntity<ApiResponse<ReadUserDTO>> updateRole(@NotNull Authentication authentication, @PathVariable("userPublicId") String userPublicId,
-                                                               @RequestBody @NotNull @NotEmpty String rolePublicId) {
-        ReadUserDTO user = userService.updateRole(UUID.fromString(userPublicId), UUID.fromString(rolePublicId));
+    @PatchMapping("/{userPublicId}/role")
+    public ResponseEntity<ApiResponse<ReadUserDTO>> updateRole(@PathVariable("userPublicId") String userPublicId,
+                                                               @RequestBody @NotBlank String roleName ) {
+        ReadUserDTO user = userService.updateRole(UUID.fromString(userPublicId), roleName);
         return ResponseEntity.ok().body(getResponse(
                 user,
                 USER_UPDATED_SUCCESSFULLY,

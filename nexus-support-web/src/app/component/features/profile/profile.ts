@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, effect, inject, ViewContainerRef } 
 import { CommonModule, Location } from '@angular/common';
 import { ProfileForm } from './profile-form/profile-form';
 import { AuthStore } from '../../../store/auth.store';
-import { RoleLabel } from '../../../enum/role';
+import { RoleEnum, RoleLabel } from '../../../enum/role';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UpdateProfileRequest } from '../../../core/model/request/update-profile.request';
 import { ModalService } from '../../../service/modal.service';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import Validation from '../../../shared/utils/validation';
 import { HotToastService } from '@ngxpert/hot-toast';
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, ProfileForm, FontAwesomeModule, ReactiveFormsModule],
+  imports: [CommonModule, ProfileForm, FontAwesomeModule, ReactiveFormsModule, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +24,8 @@ export class Profile {
   private fb = inject(FormBuilder);
   readonly store = inject(AuthStore);
   readonly roleLabel = RoleLabel;
+  readonly RoleEnum = RoleEnum;
+  readonly roles = Object.values(RoleEnum);
 
   // form password
   formPassword!: FormGroup;
@@ -133,6 +135,14 @@ export class Profile {
         }
         this.store.toggleAccountEnabled(this.store.profile()!.user.userPublicId);
       });
+  };
+
+  // roles
+
+  onRoleUserChange = (role: RoleEnum): void => {
+    if (this.store.profile()) {
+      this.store.updateUserRole({ userPublicId: this.store.profile()!.user.userPublicId, roleName: role });
+    }
   };
 
   private initFormPassword(): void {

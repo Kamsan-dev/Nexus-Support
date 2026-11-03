@@ -193,13 +193,47 @@ export const AuthStore = signalStore(
         ),
       ),
     ),
+    updateUserRole: rxMethod<{ userPublicId: string; roleName: string }>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          profileService.updateRoleUser(request.userPublicId, request.roleName).pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      role: response.data.role,
+                      authorities: response.data.authorities,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetProfileUpdated(): void {
       patchState(store, { profileUpdated: false });
     },
-    hasAnyAuthorities(authorities: string): boolean {
+    hasAnyAuthorities(authorities: string[] | string): boolean {
       if (store.profile === undefined) return false;
       let splitAuthorities = store.profile()?.user.authorities.split(',');
-      return splitAuthorities?.includes(authorities) ?? false;
+      if (!Array.isArray(authorities)) {
+        authorities = [authorities];
+      }
+      return authorities.some((authority) => splitAuthorities?.includes(authority)) ?? false;
     },
     hasAnyRole(roles: RoleEnum[]): boolean {
       const profile = store.profile();
@@ -218,3 +252,5 @@ export const AuthStore = signalStore(
     roleConnectedUser: computed(() => store.profile()?.user.role),
   })),
 );
+
+// ['aaaaaa'] | aaaaa
