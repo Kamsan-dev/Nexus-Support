@@ -254,7 +254,11 @@
               <li class="">
                 <div
                   (click)="user.isAccountLocked && onToggleAccountLocked($event)"
-                  [ngClass]="[!user.isAccountLocked ? 'bg-green-100 border-green-600 text-green-600 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    !user.isAccountLocked
+                      ? 'bg-green-100 border-green-600 text-green-600 cursor-auto'
+                      : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -273,7 +277,9 @@
               <li class="cursor-pointer">
                 <div
                   (click)="!user.isAccountLocked && onToggleAccountLocked($event)"
-                  [ngClass]="[user.isAccountLocked ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    user.isAccountLocked ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -297,7 +303,11 @@
               <li class="cursor-pointer">
                 <div
                   (click)="user.isAccountExpired && onToggleAccountExpired($event)"
-                  [ngClass]="[!user.isAccountExpired ? 'bg-green-100 border-green-600 text-green-600 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    !user.isAccountExpired
+                      ? 'bg-green-100 border-green-600 text-green-600 cursor-auto'
+                      : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -316,7 +326,9 @@
               <li class="cursor-pointer">
                 <div
                   (click)="!user.isAccountExpired && onToggleAccountExpired($event)"
-                  [ngClass]="[user.isAccountExpired ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    user.isAccountExpired ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -340,7 +352,11 @@
               <li class="cursor-pointer">
                 <div
                   (click)="!user.isAccountEnabled && onToggleAccountEnabled($event)"
-                  [ngClass]="[user.isAccountEnabled ? 'border-green-600 text-green-600 bg-green-100 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    user.isAccountEnabled
+                      ? 'border-green-600 text-green-600 bg-green-100 cursor-auto'
+                      : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -355,7 +371,9 @@
               <li class="cursor-pointer">
                 <div
                   (click)="user.isAccountEnabled && onToggleAccountEnabled($event)"
-                  [ngClass]="[!user.isAccountEnabled ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer']"
+                  [ngClass]="[
+                    !user.isAccountEnabled ? 'border-red-600 text-red-600 bg-red-100 cursor-auto' : 'cursor-pointer border-gray-200 text-gray-500',
+                  ]"
                   class="border inline-flex items-center justify-between w-full p-2.5 rounded-lg"
                 >
                   <div class="block">
@@ -386,20 +404,23 @@
           </p>
           <div class="mt-4">
             <button
-              class="bg-yellow-500 hover:bg-yellow-700 focus:ring-yellow-300 disabled:bg-gray-300 text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-md px-4 p-2"
+              (click)="toggleMfa(user.isUsingMfa ? 'disable' : 'enable', $event)"
+              [ngClass]="[
+                user.isUsingMfa
+                  ? 'focus:ring-yellow-300 bg-yellow-500 hover:bg-yellow-600'
+                  : 'bg-gray-500 text-white focus:ring-4 focus:outline-none focus:ring-blue-300 ',
+              ]"
+              class="font-medium rounded-md text-md px-4 p-2"
             >
-              Disable 2F Authentication
+              {{ user.isUsingMfa ? 'Disable 2F Authentication' : 'Enable 2F Authentication' }}
             </button>
           </div>
-          <div class="mt-4 flex flex-col items-center">
-            <p class="text-sm text-gray-500">Use your phone to scan this QR code to set up MFA</p>
-            <img
-              class="w-64 h-w-64"
-              src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
-              alt="QR Code"
-              loading="lazy"
-            />
-          </div>
+          @if (user.isUsingMfa) {
+            <div class="mt-4 flex flex-col items-center">
+              <p class="text-sm text-gray-500">Use your phone to scan this QR code to set up MFA</p>
+              <img class="w-64 h-w-64" [src]="user.qrCodeImageUri" [alt]="'QR code of user ' + user.lastName" loading="lazy" />
+            </div>
+          }
         </div>
         <div class="p-4 mb-10 rounded-lg bg-white border border-solid border-gray-200 overflow-auto">
           <h2 class="text-lg pb-2 font-semibold text-gray-800 border-b border-solid border-gray-200">Manage Access</h2>
@@ -429,12 +450,27 @@
           </div>
           <div class="p-2 mt-4">
             <p class="text-md text-gray-500">User Access</p>
-            <div class="mt-2 p-2 mb-1 border border-gray-300 rounded-lg" role="alert">
-              <div class="flex items-center">
-                <h3 class="bg-cyan-300 text-sm text-gray-900 uppercase px-1 rounded font-bold">TICKET:CREATE</h3>
+            @for (authority of user.authorities.split(','); track $index) {
+              @let subject = authority.split(':')[0];
+              @let action = authority.split(':')[1];
+              <div class="mt-2 p-2 mb-1 border border-gray-300 rounded-lg" role="alert">
+                <div class="flex items-center">
+                  <h3
+                    [ngClass]="[
+                      authority.includes('create') ? 'bg-cyan-300' : '',
+                      authority.includes('update') ? 'bg-yellow-400' : '',
+                      authority.includes('read') ? 'bg-sky-500' : '',
+                      authority.includes('delete') ? 'bg-red-500' : '',
+                      authority.includes('assignee') ? 'bg-green-300' : '',
+                    ]"
+                    class="text-sm text-gray-900 uppercase px-1 rounded font-bold"
+                  >
+                    {{ authority.toLocaleUpperCase() }}
+                  </h3>
+                </div>
+                <div class="text-md text-gray-600">You have access to {{ action }} {{ subject }}</div>
               </div>
-              <div class="text-md text-gray-600">You have access to create tickets</div>
-            </div>
+            }
           </div>
           <p class="mt-4 text-sm text-gray-500">
             Access management is usually provided as part of an identity and access management (IAM) solution. Whereas access management itself

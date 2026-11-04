@@ -47,7 +47,6 @@ export class AddTicket {
 
   onSubmitForm = (event: MouseEvent | TouchEvent): void => {
     event.stopImmediatePropagation();
-    console.log(this.modalForm.value);
     if (this.modalForm.invalid) {
       this.modalForm.markAllAsDirty;
       return;

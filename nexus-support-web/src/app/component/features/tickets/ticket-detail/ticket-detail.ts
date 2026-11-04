@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, ViewContainerRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal, ViewContainerRef } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,6 +15,7 @@ import { TicketDetailsStore } from '../../../../store/ticket-details.store';
 import { TaskFormModal } from '../../modals/task-form-modal/task-form-modal';
 import { ModalService } from '../../../../service/modal.service';
 import { getFormData } from '../../../../shared/utils/request';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -27,6 +28,7 @@ export class TicketDetail {
   protected readonly ticketStore = inject(TicketDetailsStore);
   protected readonly authStore = inject(AuthStore);
   private activatedRoute = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private toastService = inject(HotToastService);
   private modalService = inject(ModalService);
@@ -129,7 +131,6 @@ export class TicketDetail {
   };
   onEditTaskClick = (event: TouchEvent | MouseEvent, task: Task): void => {
     event.stopImmediatePropagation();
-    console.log(task);
     this.dialogService.open(TaskFormModal, {
       id: this.TASK_FORM_MODAL_ID,
       data: {
@@ -148,6 +149,7 @@ export class TicketDetail {
         subtitle: 'This action cannot be undone.',
         type: 'warning',
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (!confirmed) {
           return;
@@ -205,6 +207,7 @@ export class TicketDetail {
         subtitle: 'This action cannot be undone.',
         type: 'warning',
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (!confirmed) {
           return;
@@ -227,6 +230,7 @@ export class TicketDetail {
         subtitle: 'This action cannot be undone.',
         type: 'warning',
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (!confirmed) {
           return;

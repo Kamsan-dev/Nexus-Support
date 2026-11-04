@@ -6,6 +6,7 @@ import { DialogService } from '@ngneat/dialog';
 import { AuthStore } from '../../../store/auth.store';
 import { MessageStore } from '../../../store/message.store';
 import { AddTicket } from '../tickets/add-ticket/add-ticket';
+import { RoleEnum } from '../../../enum/role';
 
 @Component({
   selector: 'app-navbar',
@@ -23,6 +24,8 @@ export class Navbar {
   @ViewChild('addFormTicket') addTicketTemplate!: TemplateRef<any>;
   isNavOpen = signal(false);
   isMenuOpen = signal(false);
+
+  readonly Roles = RoleEnum;
 
   ngOnInit(): void {
     this.authStore.loadProfile();

@@ -94,13 +94,12 @@ export class Tickets {
 
   private listenToQueryParams(): void {
     this.activatedRoute.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const pageParam = params.get('page');
+      const pageParam = Number(params.get('page'));
       const size = Number(params.get('size') ?? this.ticketStore.query.pageRequest.size());
       const statusParam = params.get('status') ?? this.ticketStore.statusQuery();
       const typeParam = params.get('type') ?? this.ticketStore.typeQuery();
       const filter = params.get('filter') ?? undefined;
-
-      const page = pageParam !== null ? Number(pageParam) - 1 : this.ticketStore.query.pageRequest.page();
+      const page = isNaN(pageParam) ? this.ticketStore.query.pageRequest.page() : pageParam - 1;
 
       const status = statusParam && statusParam !== 'all' ? parseEnum(TicketStatusEnum, statusParam) : undefined;
 

@@ -12,7 +12,11 @@ public record PageUserDTO(UUID userPublicId,
                           String imageUrl,
                           String phone,
                           String address,
+                          boolean isUsingMfa,
                           OffsetDateTime createdAt,
                           String role,
-                          String authorities) {
+                          String authorities,
+                          boolean isAccountExpired,
+                          boolean isAccountLocked,
+                          boolean isAccountEnabled) {
 }

@@ -2,6 +2,7 @@ package com.kamsan.userservice.repository;
 
 import com.kamsan.userservice.dto.DeviceDTO;
 import com.kamsan.userservice.dto.PageUserDTO;
+import com.kamsan.userservice.dto.ReadUserDTO;
 import com.kamsan.userservice.dto.TicketUserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,20 +26,7 @@ public class UserQueryRepository {
         return jdbc.sql(FIND_USERS_PAGE_QUERY)
                    .param("limit", page.getPageSize())
                    .param("offset", page.getOffset())
-                   .query((rs, rowNum) -> new PageUserDTO(
-                           rs.getObject("user_public_id", UUID.class),
-                           rs.getString("email"),
-                           rs.getString("first_name"),
-                           rs.getString("last_name"),
-                           rs.getString("member_id"),
-                           rs.getString("bio"),
-                           rs.getString("image_url"),
-                           rs.getString("phone"),
-                           rs.getString("address"),
-                           rs.getObject("created_at", OffsetDateTime.class),
-                           rs.getString("role"),
-                           rs.getString("authorities")
-                   ))
+                   .query(PageUserDTO.class)
                    .list();
     }
 

@@ -10,7 +10,7 @@ export interface User {
   imageUrl: string;
   phone?: string;
   address?: string;
-  qrCodeImageUri: string;
+  qrCodeImageUri: string | null;
   isUsingMfa: boolean;
   lastLogin: string | null;
   createdAt: string;
@@ -32,4 +32,24 @@ export interface Device {
   client: string;
   ipAddress: string;
   createdAt: string;
+}
+
+export interface PageUsers {
+  userPublicId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  memberId: string;
+  bio?: string;
+  imageUrl: string;
+  phone?: string;
+  address?: string;
+  isUsingMfa: boolean;
+  createdAt: string;
+  updatedAt: string;
+  role: RoleEnum;
+  authorities: string;
+  isAccountExpired: boolean;
+  isAccountLocked: boolean;
+  isAccountEnabled: boolean;
 }

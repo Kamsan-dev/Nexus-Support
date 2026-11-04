@@ -35,4 +35,11 @@ export class ProfileService {
   public updateRoleUser(userPublicId: string, roleName: string): Observable<ApiResponse<User>> {
     return this.http.patch<ApiResponse<User>>(`${this.server}/users/${userPublicId}/role`, roleName);
   }
+
+  public enableMfa(): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.server}/users/mfa/enable`, {});
+  }
+  public disableMfa(): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.server}/users/mfa/disable`, {});
+  }
 }

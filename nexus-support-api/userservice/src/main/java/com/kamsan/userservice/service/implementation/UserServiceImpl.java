@@ -67,7 +67,6 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public ReadUserDTO getUserByPublicId(UUID publicId) {
         var user = this.getUserByUUID(publicId);
-        loadSecurityDetails(user);
         ReadUserDTO readUserDTO = userMapper.userToReadUserDTO(user);
         return readUserDTO;
     }
@@ -86,7 +85,6 @@ public class UserServiceImpl implements UserService {
     public ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId) {
         var user = getUserByUUID(userPublicId);
         userMapper.updateUser(updateUserDTO, user);
-        loadSecurityDetails(user);
         return userMapper.userToReadUserDTO(user);
     }
 
@@ -146,7 +144,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ReadUserDTO enableMfa(UUID userPublicId) {
         var user = this.getUserByUUID(userPublicId);
 
@@ -156,17 +153,18 @@ public class UserServiceImpl implements UserService {
         user.setQrCodeSecret(qrCodeSecret);
         user.setQrCodeImageUri(qrCodeImageUri);
         user.setUsingMfa(true);
+        userRepository.save(user);
 
         return userMapper.userToReadUserDTO(user);
     }
 
     @Override
-    @Transactional
     public ReadUserDTO disableMfa(UUID userPublicId) {
         var user = this.getUserByUUID(userPublicId);
         user.setQrCodeSecret(null);
         user.setQrCodeImageUri(null);
         user.setUsingMfa(false);
+        userRepository.save(user);
         return userMapper.userToReadUserDTO(user);
     }
 
@@ -347,10 +345,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private User getUserByUUID(UUID publicId) {
-        return userRepository.findByUserPublicId(publicId).orElseThrow(
+        User user = userRepository.findByUserPublicId(publicId).orElseThrow(
                 () -> new ApiException(String.format(
                         "User with public id %s does not exist.",
                         publicId)));
+        loadSecurityDetails(user);
+        return user;
     }
 
     private void loadSecurityDetails(User user) {

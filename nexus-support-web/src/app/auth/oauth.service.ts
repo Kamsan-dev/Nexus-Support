@@ -50,8 +50,6 @@ export class OAuthService {
       code_challenge: codeChallenge,
       state,
     });
-
-    console.log(`${this.authorizationEndpoint}?${params.toString()}`);
     window.location.href = `${this.authorizationEndpoint}?${params.toString()}`;
   }
 

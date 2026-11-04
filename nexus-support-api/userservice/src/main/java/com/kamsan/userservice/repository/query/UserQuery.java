@@ -17,6 +17,10 @@ public class UserQuery {
                 u.phone,
                 u.address,
                 u.created_at,
+                u.is_using_mfa,
+                u.is_account_expired,
+                u.is_account_locked,
+                u.is_account_enabled,
                 r.name AS role,
                 r.authority AS authorities
             FROM users u

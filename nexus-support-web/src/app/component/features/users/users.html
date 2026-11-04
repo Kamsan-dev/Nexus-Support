@@ -1,1 +1,275 @@
-<p>user works!</p>
+@if (this.store.loading() || this.authStore.loading()) {
+  <div class="container mx-auto">
+    <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-4">
+      <main class="xl:col-span-2 lg:col-span-2 w-full">
+        <div role="status" class="animate-pulse bg-white mt-5 rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </main>
+      <div class="rounded-xl h-fit mt-5">
+        <div role="status" class="animate-pulse bg-white rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (!this.authStore.loading() && !this.authStore.hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+  <div class="container mx-auto">
+    <div class="p-1.5 min-w-full inline-block align-middle">
+      <!-- Access denied banner -->
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+        <div class="flex items-center gap-2">
+          <svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+            />
+          </svg>
+          <div>
+            <p class="text-sm font-semibold text-red-800">Access denied</p>
+            <p class="text-sm text-red-700">You don't have access to this page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (this.store.users() && this.authStore.hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+  @let users = store.users();
+  <div class="container mx-auto">
+    <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
+      <a (click)="goBack()" class="bg-gray-200 hover:bg-gray-300 p-1 rounded-full cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+      <h3 class="text-xl font-bold bg-gray-200 hover:bg-gray-300x rounded-md px-2">Users</h3>
+    </div>
+    <div class="mx-auto mt-3 mb-3 border-t border-gray-200"></div>
+  </div>
+  <div class="container mx-auto">
+    <div class="p-1.5 min-w-full inline-block align-middle">
+      <!-- Table -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <table class="divide-y divide-gray-200 w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-5">
+                <div class="flex items-center">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Name</span>
+                </div>
+              </th>
+              <th class="px-5 text-start">
+                <div class="flex items-center gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Role</span>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-start">
+                <div class="flex items-center gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Status</span>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-start">
+                <div class="flex items-center gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">MFA Authentication</span>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-start">
+                <div class="flex items-center gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Phone</span>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-start">
+                <div class="flex items-center gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Created</span>
+                </div>
+              </th>
+              <th class="px-6 py-3 text-end">
+                <div class="flex items-center justify-end gap-x-2">
+                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Action</span>
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200">
+            <!-- Row example -->
+            @if (users.length === 0) {
+              <tr>
+                <td colspan="100%" class="text-center p-4 text-gray-800 text-md">No users found.</td>
+              </tr>
+            }
+            @for (user of users; track user.userPublicId) {
+              <tr class="hover:bg-gray-50">
+                <!-- Name -->
+                <td class="px-5 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-x-3">
+                    <img
+                      [src]="user.imageUrl"
+                      [alt]="'Profile image of user ' + user.lastName"
+                      class="w-12 h-12 aspect-square object-cover rounded-full"
+                      loading="lazy"
+                    />
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">{{ user.firstName }} {{ user.lastName }}</p>
+                      <p class="text-xs text-gray-500">{{ user.email }}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Role -->
+                <td class="px-5 py-3 whitespace-nowrap">
+                  <div>
+                    <p class="text-sm text-gray-800">{{ RoleLabel[user.role] }}</p>
+                  </div>
+                </td>
+
+                <!-- Status -->
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-2">
+                    <span
+                      [ngClass]="[user.isAccountEnabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']"
+                      class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    >
+                      <span class="h-1.5 w-1.5 rounded-full" [ngClass]="[user.isAccountEnabled ? 'bg-green-500' : 'bg-red-500']"></span>
+                      {{ user.isAccountEnabled ? 'Active' : 'Unactive' }}
+                    </span>
+                  </div>
+                </td>
+
+                <!-- MFA Authentication -->
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span class="text-sm text-gray-800">{{ user.isUsingMfa ? 'MFA Activated' : 'MFA disabled' }}</span>
+                </td>
+
+                <!-- Phone -->
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span class="text-sm text-gray-800">{{ user.phone }}</span>
+                </td>
+
+                <!-- Created -->
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span class="text-sm text-gray-800">{{ user.createdAt | date: 'mediumDate' }}</span>
+                </td>
+
+                <!-- Action -->
+                <td class="px-6 py-3 whitespace-nowrap text-end">
+                  <button
+                    [routerLink]="null"
+                    type="button"
+                    class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Footer results -->
+        @if (store.users().length > 0) {
+          <div class="px-5 py-3 border-t border-gray-200">
+            <p class="text-sm text-gray-500">
+              Showing {{ store.offset() + 1 }} to {{ store.offset() + store.numberOfElement() }} of {{ store.totalUsers() }} results
+            </p>
+          </div>
+        }
+      </div>
+      @if (store.totalPages() > 1) {
+        <nav class="mt-6 flex justify-center" aria-label="Page navigation">
+          <ul class="flex items-center -space-x-px h-10 text-base">
+            <li
+              (click)="onPaginationClick($event, 0, 'previous')"
+              [ngClass]="[store.currentPage() == 0 ? 'pointer-events-none opacity-40' : 'cursor-pointer']"
+            >
+              <a
+                class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-blue-600 bg-white border border-blue-300 border-e-0 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
+              >
+                <span class="sr-only">Previous</span>
+                <fa-icon [icon]="'chevron-left'" class="fa-fw"></fa-icon>
+              </a>
+            </li>
+            @for (page of [].constructor(store.totalPages()); track $index) {
+              <li
+                (click)="onPaginationClick($event, $index)"
+                [ngClass]="[store.currentPage() === $index ? 'bg-blue-70' : 'bg-white']"
+                class="cursor-pointer"
+              >
+                <a
+                  class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+                >
+                  {{ $index + 1 }}
+                </a>
+              </li>
+            }
+
+            <li
+              (click)="onPaginationClick($event, 0, 'next')"
+              [ngClass]="[store.totalPages() - 1 == store.currentPage() ? 'pointer-events-none opacity-40' : 'cursor-pointer']"
+            >
+              <a
+                class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 bg-white border border-blue-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
+              >
+                <span class="sr-only">Next</span>
+                <fa-icon [icon]="'chevron-right'" class="fa-fw"></fa-icon>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="container mx-auto">
+    <div class="flex justify-center">
+      <p>Something went wrong when loading the dashboard.</p>
+    </div>
+  </div>
+}

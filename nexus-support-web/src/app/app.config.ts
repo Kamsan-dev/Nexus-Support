@@ -1,5 +1,5 @@
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { InMemoryScrollingFeature, provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHotToastConfig } from '@ngxpert/hot-toast';
@@ -10,11 +10,16 @@ import localeFr from '@angular/common/locales/fr';
 
 registerLocaleData(localeFr);
 
+const inMemoryScrollingFeature: InMemoryScrollingFeature = withInMemoryScrolling({
+  scrollPositionRestoration: 'enabled',
+  anchorScrolling: 'enabled',
+});
+
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: 'fr-FR' },
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding(), inMemoryScrollingFeature),
     provideHotToastConfig({
       dismissible: true,
       position: 'top-right',

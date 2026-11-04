@@ -25,39 +25,43 @@
           <img class="h-8 w-auto" src="https://cdn-icons-png.flaticon.com/512/9732/9732800.png" alt="Ticket App" />
         </div>
         <div class="hidden sm:ml-6 lg:block">
-          <div class="flex space-x-4">
-            <a [routerLink]="['/app/dashboard']" [routerLinkActive]="['bg-gray-700']" class="rounded-md px-3 py-2 text-sm font-medium text-white"
-              >Dashboard</a
-            >
-            <a
-              [routerLink]="['/app/tickets/list']"
-              [routerLinkActive]="['bg-gray-700']"
-              class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
-              >Tickets</a
-            >
-            <a
-              [routerLink]="['/app/users/list']"
-              [routerLinkActive]="['bg-gray-700']"
-              class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
-              >Users</a
-            >
-            <a
-              [routerLink]="['/app/reports']"
-              [routerLinkActive]="['bg-gray-700']"
-              class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
-              >Reports</a
-            >
-            <a
-              [routerLink]="['/app/messages/list']"
-              [routerLinkActive]="['bg-gray-700']"
-              class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 relative group"
-              >Messages
-              <span
-                class="inline-flex items-center justify-center h-4 w-max px-[5px] py-[5px] text-xs font-semibold text-black bg-yellow-400 rounded-full"
-                >{{ messageStore.unreadMessageCount() }}</span
+          @if (this.authStore.profile()) {
+            <div class="flex space-x-4">
+              <a [routerLink]="['/app/dashboard']" [routerLinkActive]="['bg-gray-700']" class="rounded-md px-3 py-2 text-sm font-medium text-white"
+                >Dashboard</a
               >
-            </a>
-          </div>
+              <a
+                [routerLink]="['/app/tickets/list']"
+                [routerLinkActive]="['bg-gray-700']"
+                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >Tickets</a
+              >
+              @if (this.authStore.hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+                <a
+                  [routerLink]="['/app/users/list']"
+                  [routerLinkActive]="['bg-gray-700']"
+                  class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                  >Users</a
+                >
+              }
+              <a
+                [routerLink]="['/app/reports']"
+                [routerLinkActive]="['bg-gray-700']"
+                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >Reports</a
+              >
+              <a
+                [routerLink]="['/app/messages/list']"
+                [routerLinkActive]="['bg-gray-700']"
+                class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-gray-700 relative group"
+                >Messages
+                <span
+                  class="inline-flex items-center justify-center h-4 w-max px-[5px] py-[5px] text-xs font-semibold text-black bg-yellow-400 rounded-full"
+                  >{{ messageStore.unreadMessageCount() }}</span
+                >
+              </a>
+            </div>
+          }
         </div>
       </div>
       @if (authStore.loading()) {
@@ -98,7 +102,11 @@
               <div class="font-medium text-md">{{ authStore.user()?.email }}</div>
             </div>
             <ul class="p-2 text-sm text-gray-700" aria-labelledby="dropdownHoverButton">
-              <li [routerLink]="['/app/profile']" class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100">
+              <li
+                [routerLink]="['/app/profile']"
+                (click)="toggleMenu()"
+                class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path
                     stroke-linecap="round"
@@ -111,6 +119,7 @@
               <li
                 [routerLink]="['/app/profile']"
                 fragment="password"
+                (click)="toggleMenu()"
                 class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
@@ -125,6 +134,7 @@
               <li
                 [routerLink]="['/app/profile']"
                 fragment="settings"
+                (click)="toggleMenu()"
                 class="mb-3 pl-4 flex justify-start items-center cursor-pointer rounded-md hover:bg-gray-100"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">

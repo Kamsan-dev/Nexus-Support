@@ -224,6 +224,68 @@ export const AuthStore = signalStore(
         ),
       ),
     ),
+    enableMfa: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap(() =>
+          profileService.enableMfa().pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      isUsingMfa: true,
+                      qrCodeImageUri: response.data.qrCodeImageUri,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    disableMfa: rxMethod<void>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap(() =>
+          profileService.disableMfa().pipe(
+            tapResponse({
+              next: (response) => {
+                const profile = store.profile();
+                if (!profile) {
+                  return;
+                }
+                patchState(store, setFulfilled(), {
+                  profile: {
+                    ...profile,
+                    user: {
+                      ...profile.user,
+                      isUsingMfa: false,
+                      qrCodeImageUri: null,
+                    },
+                  },
+                });
+                toastService.success(response.message);
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
     resetProfileUpdated(): void {
       patchState(store, { profileUpdated: false });
     },

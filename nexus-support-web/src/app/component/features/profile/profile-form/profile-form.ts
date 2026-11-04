@@ -43,7 +43,6 @@ export class ProfileForm {
 
   onFormSubmit = (event: MouseEvent | TouchEvent): void => {
     event.stopImmediatePropagation();
-    console.log('here');
     if (this.form.invalid) {
       this.form.markAllAsDirty;
       return;

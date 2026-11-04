@@ -14,6 +14,7 @@ public interface UserMapper {
     @Mapping(source = "accountEnabled", target = "isAccountEnabled")
     @Mapping(source = "accountExpired", target = "isAccountExpired")
     @Mapping(source = "accountLocked", target = "isAccountLocked")
+    @Mapping(source = "usingMfa", target = "isUsingMfa")
     ReadUserDTO userToReadUserDTO(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
