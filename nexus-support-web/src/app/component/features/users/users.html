@@ -80,7 +80,7 @@
       </div>
     </div>
   </div>
-} @else if (this.store.users() && this.authStore.hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
+} @else if (authStore.profile() && this.authStore.hasAnyRole([Roles.ADMIN, Roles.SUPER_ADMIN])) {
   @let users = store.users();
   <div class="container mx-auto">
     <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
@@ -102,37 +102,37 @@
             <tr>
               <th class="px-5">
                 <div class="flex items-center">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Name</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Name</span>
                 </div>
               </th>
               <th class="px-5 text-start">
                 <div class="flex items-center gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Role</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Role</span>
                 </div>
               </th>
               <th class="px-6 py-3 text-start">
                 <div class="flex items-center gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Status</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Status</span>
                 </div>
               </th>
               <th class="px-6 py-3 text-start">
                 <div class="flex items-center gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">MFA Authentication</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">MFA Authentication</span>
                 </div>
               </th>
               <th class="px-6 py-3 text-start">
                 <div class="flex items-center gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Phone</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Phone</span>
                 </div>
               </th>
               <th class="px-6 py-3 text-start">
                 <div class="flex items-center gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Created</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Created</span>
                 </div>
               </th>
               <th class="px-6 py-3 text-end">
                 <div class="flex items-center justify-end gap-x-2">
-                  <span class="text-xs font-semibold uppercase tracking-wide text-gray-800">Action</span>
+                  <span class="text-xs font-bold uppercase tracking-wide text-gray-800">Action</span>
                 </div>
               </th>
             </tr>
@@ -146,69 +146,71 @@
               </tr>
             }
             @for (user of users; track user.userPublicId) {
-              <tr class="hover:bg-gray-50">
-                <!-- Name -->
-                <td class="px-5 py-3 whitespace-nowrap">
-                  <div class="flex items-center gap-x-3">
-                    <img
-                      [src]="user.imageUrl"
-                      [alt]="'Profile image of user ' + user.lastName"
-                      class="w-12 h-12 aspect-square object-cover rounded-full"
-                      loading="lazy"
-                    />
-                    <div>
-                      <p class="text-sm font-medium text-gray-800">{{ user.firstName }} {{ user.lastName }}</p>
-                      <p class="text-xs text-gray-500">{{ user.email }}</p>
+              @if (user.email !== authStore.user()?.email) {
+                <tr class="hover:bg-gray-50">
+                  <!-- Name -->
+                  <td class="px-5 py-3 whitespace-nowrap">
+                    <div class="flex items-center gap-x-3">
+                      <img
+                        [src]="user.imageUrl"
+                        [alt]="'Profile image of user ' + user.lastName"
+                        class="w-12 h-12 aspect-square object-cover rounded-full"
+                        loading="lazy"
+                      />
+                      <div>
+                        <p class="text-sm font-medium text-gray-800">{{ user.firstName }} {{ user.lastName }}</p>
+                        <p class="text-xs text-gray-500">{{ user.email }}</p>
+                      </div>
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                <!-- Role -->
-                <td class="px-5 py-3 whitespace-nowrap">
-                  <div>
-                    <p class="text-sm text-gray-800">{{ RoleLabel[user.role] }}</p>
-                  </div>
-                </td>
+                  <!-- Role -->
+                  <td class="px-5 py-3 whitespace-nowrap">
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">{{ RoleLabel[user.role] }}</p>
+                    </div>
+                  </td>
 
-                <!-- Status -->
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <div class="flex items-center gap-2">
-                    <span
-                      [ngClass]="[user.isAccountEnabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']"
-                      class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  <!-- Status -->
+                  <td class="px-6 py-3 whitespace-nowrap">
+                    <div class="flex items-center gap-2">
+                      <span
+                        [ngClass]="[user.isAccountEnabled ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']"
+                        class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                      >
+                        <span class="h-1.5 w-1.5 rounded-full" [ngClass]="[user.isAccountEnabled ? 'bg-green-500' : 'bg-red-500']"></span>
+                        {{ user.isAccountEnabled ? 'Active' : 'Unactive' }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <!-- MFA Authentication -->
+                  <td class="px-6 py-3 whitespace-nowrap">
+                    <span class="text-sm text-gray-800">{{ user.isUsingMfa ? 'MFA Activated' : 'MFA disabled' }}</span>
+                  </td>
+
+                  <!-- Phone -->
+                  <td class="px-6 py-3 whitespace-nowrap">
+                    <span class="text-sm text-gray-800">{{ user.phone }}</span>
+                  </td>
+
+                  <!-- Created -->
+                  <td class="px-6 py-3 whitespace-nowrap">
+                    <span class="text-sm text-gray-800">{{ user.createdAt | date: 'mediumDate' }}</span>
+                  </td>
+
+                  <!-- Action -->
+                  <td class="px-6 py-3 whitespace-nowrap text-end">
+                    <button
+                      [routerLink]="['/app/users/', user.userPublicId]"
+                      type="button"
+                      class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
-                      <span class="h-1.5 w-1.5 rounded-full" [ngClass]="[user.isAccountEnabled ? 'bg-green-500' : 'bg-red-500']"></span>
-                      {{ user.isAccountEnabled ? 'Active' : 'Unactive' }}
-                    </span>
-                  </div>
-                </td>
-
-                <!-- MFA Authentication -->
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="text-sm text-gray-800">{{ user.isUsingMfa ? 'MFA Activated' : 'MFA disabled' }}</span>
-                </td>
-
-                <!-- Phone -->
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="text-sm text-gray-800">{{ user.phone }}</span>
-                </td>
-
-                <!-- Created -->
-                <td class="px-6 py-3 whitespace-nowrap">
-                  <span class="text-sm text-gray-800">{{ user.createdAt | date: 'mediumDate' }}</span>
-                </td>
-
-                <!-- Action -->
-                <td class="px-6 py-3 whitespace-nowrap text-end">
-                  <button
-                    [routerLink]="null"
-                    type="button"
-                    class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
             }
           </tbody>
         </table>
@@ -269,7 +271,7 @@
 } @else {
   <div class="container mx-auto">
     <div class="flex justify-center">
-      <p>Something went wrong when loading the dashboard.</p>
+      <p>Something went wrong when loading this page. Please try again.</p>
     </div>
   </div>
 }

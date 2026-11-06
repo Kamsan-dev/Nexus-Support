@@ -50,7 +50,10 @@ export class Profile {
   }
 
   onUpdateProfile = (event: UpdateProfileRequest) => {
-    this.store.updateProfile(event);
+    this.store.updateProfile({
+      userPublicId: this.store.user()!.userPublicId,
+      request: event,
+    });
   };
 
   onResetProfileUpdate = () => {

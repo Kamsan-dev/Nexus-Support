@@ -129,9 +129,11 @@ public class UserResource {
                 HttpStatus.OK));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse<ReadUserDTO>> updateUser(@NotNull Authentication authentication, @RequestBody UpdateUserDTO updateUserDTO) {
-        ReadUserDTO user = userService.updateUser(updateUserDTO, UUID.fromString(authentication.getName()));
+    @PutMapping("/{userPublicId}/update")
+    public ResponseEntity<ApiResponse<ReadUserDTO>> updateUser(@NotNull Authentication authentication,
+                                                               @RequestBody UpdateUserDTO updateUserDTO,
+                                                               @PathVariable UUID userPublicId) {
+        ReadUserDTO user = userService.updateUser(updateUserDTO, userPublicId);
         return ResponseEntity.ok().body(getResponse(
                 user,
                 "Your profile has been updated successfully.",

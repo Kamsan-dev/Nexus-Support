@@ -87,6 +87,7 @@
       <main class="xl:col-span-2 lg:col-span-2 w-full">
         <app-profile-form
           [user]="user"
+          [canEdit]="true"
           [loading]="store.loading()"
           [profileUpdated]="store.profileUpdated()"
           (submitEvent)="onUpdateProfile($event)"

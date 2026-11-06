@@ -52,11 +52,11 @@ export const AuthStore = signalStore(
         ),
       ),
     ),
-    updateProfile: rxMethod<UpdateProfileRequest>(
+    updateProfile: rxMethod<{ userPublicId: string; request: UpdateProfileRequest }>(
       pipe(
         tap(() => patchState(store, setLoading())),
         exhaustMap((request) =>
-          profileService.updateUserProfile(request).pipe(
+          userService.updateUser(request.userPublicId, request.request).pipe(
             delay(1500),
             tapResponse({
               next: (response) => {

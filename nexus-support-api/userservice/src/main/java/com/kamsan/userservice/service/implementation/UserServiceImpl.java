@@ -19,8 +19,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,10 +85,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public ReadUserDTO updateUser(UpdateUserDTO updateUserDTO, UUID userPublicId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
+        UUID connectedUser = UUID.fromString(jwtAuthenticationToken.getName());
+        if (!hasElevatedPermissions(authentication) && !connectedUser.equals(userPublicId)) {
+            throw new ApiException("Insufficient permissions.");
+        }
         var user = getUserByUUID(userPublicId);
         userMapper.updateUser(updateUserDTO, user);
+        userRepository.save(user);
         return userMapper.userToReadUserDTO(user);
     }
 
@@ -396,6 +406,14 @@ public class UserServiceImpl implements UserService {
             log.error(ex.getMessage());
             throw new ApiException(ex.getMessage());
         }
+    }
+
+    private boolean hasElevatedPermissions(Authentication authentication){
+        JwtAuthenticationToken authenticatedUser = (JwtAuthenticationToken) authentication;
+        Set<String> authorities = AuthorityUtils.authorityListToSet(
+                authenticatedUser.getAuthorities()
+        );
+        return authorities.contains("SUPER_ADMIN") || authorities.contains("ADMIN");
     }
 
 }

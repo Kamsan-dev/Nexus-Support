@@ -14,10 +14,6 @@ export class ProfileService {
   private http = inject(HttpClient);
   private readonly server: string = `${environment.API_URL}/${environment.API_VERSION}`;
 
-  public updateUserProfile(request: UpdateProfileRequest): Observable<ApiResponse<User>> {
-    return this.http.put<ApiResponse<User>>(`${this.server}/users/update`, request);
-  }
-
   public updatePasswordUser(request: UpdatePasswordRequest): Observable<ApiResponse<void>> {
     return this.http.patch<ApiResponse<void>>(`${this.server}/users/update/password`, request);
   }

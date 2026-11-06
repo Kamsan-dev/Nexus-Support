@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { UpdateProfileRequest } from '../../../../core/model/request/update-profile.request';
 import { User } from '../../../../core/model/user.model';
-
+type viewMode = 'profile' | 'view';
 @Component({
   selector: 'app-profile-form',
   imports: [FontAwesomeModule, ReactiveFormsModule, DatePipe],
@@ -16,6 +16,8 @@ export class ProfileForm {
   private fb = inject(FormBuilder);
   user = input.required<User>();
   loading = input.required<boolean>();
+  canEdit = input.required<boolean>();
+  viewMode = input<viewMode>('profile');
   profileUpdated = input.required<boolean>();
   submitEvent = output<UpdateProfileRequest>();
   resetProfileUpdate = output<void>();
@@ -57,8 +59,8 @@ export class ProfileForm {
       firstName: [this.initialUserData.firstName, Validators.required],
       lastName: [this.initialUserData.lastName, Validators.required],
       email: [this.initialUserData.email, Validators.required],
-      address: [this.initialUserData.address, Validators.required],
-      phone: [this.initialUserData.phone, Validators.required],
+      address: [this.initialUserData.address],
+      phone: [this.initialUserData.phone],
       bio: [this.initialUserData.bio],
     });
     this.form.disable();

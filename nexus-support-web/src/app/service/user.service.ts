@@ -2,12 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ApiResponse } from '../core/model/response/api.response';
+import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
 import { DoResetPasswordRequest } from '../core/model/request/change-password.request';
 import { CreateUserRequest } from '../core/model/request/create-user.request';
+import { UpdateProfileRequest } from '../core/model/request/update-profile.request';
+import { ApiResponse } from '../core/model/response/api.response';
 import { PageUsers, Profile, User } from '../core/model/user.model';
-import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
-import { PageTicket } from '../core/model/ticket.model';
 
 @Injectable({
   providedIn: 'root',
@@ -44,8 +44,16 @@ export class UserService {
 
   //#endregion
 
+  public updateUser(userPublicId: string, request: UpdateProfileRequest): Observable<ApiResponse<User>> {
+    return this.http.put<ApiResponse<User>>(`${this.server}/users/${userPublicId}/update`, request);
+  }
+
   public getUsers(pageRequest: Pagination): Observable<ApiResponse<Page<PageUsers>>> {
     let params = createPaginationOption(pageRequest);
     return this.http.get<ApiResponse<Page<PageUsers>>>(`${this.server}/users/get-all`, { params });
+  }
+
+  public getUser(userPublicId: string): Observable<ApiResponse<User>> {
+    return this.http.get<ApiResponse<User>>(`${this.server}/users/${userPublicId}`);
   }
 }
