@@ -98,4 +98,8 @@ export class TicketService {
     let params = createPaginationOption(pageRequest);
     return this.http.post<ApiResponse<Page<TicketReport>>>(`${this.server}/tickets/report`, request, { params });
   }
+
+  public downloadPdfReport(request: TicketReportRequest) {
+    return this.http.post(`${this.server}/tickets/report/download`, request, { responseType: 'blob', observe: 'response', reportProgress: false });
+  }
 }

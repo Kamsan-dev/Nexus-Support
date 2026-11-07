@@ -322,16 +322,14 @@ public class TicketServiceImpl implements TicketService {
     @Override
     @Transactional(readOnly = true)
     public Page<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO, Pageable page) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        boolean isRegularUser = authentication.getAuthorities()
-//                                              .stream()
-//                                              .map(GrantedAuthority::getAuthority)
-//                                              .anyMatch(a -> a.equals("USER"));
-//        return isRegularUser ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
-//                : ticketQueryRepository.generateReport(createReportDTO);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isRegularUser = authentication.getAuthorities()
+                                              .stream()
+                                              .map(GrantedAuthority::getAuthority)
+                                              .anyMatch(a -> a.equals("USER"));
 
         List<TicketReportQueryResult> ticketReportQueryResults = ticketQueryRepository.generateReport(createReportDTO,
-                page);
+                page, isRegularUser ? userPublicId : null);
         List<TicketReportDTO> tickets = ticketReportQueryResults.stream()
                                                              .map(TicketReportQueryResult::ticket)
                                                              .filter(Objects::nonNull)
@@ -341,15 +339,13 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        boolean isRegularUser = authentication.getAuthorities()
-//                                              .stream()
-//                                              .map(GrantedAuthority::getAuthority)
-//                                              .anyMatch(a -> a.equals("USER"));
-//        List<TicketReportDTO> ticketReportDTO = isRegularUser
-//                ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
-//                : ticketQueryRepository.generateReport(createReportDTO);
+    public List<TicketReportDTO> exportPdf(UUID userPublicId, CreateReportDTO createReportDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isRegularUser = authentication.getAuthorities()
+                                              .stream()
+                                              .map(GrantedAuthority::getAuthority)
+                                              .anyMatch(a -> a.equals("USER"));
+        return ticketQueryRepository.generateReportForExportPDF(createReportDTO, isRegularUser ? userPublicId : null);
 
     }
 

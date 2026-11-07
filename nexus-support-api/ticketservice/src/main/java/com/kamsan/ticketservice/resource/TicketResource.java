@@ -10,6 +10,7 @@ import com.kamsan.ticketservice.model.Task;
 import com.kamsan.ticketservice.service.TicketService;
 import com.kamsan.ticketservice.service.UserService;
 import com.kamsan.ticketservice.service.implementation.TicketReportPdfService;
+import com.kamsan.ticketservice.utils.DateFormatter;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -252,23 +254,26 @@ public class TicketResource {
         ));
     }
 
-//    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
-//    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
-//                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
-//
-//        List<TicketReportDTO> tickets = ticketService.report(UUID.fromString(authentication.getName()),
-//                createReportDTO);
-//        ticketReportPdfService.generateReport(tickets);
-//        byte[] pdf = ticketReportPdfService.generateReport(tickets);
-//
-//        return ResponseEntity.ok()
-//                             .contentType(MediaType.APPLICATION_PDF)
-//                             .header(
-//                                     HttpHeaders.CONTENT_DISPOSITION,
-//                                     "attachment; filename=\"tickets-report.pdf\""
-//                             )
-//                             .body(pdf);
-//    }
+    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
+                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
+
+        List<TicketReportDTO> tickets = ticketService.exportPdf(UUID.fromString(authentication.getName()), createReportDTO);
+        byte[] pdf = ticketReportPdfService.generateReport(tickets);
+        LocalDate date = LocalDate.now(DateFormatter.PARIS_ZONE);
+
+        var headers = new HttpHeaders();
+        headers.set("File-Name", date + "-ticket-reports.pdf");
+        headers.setContentDisposition(
+                ContentDisposition.attachment()
+                                  .filename(date + "-tickets-report.pdf", StandardCharsets.UTF_8)
+                                  .build()
+        );
+        return ResponseEntity.ok()
+                             .contentType(MediaType.APPLICATION_PDF)
+                             .headers(headers)
+                             .body(pdf);
+    }
 
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<TicketDashboardStatsDTO>> getDashboardStats(@NotNull Authentication authentication) {

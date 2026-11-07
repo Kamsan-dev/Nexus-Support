@@ -444,7 +444,6 @@ public class TicketQuery {
             JOIN statuses s ON s.status_id = t.status_id
             JOIN types typ ON typ.type_id = t.type_id
             JOIN priorities pr ON pr.priority_id = t.priority_id
-            WHERE 1=1
             %s
         ),
         total_count AS (
@@ -463,5 +462,25 @@ public class TicketQuery {
         FROM total_count tc
         LEFT JOIN paginated_tickets pt ON TRUE
         ORDER BY pt.created_at DESC, pt.ticket_public_id DESC
+        """;
+
+    public static final String SELECT_TICKETS_FOR_EXPORT_REPORT_PDF_QUERY = """
+            SELECT
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            %s
         """;
 }

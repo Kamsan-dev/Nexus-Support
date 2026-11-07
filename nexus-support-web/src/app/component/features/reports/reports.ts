@@ -134,8 +134,8 @@ export class Reports {
 
   downloadPDF = () => {
     this.closeMenu();
-    // const request = this.store.reportRequest();
-    // this.store.downloadReport(request);
+    const request = this.store.reportRequest();
+    this.store.downloadReport(request);
   };
 
   //form
@@ -209,7 +209,8 @@ export class Reports {
   private listenToQueryParams(): void {
     this.activatedRoute.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const pageParam = Number(params.get('page'));
-      const size = Number(params.get('size')) ?? this.store.pageRequest().size;
+
+      const size = Number(params.get('size') ?? this.store.pageRequest().size);
 
       const statuses = params.getAll('statuses') as TicketStatusEnum[];
       const types = params.getAll('types') as TicketTypeEnum[];

@@ -92,8 +92,14 @@ public class QueryUtils {
 //        return replace(query.toString(), "\\n", "");
 //    }
 
-    public static final String createTicketReportQuery(CreateReportDTO request) {
+    public static final String createTicketReportQuery(CreateReportDTO request, UUID userPublicId, boolean generateForExportPDF) {
         var query = new StringBuilder();
+
+        if (userPublicId != null ){
+            query.append(" WHERE u.user_public_id = :userPublicId");
+        } else {
+            query.append(" WHERE 1 = 1");
+        }
 
         if (request.fromDate() != null && isNotBlank(request.fromDate().toString())) {
             query.append(" AND t.created_at >= :fromDate");
@@ -113,6 +119,10 @@ public class QueryUtils {
         }
         if (isNotBlank(request.filter())) {
             query.append(FILTER_TITLE_BY_CRITERIA);
+        }
+
+        if (generateForExportPDF){
+            query.append(" ORDER BY created_at DESC");
         }
 
         return query.toString();

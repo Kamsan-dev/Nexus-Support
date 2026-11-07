@@ -78,6 +78,7 @@ public class ResourceServerConfig {
         corsConfiguration.setExposedHeaders(Arrays.asList(ORIGIN,
                 ACCESS_CONTROL_ALLOW_ORIGIN,
                 CONTENT_TYPE,
+                "File-Name",
                 ACCEPT,
                 AUTHORIZATION,
                 "X_REQUESTED_WITH",
