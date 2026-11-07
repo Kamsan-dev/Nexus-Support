@@ -345,46 +345,6 @@ public class TicketQuery {
             JOIN users a ON a.user_id = i.assignee_id;
             """;
 
-    public static final String SELECT_USER_TICKETS_FOR_REPORT_QUERY = """
-            SELECT
-                t.ticket_public_id,
-                t.title,
-                t.description,
-                t.progress,
-                t.due_date,
-                t.created_at,
-                t.updated_at,
-                s.status,
-                typ.type,
-                pr.priority
-            FROM tickets t
-            JOIN users u ON u.user_id = t.issuer_id
-            JOIN statuses s ON s.status_id = t.status_id
-            JOIN types typ ON typ.type_id = t.type_id
-            JOIN priorities pr ON pr.priority_id = t.priority_id
-            WHERE u.user_public_id = :userPublicId
-            """;
-
-    public static final String SELECT_TICKETS_FOR_REPORT_QUERY = """
-            SELECT
-                t.ticket_public_id,
-                t.title,
-                t.description,
-                t.progress,
-                t.due_date,
-                t.created_at,
-                t.updated_at,
-                s.status,
-                typ.type,
-                pr.priority
-            FROM tickets t
-            JOIN users u ON u.user_id = t.issuer_id
-            JOIN statuses s ON s.status_id = t.status_id
-            JOIN types typ ON typ.type_id = t.type_id
-            JOIN priorities pr ON pr.priority_id = t.priority_id
-            WHERE 1 = 1
-            """;
-
     public static final String TICKET_EXISTS_QUERY = """
             SELECT EXISTS (
                 SELECT 1
@@ -464,4 +424,44 @@ public class TicketQuery {
             WHERE u.user_public_id = :userPublicId
             AND t.ticket_public_id = :ticketPublicId
             """;
+
+
+    public static final String SELECT_TICKETS_FOR_REPORT_QUERY = """
+        WITH filtered_tickets AS (
+            SELECT
+                t.ticket_public_id,
+                t.title,
+                t.description,
+                t.progress,
+                t.due_date,
+                t.created_at,
+                t.updated_at,
+                s.status,
+                typ.type,
+                pr.priority
+            FROM tickets t
+            JOIN users u ON u.user_id = t.issuer_id
+            JOIN statuses s ON s.status_id = t.status_id
+            JOIN types typ ON typ.type_id = t.type_id
+            JOIN priorities pr ON pr.priority_id = t.priority_id
+            WHERE 1=1
+            %s
+        ),
+        total_count AS (
+            SELECT COUNT(*) AS total_elements
+            FROM filtered_tickets
+        ),
+        paginated_tickets AS (
+            SELECT *
+            FROM filtered_tickets
+            ORDER BY created_at DESC, ticket_public_id DESC
+            LIMIT :size OFFSET :offset
+        )
+        SELECT
+            pt.*,
+            tc.total_elements
+        FROM total_count tc
+        LEFT JOIN paginated_tickets pt ON TRUE
+        ORDER BY pt.created_at DESC, pt.ticket_public_id DESC
+        """;
 }

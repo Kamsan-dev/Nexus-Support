@@ -101,3 +101,16 @@ export interface Ticket {
   assignee: TicketUser | null;
   issuerTicket: User;
 }
+
+export interface TicketReport {
+  ticketPublicId: string;
+  title: string;
+  description: string;
+  status: TicketStatusEnum;
+  priority: TicketPriorityEnum;
+  type: TicketTypeEnum;
+  dueDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  totalElements: number;
+}

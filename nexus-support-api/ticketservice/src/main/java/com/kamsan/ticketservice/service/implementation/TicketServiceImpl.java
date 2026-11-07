@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,10 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kamsan.ticketservice.enumeration.EventType.*;
@@ -323,26 +321,35 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isRegularUser = authentication.getAuthorities()
-                                              .stream()
-                                              .map(GrantedAuthority::getAuthority)
-                                              .anyMatch(a -> a.equals("USER"));
-        return isRegularUser ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
-                : ticketQueryRepository.generateReport(createReportDTO);
+    public Page<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO, Pageable page) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        boolean isRegularUser = authentication.getAuthorities()
+//                                              .stream()
+//                                              .map(GrantedAuthority::getAuthority)
+//                                              .anyMatch(a -> a.equals("USER"));
+//        return isRegularUser ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
+//                : ticketQueryRepository.generateReport(createReportDTO);
+
+        List<TicketReportQueryResult> ticketReportQueryResults = ticketQueryRepository.generateReport(createReportDTO,
+                page);
+        List<TicketReportDTO> tickets = ticketReportQueryResults.stream()
+                                                             .map(TicketReportQueryResult::ticket)
+                                                             .filter(Objects::nonNull)
+                                                             .toList();
+        long totalElements = ticketReportQueryResults.getFirst().totalElements();
+        return new PageImpl<>(tickets, page, totalElements);
     }
 
     @Override
     public void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isRegularUser = authentication.getAuthorities()
-                                              .stream()
-                                              .map(GrantedAuthority::getAuthority)
-                                              .anyMatch(a -> a.equals("USER"));
-        List<TicketReportDTO> ticketReportDTO = isRegularUser
-                ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
-                : ticketQueryRepository.generateReport(createReportDTO);
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        boolean isRegularUser = authentication.getAuthorities()
+//                                              .stream()
+//                                              .map(GrantedAuthority::getAuthority)
+//                                              .anyMatch(a -> a.equals("USER"));
+//        List<TicketReportDTO> ticketReportDTO = isRegularUser
+//                ? ticketQueryRepository.generateReportForUser(userPublicId, createReportDTO)
+//                : ticketQueryRepository.generateReport(createReportDTO);
 
     }
 

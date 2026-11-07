@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { createPaginationOption, Page, Pagination } from '../core/model/request.model';
 import { CreateTaskRequest, UpdateTaskRequest } from '../core/model/request/create-task.request';
+import { TicketReportRequest } from '../core/model/request/report-request';
 import { UpdateCommentRequest } from '../core/model/request/update-comment.request';
+import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 import { ApiResponse } from '../core/model/response/api.response';
 import { TicketDashboardStats } from '../core/model/response/dashboard.model';
-import { Attachment, Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters } from '../core/model/ticket.model';
+import { Attachment, Comment, PageTicket, Task, Ticket, TicketDetails, TicketFilters, TicketReport } from '../core/model/ticket.model';
 import { toHttpParams } from '../shared/utils/request';
-import { UpdateTicketRequest } from '../core/model/request/update-ticket.request';
 
 @Injectable({
   providedIn: 'root',
@@ -85,7 +86,16 @@ export class TicketService {
     return this.http.get(`${this.server}/tickets/file/download/${filePublicId}`, { responseType: 'blob' });
   }
 
+  // --- DASHBOARD ---
+
   public getDashboardStats(): Observable<ApiResponse<TicketDashboardStats>> {
     return this.http.get<ApiResponse<TicketDashboardStats>>(`${this.server}/tickets/dashboard`);
+  }
+
+  // --- REPORT ---
+
+  public getTicketsReport(pageRequest: Pagination, request: TicketReportRequest): Observable<ApiResponse<Page<TicketReport>>> {
+    let params = createPaginationOption(pageRequest);
+    return this.http.post<ApiResponse<Page<TicketReport>>>(`${this.server}/tickets/report`, request, { params });
   }
 }

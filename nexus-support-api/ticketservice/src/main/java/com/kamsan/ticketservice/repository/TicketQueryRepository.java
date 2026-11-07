@@ -8,12 +8,15 @@ import com.kamsan.ticketservice.model.Attachment;
 import com.kamsan.ticketservice.model.Comment;
 import com.kamsan.ticketservice.utils.TicketUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
 import java.sql.Types;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +26,7 @@ import static com.kamsan.ticketservice.utils.QueryUtils.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketQueryRepository {
 
     private final JdbcClient jdbc;
@@ -326,51 +330,83 @@ public class TicketQueryRepository {
                    .update();
     }
 
-    public List<TicketReportDTO> generateReportForUser(UUID userPublicId, CreateReportDTO request) {
-        var query = createUserTicketReportQuery(request);
-        return jdbc.sql(query)
-                   .param("userPublicId", userPublicId)
-                   .param("statuses", request.statuses())
-                   .param("types", request.types())
-                   .param("priorities", request.priorities())
-                   .param("filter", request.filter())
-                   .param("fromDate", request.fromDate())
-                   .param("toDate", request.toDate())
-                   .query((rs, rowNum) -> new TicketReportDTO(
-                           rs.getObject("ticket_public_id", UUID.class),
-                           rs.getString("title"),
-                           rs.getString("description"),
-                           TicketStatus.valueOf(rs.getString("status")),
-                           TicketPriority.valueOf(rs.getString("priority")),
-                           TicketType.valueOf(rs.getString("type")),
-                           rs.getObject("due_date", OffsetDateTime.class),
-                           rs.getObject("created_at", OffsetDateTime.class),
-                           rs.getObject("updated_at", OffsetDateTime.class)
-                   ))
-                   .list();
+//    public List<TicketReportDTO> generateReportForUser(UUID userPublicId, CreateReportDTO request) {
+//        var query = createUserTicketReportQuery(request);
+//        return jdbc.sql(query)
+//                   .param("userPublicId", userPublicId)
+//                   .param("statuses", request.statuses())
+//                   .param("types", request.types())
+//                   .param("priorities", request.priorities())
+//                   .param("filter", request.filter())
+//                   .param("fromDate", request.fromDate())
+//                   .param("toDate", request.toDate())
+//                   .query((rs, rowNum) -> new TicketReportDTO(
+//                           rs.getObject("ticket_public_id", UUID.class),
+//                           rs.getString("title"),
+//                           rs.getString("description"),
+//                           TicketStatus.valueOf(rs.getString("status")),
+//                           TicketPriority.valueOf(rs.getString("priority")),
+//                           TicketType.valueOf(rs.getString("type")),
+//                           rs.getObject("due_date", OffsetDateTime.class),
+//                           rs.getObject("created_at", OffsetDateTime.class),
+//                           rs.getObject("updated_at", OffsetDateTime.class)
+//                   ))
+//                   .list();
+//
+//    }
 
-    }
+    public List<TicketReportQueryResult> generateReport(CreateReportDTO request, Pageable page) {
+        var query = SELECT_TICKETS_FOR_REPORT_QUERY.formatted(createTicketReportQuery(request));
+        log.info("Query : {}", query);
+        OffsetDateTime fromDate = null;
+        OffsetDateTime toDate = null;
+        if (request.fromDate() != null){
+            fromDate = request.fromDate().atStartOfDay(ZoneId.of("Europe/Paris")).toOffsetDateTime();
+        }
 
-    public List<TicketReportDTO> generateReport(CreateReportDTO request) {
-        var query = createTicketReportQuery(request);
+        if (request.toDate() != null){
+            toDate = request.toDate().atStartOfDay(ZoneId.of("Europe/Paris")).toOffsetDateTime();
+        }
         return jdbc.sql(query)
-                   .param("statuses", request.statuses())
-                   .param("types", request.types())
-                   .param("priorities", request.priorities())
+                   .param("statuses", request.statuses().stream()
+                                             .map(TicketStatus::getValue)
+                                             .toList())
+                   .param("types", request.types().stream()
+                                          .map(TicketType::getValue)
+                                          .toList())
+                   .param("priorities", request.priorities().stream()
+                                               .map(TicketPriority::getValue)
+                                               .toList())
+
                    .param("filter", request.filter())
-                   .param("fromDate", request.fromDate())
-                   .param("toDate", request.toDate())
-                   .query((rs, rowNum) -> new TicketReportDTO(
-                           rs.getObject("ticket_public_id", UUID.class),
-                           rs.getString("title"),
-                           rs.getString("description"),
-                           TicketStatus.valueOf(rs.getString("status")),
-                           TicketPriority.valueOf(rs.getString("priority")),
-                           TicketType.valueOf(rs.getString("type")),
-                           rs.getObject("due_date", OffsetDateTime.class),
-                           rs.getObject("created_at", OffsetDateTime.class),
-                           rs.getObject("updated_at", OffsetDateTime.class)
-                   ))
+                   .param("fromDate",  fromDate)
+                   .param("toDate",  toDate)
+                   .param("offset", page.getOffset())
+                   .param("size", page.getPageSize())
+                   .query((rs, rowNum) -> {
+                       UUID ticketPublicId = rs.getObject("ticket_public_id", UUID.class);
+
+                       if (ticketPublicId == null) {
+                           return new TicketReportQueryResult(
+                                   null,
+                                   rs.getLong("total_elements")
+                           );
+                       }
+                       return new TicketReportQueryResult(
+                               new TicketReportDTO(
+                                       ticketPublicId,
+                                       rs.getString("title"),
+                                       rs.getString("description"),
+                                       TicketStatus.valueOf(rs.getString("status")),
+                                       TicketPriority.valueOf(rs.getString("priority")),
+                                       TicketType.valueOf(rs.getString("type")),
+                                       rs.getObject("due_date", OffsetDateTime.class),
+                                       rs.getObject("created_at", OffsetDateTime.class),
+                                       rs.getObject("updated_at", OffsetDateTime.class)
+                               ),
+                               rs.getLong("total_elements")
+                       );
+                   })
                    .list();
 
     }

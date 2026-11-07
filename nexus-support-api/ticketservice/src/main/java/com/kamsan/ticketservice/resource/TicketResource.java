@@ -240,9 +240,11 @@ public class TicketResource {
     }
 
     @PostMapping("/report")
-    public ResponseEntity<ApiResponse<List<TicketReportDTO>>> generateReport(@NotNull Authentication authentication,
+    public ResponseEntity<ApiResponse<Page<TicketReportDTO>>> generateReport(@NotNull Authentication authentication,
+                                                                             Pageable pageable,
                                                                              @RequestBody @Valid CreateReportDTO createReportDTO) {
-        List<TicketReportDTO> report = ticketService.report(UUID.fromString(authentication.getName()), createReportDTO);
+
+        Page<TicketReportDTO> report = ticketService.report(UUID.fromString(authentication.getName()), createReportDTO, pageable);
         return ResponseEntity.ok().body(getResponse(
                 report,
                 "Report generated successfully.",
@@ -250,23 +252,23 @@ public class TicketResource {
         ));
     }
 
-    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
-    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
-                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
-
-        List<TicketReportDTO> tickets = ticketService.report(UUID.fromString(authentication.getName()),
-                createReportDTO);
-        ticketReportPdfService.generateReport(tickets);
-        byte[] pdf = ticketReportPdfService.generateReport(tickets);
-
-        return ResponseEntity.ok()
-                             .contentType(MediaType.APPLICATION_PDF)
-                             .header(
-                                     HttpHeaders.CONTENT_DISPOSITION,
-                                     "attachment; filename=\"tickets-report.pdf\""
-                             )
-                             .body(pdf);
-    }
+//    @PostMapping(value = "/report/download", produces = MediaType.APPLICATION_PDF_VALUE)
+//    public ResponseEntity<byte[]> exportReportToPDF(@NotNull Authentication authentication,
+//                                                    @RequestBody @Valid CreateReportDTO createReportDTO) {
+//
+//        List<TicketReportDTO> tickets = ticketService.report(UUID.fromString(authentication.getName()),
+//                createReportDTO);
+//        ticketReportPdfService.generateReport(tickets);
+//        byte[] pdf = ticketReportPdfService.generateReport(tickets);
+//
+//        return ResponseEntity.ok()
+//                             .contentType(MediaType.APPLICATION_PDF)
+//                             .header(
+//                                     HttpHeaders.CONTENT_DISPOSITION,
+//                                     "attachment; filename=\"tickets-report.pdf\""
+//                             )
+//                             .body(pdf);
+//    }
 
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<TicketDashboardStatsDTO>> getDashboardStats(@NotNull Authentication authentication) {

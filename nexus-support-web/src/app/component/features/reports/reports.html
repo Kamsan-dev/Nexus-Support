@@ -1,1 +1,334 @@
-<p>report works!</p>
+@if (this.store.loading() || this.authStore.loading()) {
+  <div class="container mx-auto">
+    <div class="grid grid-cols-1 xl:grid-cols-3 lg:grid-cols-3 gap-4">
+      <main class="xl:col-span-2 lg:col-span-2 w-full">
+        <div role="status" class="animate-pulse bg-white mt-5 rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </main>
+      <div class="rounded-xl h-fit mt-5">
+        <div role="status" class="animate-pulse bg-white rounded-lg p-2 border border-solid border-gray-200">
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full mb-3"></div>
+          <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (!this.authStore.loading() && !this.authStore.hasAnyRole([roles.ADMIN, roles.SUPER_ADMIN])) {
+  <div class="container mx-auto">
+    <div class="p-1.5 min-w-full inline-block align-middle">
+      <!-- Access denied banner -->
+      <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+        <div class="flex items-center gap-2">
+          <svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+            />
+          </svg>
+          <div>
+            <p class="text-sm font-semibold text-red-800">Access denied</p>
+            <p class="text-sm text-red-700">You don't have access to this page.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else if (authStore.profile() && this.authStore.hasAnyRole([roles.ADMIN, roles.SUPER_ADMIN])) {
+  <div class="container mx-auto">
+    <div class="flex flex-wrap justify-between items-center space-y-5 md:space-y-0">
+      <a (click)="goBack()" class="bg-gray-300 p-1 rounded-full cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+      </a>
+      <h3 class="text-xl font-bold text-black rounded-md px-2">Reports</h3>
+    </div>
+    <div class="mx-auto mt-3 mb-3 border-t border-gray-200"></div>
+  </div>
+  <div class="container mx-auto">
+    <form [formGroup]="reportForm" (ngSubmit)="onSubmitForm()" class="flex justify-between items-center flex-wrap xl:flex-nowrap gap-1.5">
+      <div class="relative w-full status">
+        <button
+          (click)="toggleMenu(menu.STATUS)"
+          class="w-full text-gray-800 border border-gray-300 bg-white hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center"
+          type="button"
+        >
+          Status &darr;
+        </button>
+        <div
+          [ngClass]="[!statusMenuOpen() ? 'invisible opacity-0' : 'opacity-100 visible']"
+          class="transition ease-in duration-75 transform scale-95 absolute top-10 z-10 w-48 mt-1 bg-white divide-y divide-gray-100 rounded-lg shadow"
+        >
+          <ul class="p-3 space-y-3 text-sm text-gray-700">
+            @for (status of ticketStatuses; track status) {
+              <li>
+                <div class="flex items-center">
+                  <input
+                    [id]="'status-' + status"
+                    [name]="'status-' + status"
+                    type="checkbox"
+                    [checked]="f['statuses'].value.includes(status)"
+                    (change)="toggleSelection(f['statuses'].value, status, $any($event.target).checked, menu.STATUS)"
+                    class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                  />
+
+                  <label [for]="'status-' + status" class="ms-2 text-sm font-medium text-gray-900 w-full">
+                    {{ ticketStatusLabel[status] }}
+                  </label>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+      <div class="relative w-full type">
+        <button
+          (click)="toggleMenu(menu.TYPE)"
+          class="w-full text-gray-800 border border-gray-300 bg-white hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center"
+          type="button"
+        >
+          Type &darr;
+        </button>
+        <div
+          [ngClass]="[!typeMenuOpen() ? 'invisible opacity-0' : 'opacity-100 visible']"
+          class="transition ease-in duration-75 transform scale-95 absolute top-10 z-10 w-48 mt-1 bg-white divide-y divide-gray-100 rounded-lg shadow"
+        >
+          <ul class="p-3 space-y-3 text-sm text-gray-700">
+            @for (type of ticketTypes; track type) {
+              <li>
+                <div class="flex items-center">
+                  <input
+                    [id]="'type-' + type"
+                    [name]="'type-' + type"
+                    type="checkbox"
+                    [checked]="f['types'].value.includes(type)"
+                    (change)="toggleSelection(f['types'].value, type, $any($event.target).checked, menu.TYPE)"
+                    class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                  />
+
+                  <label [for]="'type-' + type" class="ms-2 text-sm font-medium text-gray-900 w-full">
+                    {{ ticketTypeLabel[type] }}
+                  </label>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+      <div class="relative w-full priority">
+        <button
+          (click)="toggleMenu(menu.PRIORIY)"
+          class="w-full text-gray-800 border border-gray-300 bg-white hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center"
+          type="button"
+        >
+          Priority &darr;
+        </button>
+        <div
+          [ngClass]="[!priorityMenuOpen() ? 'invisible opacity-0' : 'opacity-100 visible']"
+          class="transition ease-in duration-75 transform scale-95 absolute top-10 z-10 w-48 mt-1 bg-white divide-y divide-gray-100 rounded-lg shadow"
+        >
+          <ul class="p-3 space-y-3 text-sm text-gray-700">
+            @for (priority of ticketPriorities; track priority) {
+              <li>
+                <div class="flex items-center">
+                  <input
+                    [id]="'priority-' + priority"
+                    [name]="'priority-' + priority"
+                    type="checkbox"
+                    [checked]="f['priorities'].value.includes(priority)"
+                    (change)="toggleSelection(f['priorities'].value, priority, $any($event.target).checked, menu.PRIORIY)"
+                    class="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500"
+                  />
+
+                  <label [for]="'priority-' + priority" class="ms-2 text-sm font-medium text-gray-900 w-full">
+                    {{ ticketPriorityLabel[priority] }}
+                  </label>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+      <input
+        type="search"
+        name="title"
+        formControlName="filter"
+        placeholder="Search ticket title"
+        class="w-full min-w-60 rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 bg-white"
+      />
+      <input
+        type="date"
+        name="fromDate"
+        formControlName="fromDate"
+        class="w-full min-w-60 rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+      />
+      <input
+        type="date"
+        name="toDate"
+        formControlName="toDate"
+        class="w-full min-w-60 rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400"
+      />
+      <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-xs p-2">Search</button>
+    </form>
+  </div>
+  <div class="mt-6 container mx-auto" id="report">
+    <div class="bg-white rounded-lg p-6 border border-solid border-gray-200">
+      <div class="flex flex-wrap justify-between items-center md:flex-nowrap">
+        <h3 class="text-xl font-bold">Tickets ({{ store.totalElements() }})</h3>
+        <div class="flex flex-wrap md:flex-nowrap justify-between items-center space-x-0 md:space-x-4 space-y-2 md:space-y-0">
+          <button type="button" class="disabled:bg-gray-300 text-white bg-red-800 hover:bg-red-900 font-medium rounded-lg text-xs p-2">
+            Download PDF
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="3"
+              stroke="currentColor"
+              class="size-3 inline-block"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="mx-auto mt-3 mb-3 border-t border-gray-200"></div>
+      @for (ticket of store.report(); track ticket.ticketPublicId) {
+        <div
+          [routerLink]="['/app/tickets/', ticket.ticketPublicId]"
+          class="bg-white cursor-pointer rounded-xl p-0.5 border border-solid border-gray-200 mb-2"
+        >
+          <div class="p-4">
+            <div class="flex flex-col items-start justify-between gap-y-6 md:flex-row md:items-center">
+              <div class="basis-1/5">
+                <p class="text-base font-bold">Ticket #{{ ticket.ticketPublicId.substring(0, 8) }}</p>
+                <p class="text-sm m-0 text-gray-500 font-normal">Crée le : {{ ticket.createdAt | date: 'mediumDate' }}</p>
+              </div>
+              <div class="basis-1/5 pl-2 border-gray-300 border-l">
+                <p class="text-base font-bold">Title</p>
+                <p class="text-sm text-gray-500 font-normal line-clamp-1">{{ ticket.title }}</p>
+              </div>
+              <div class="basis-1/5 pl-2 border-gray-300 border-l">
+                <p class="text-base font-bold">Description</p>
+                <p class="text-sm text-gray-500 font-normal line-clamp-1">{{ ticket.description }}</p>
+              </div>
+              <div class="basis-1/5 pl-2 border-gray-300 border-l">
+                <p class="text-base font-bold">Due Date</p>
+                <p class="text-sm text-gray-500 font-normal">{{ ticket.dueDate | date: 'mediumDate' }}</p>
+              </div>
+              <div class="basis-1/5 pl-2 border-gray-300 border-l flex items-center justify-between">
+                <span [ngClass]="ticketStatusColor[ticket.status]" class="px-1 py-0.5 text-sm align-middle font-bold rounded-md">
+                  {{ ticketStatusLabel[ticket.status] }}</span
+                >
+                <span [ngClass]="ticketTypeColor[ticket.type]" class="px-1 py-0.5 text-sm align-middle font-bold rounded-md ml-2">
+                  {{ ticketTypeLabel[ticket.type] }}
+                </span>
+                <span [ngClass]="ticketPriorityColor[ticket.priority]" class="px-1 py-0.5 text-sm align-middle font-bold rounded-md ml-2">
+                  {{ ticketPriorityLabel[ticket.priority] }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+  @if (store.totalPages() > 1) {
+    <nav class="mt-6 flex justify-center" aria-label="Page navigation">
+      <ul class="flex items-center -space-x-px h-10 text-base">
+        <li
+          (click)="onPaginationClick($event, 0, 'previous')"
+          [ngClass]="[store.currentPage() == 0 ? 'pointer-events-none opacity-40' : 'cursor-pointer']"
+        >
+          <a
+            class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-blue-600 bg-white border border-blue-300 border-e-0 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
+          >
+            <span class="sr-only">Previous</span>
+            <fa-icon [icon]="'chevron-left'" class="fa-fw"></fa-icon>
+          </a>
+        </li>
+        @for (page of [].constructor(store.totalPages()); track $index) {
+          <li
+            (click)="onPaginationClick($event, $index)"
+            [ngClass]="[store.currentPage() === $index ? 'bg-blue-70' : 'bg-white']"
+            class="cursor-pointer"
+          >
+            <a
+              class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 border border-blue-300 hover:bg-blue-100 hover:text-blue-700"
+            >
+              {{ $index + 1 }}
+            </a>
+          </li>
+        }
+
+        <li
+          (click)="onPaginationClick($event, 0, 'next')"
+          [ngClass]="[store.totalPages() - 1 == store.currentPage() ? 'pointer-events-none opacity-40' : 'cursor-pointer']"
+        >
+          <a
+            class="flex items-center justify-center px-4 h-10 leading-tight text-blue-600 bg-white border border-blue-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
+          >
+            <span class="sr-only">Next</span>
+            <fa-icon [icon]="'chevron-right'" class="fa-fw"></fa-icon>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  }
+} @else {
+  <div class="container mx-auto">
+    <div class="flex justify-center">
+      <p>Something went wrong when loading this page. Please try again.</p>
+    </div>
+  </div>
+}

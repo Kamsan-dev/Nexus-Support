@@ -314,5 +314,3 @@ export const AuthStore = signalStore(
     roleConnectedUser: computed(() => store.profile()?.user.role),
   })),
 );
-
-// ['aaaaaa'] | aaaaa

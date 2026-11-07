@@ -3,6 +3,7 @@ package com.kamsan.ticketservice.service;
 import com.kamsan.ticketservice.dto.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
@@ -47,7 +48,7 @@ public interface TicketService {
 
     ReadUserDTO getTicketUser(UUID ticketPublicId);
 
-    List<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO);
+    Page<TicketReportDTO> report(UUID userPublicId, CreateReportDTO createReportDTO, Pageable page);
 
     void exportPdf(HttpServletResponse response, UUID userPublicId, CreateReportDTO createReportDTO);
 
