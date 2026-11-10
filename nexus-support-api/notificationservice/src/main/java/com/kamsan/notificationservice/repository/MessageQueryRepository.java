@@ -1,5 +1,6 @@
 package com.kamsan.notificationservice.repository;
 
+import com.kamsan.notificationservice.dto.ConversationOverviewDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
 import com.kamsan.notificationservice.model.Message;
@@ -40,10 +41,10 @@ public class MessageQueryRepository {
             .update();
     }
 
-    public List<MessageDTO> findMessagesByUserPublicId(UUID authenticatedUser) {
-        return jdbc.sql(SELECT_MESSAGES_QUERY)
+    public List<ConversationOverviewDTO> findConversationOverviews(UUID authenticatedUser) {
+        return jdbc.sql(SELECT_CONVERSATION_OVERVIEW_QUERY)
                    .param("userPublicId", authenticatedUser)
-                   .query(MessageDTO.class)
+                   .query(ConversationOverviewDTO.class)
                    .list();
     }
 
@@ -77,6 +78,13 @@ public class MessageQueryRepository {
                    .param("receiverEmail", toEmail)
                    .query(UUID.class)
                    .optional();
+    }
+
+    public long findUnreadMessagesCount(UUID authenticatedUser){
+            return jdbc.sql(SELECT_UNREAD_MESSAGE_COUNT_QUERY)
+                     .param("userPublicId", authenticatedUser)
+                     .query(Long.class)
+                     .single();
     }
 }
 

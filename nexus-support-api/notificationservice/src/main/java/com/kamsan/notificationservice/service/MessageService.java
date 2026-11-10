@@ -1,5 +1,6 @@
 package com.kamsan.notificationservice.service;
 
+import com.kamsan.notificationservice.dto.ConversationOverviewsDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
 
@@ -10,7 +11,7 @@ public interface MessageService {
 
     UUID sendMessage(UUID authenticatedUser, SendMessageDTO sendMessageDTO);
 
-    List<MessageDTO> getMessages(UUID authenticatedUser);
+    ConversationOverviewsDTO getMessages(UUID authenticatedUser);
 
     List<MessageDTO> getConversation(UUID authenticatedUser, UUID conversationId);
 

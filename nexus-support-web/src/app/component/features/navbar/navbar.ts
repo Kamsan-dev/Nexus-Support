@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, HostListener, inject, signal, TemplateRef, ViewChild } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DialogService } from '@ngneat/dialog';
@@ -26,6 +26,14 @@ export class Navbar {
   isMenuOpen = signal(false);
 
   readonly Roles = RoleEnum;
+
+  constructor() {
+    effect(() => {
+      if (this.authStore.profile()) {
+        this.messageStore.loadConversations();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.authStore.loadProfile();

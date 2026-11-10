@@ -1,5 +1,7 @@
 package com.kamsan.notificationservice.service.implementation;
 
+import com.kamsan.notificationservice.dto.ConversationOverviewDTO;
+import com.kamsan.notificationservice.dto.ConversationOverviewsDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
 import com.kamsan.notificationservice.model.Message;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -34,8 +37,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MessageDTO> getMessages(UUID authenticatedUser) {
-        return messageQueryRepository.findMessagesByUserPublicId(authenticatedUser);
+    public ConversationOverviewsDTO getMessages(UUID authenticatedUser) {
+        List<ConversationOverviewDTO> conversationOverviews = messageQueryRepository.findConversationOverviews(
+                authenticatedUser);
+        long unreadMessagesCount = messageQueryRepository.findUnreadMessagesCount(authenticatedUser);
+
+        return new ConversationOverviewsDTO(conversationOverviews, unreadMessagesCount);
+
     }
 
     @Override

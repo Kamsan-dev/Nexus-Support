@@ -4,7 +4,7 @@ import { Messages } from './messages';
 export const MESSAGE_ROUTES: Routes = [
   {
     path: 'list',
-    component: Messages,
+    loadComponent: () => import('./messages').then((c) => c.Messages),
   },
 
   {

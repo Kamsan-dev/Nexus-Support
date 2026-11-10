@@ -63,7 +63,7 @@ public class TicketDashboardQuery {
              JOIN types typ ON typ.type_id = t.type_id
              JOIN priorities pr ON pr.priority_id = t.priority_id
              WHERE s.status NOT IN ('COMPLETED', 'CLOSED')
-             ORDER BY t.created_at DESC
+             ORDER BY t.created_at ASC
              LIMIT 5;
             """;
 }
