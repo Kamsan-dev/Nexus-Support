@@ -29,7 +29,7 @@ spring:
             - id: notification-service
               uri: lb://NOTIFICATIONSERVICE
               predicates:
-                - Path=/notification/**
+                - Path=/api/v1/notifications/**
 
 eureka:
   instance:

@@ -25,7 +25,6 @@ public class MessageDTO {
     private String receiverImageUrl;
 
     private Long messageId;
-    private UUID conversationId;
     private UUID messagePublicId;
     private String subject;
     private String content;

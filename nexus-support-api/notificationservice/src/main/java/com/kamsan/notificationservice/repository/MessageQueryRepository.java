@@ -64,12 +64,12 @@ public class MessageQueryRepository {
                    .single();
     }
 
-    public int updateMessageStatus(UUID authenticatedUser, Long messageId, String messageStatus) {
+    public List<Long> updateMessageStatus(UUID authenticatedUser, UUID conversationId) {
         return jdbc.sql(UPDATE_MESSAGE_STATUS_QUERY)
                    .param("userPublicId", authenticatedUser)
-                   .param("messageId", messageId)
-                   .param("messageStatus", messageStatus)
-                   .update();
+                   .param("conversationId", conversationId)
+                   .query(Long.class)
+                   .list();
     }
 
     public Optional<UUID> findConversationId(UUID authenticatedUser, String toEmail) {

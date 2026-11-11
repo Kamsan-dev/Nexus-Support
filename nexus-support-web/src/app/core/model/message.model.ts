@@ -48,3 +48,9 @@ export interface ConversationOverviewsResponse {
   conversations: Array<ConversationOverview>;
   unreadMessagesCount: number;
 }
+
+export interface ConversationMessages {
+  messages: Array<Message>;
+  messageStatusUpdatedCount: number;
+  correspondentPublicId: string;
+}

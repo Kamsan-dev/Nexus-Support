@@ -1,6 +1,7 @@
 package com.kamsan.notificationservice.resource;
 
 import com.kamsan.notificationservice.domain.ApiResponse;
+import com.kamsan.notificationservice.dto.ConversationMessagesDTO;
 import com.kamsan.notificationservice.dto.ConversationOverviewsDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
@@ -21,7 +22,7 @@ import static com.kamsan.notificationservice.utils.RequestUtils.getResponse;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/notification")
+@RequestMapping("/api/v1/notifications")
 public class NotificationResource {
 
     private final MessageService messageService;
@@ -46,7 +47,7 @@ public class NotificationResource {
     }
 
     @GetMapping("/message/{conversationId}")
-    public ResponseEntity<ApiResponse<List<MessageDTO>>> getAllMessages(@NotNull Authentication authentication, @PathVariable("conversationId") UUID conversationId) {
+    public ResponseEntity<ApiResponse<ConversationMessagesDTO>> getAllMessages(@NotNull Authentication authentication, @PathVariable("conversationId") UUID conversationId) {
         return ResponseEntity.ok().body(getResponse(
                 messageService.getConversation(UUID.fromString(authentication.getName()), conversationId),
                 "Messages retrieved.",

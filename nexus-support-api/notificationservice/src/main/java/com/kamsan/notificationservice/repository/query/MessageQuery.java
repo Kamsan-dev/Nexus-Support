@@ -49,12 +49,13 @@ public class MessageQuery {
                 r.last_name AS receiverLastname,
                 r.email AS receiverEmail,
                 r.image_url AS receiverImageUrl,
+                ms.message_status AS status,
+                m.message_public_id,
                 m.message_id,
                 m.subject,
                 m.content,
                 m.created_at,
-                m.updated_at,
-                ms.message_status AS status
+                m.updated_at
             FROM messages m
             JOIN users s ON s.user_id = m.sender_id
             JOIN users r ON r.user_id = m.receiver_id
@@ -62,7 +63,7 @@ public class MessageQuery {
             ON (ms.message_id = m.message_id AND ms.user_id = (SELECT user_id FROM users WHERE user_public_id = :userPublicId))
             WHERE (s.user_public_id = :userPublicId OR r.user_public_id = :userPublicId)
             AND m.conversation_id = :conversationId
-            ORDER BY m.created_at DESC
+            ORDER BY m.created_at ASC;
             """;
 
     public static final String SELECT_MESSAGE_STATUS_QUERY = """
@@ -70,14 +71,6 @@ public class MessageQuery {
             FROM message_statuses ms
             WHERE ms.user_id = (SELECT user_id FROM users WHERE user_public_id = :userPublicId)
             AND ms.message_id = :messageId
-            """;
-
-    public static final String UPDATE_MESSAGE_STATUS_QUERY = """
-            UPDATE
-                message_statuses
-            SET message_status = :messageStatus
-            WHERE user_id = (SELECT user_id FROM users WHERE user_public_id = :userPublicId)
-            AND message_id = :messageId
             """;
 
     public static final String SELECT_CONVERSATION_ID_QUERY = """
@@ -161,5 +154,22 @@ public class MessageQuery {
             
             WHERE rm.rn = 1
             ORDER BY m.created_at DESC;
+            """;
+
+
+    public static final String UPDATE_MESSAGE_STATUS_QUERY = """
+            UPDATE message_statuses
+            SET message_status = 'READ'
+            WHERE user_id = (
+                SELECT user_id
+                FROM users
+                WHERE user_public_id = :userPublicId)
+              AND message_id IN (
+                  SELECT message_id
+                  FROM messages
+                  WHERE conversation_id = :conversationId
+              )
+              AND message_status = 'UNREAD'
+            RETURNING message_id
             """;
 }
