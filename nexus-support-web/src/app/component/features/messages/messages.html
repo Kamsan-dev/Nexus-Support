@@ -39,6 +39,7 @@
       <h3 class="text-xl font-bold">Active conversations ({{ store.conversations().length }})</h3>
       <div class="flex flex-wrap md:flex-nowrap justify-between items-center space-x-0 md:space-x-4 space-y-2 md:space-y-0">
         <button
+          (click)="onAddNewMessageClick($event, newMessageTemplate)"
           type="button"
           class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-sm p-2"
         >
@@ -50,7 +51,7 @@
   <div class="container mx-auto">
     <div class="mt-4 p-4 bg-white rounded-md">
       @if (store.conversations().length == 0) {
-        <h3>No messages.</h3>
+        <h3>No messages found.</h3>
       } @else {
         @for (conversation of store.conversations(); track conversation.conversationId) {
           <div
@@ -61,8 +62,11 @@
               <div class="flex flex-row items-center justify-between gap-4">
                 <div class="hidden md:block border overflow-hidden border-white w-16 h-16 [&:not(:first-child)]:-ml-[4.3rem] rounded-full">
                   <img
-                    [src]="conversation.senderImageUrl"
-                    [alt]="'Profile image of ' + conversation.senderLastname"
+                    [src]="isAuthenticatedUser(conversation.senderPublicId) ? conversation.receiverImageUrl : conversation.senderImageUrl"
+                    [alt]="
+                      'Profile image of ' +
+                      (isAuthenticatedUser(conversation.senderPublicId) ? conversation.receiverLastname : conversation.senderLastname)
+                    "
                     class="w-16 h-16 object-cover"
                     loading="lazy"
                   />
@@ -70,7 +74,13 @@
                 <div class="flex flex-row items-center justify-between">
                   <div>
                     <p class="text-sm md:text-xl font-bold">{{ conversation.title }}</p>
-                    <p class="text-sm text-gray-500 font-normal line-clamp-1">{{ conversation.lastMessageContent }}</p>
+                    <p class="text-sm text-gray-500 font-normal line-clamp-1">
+                      {{
+                        conversation.lastMessageContent.length > 200
+                          ? (conversation.lastMessageContent | slice: 0 : 200) + '...'
+                          : conversation.lastMessageContent
+                      }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -87,12 +97,13 @@
   </div>
 }
 
-<ng-template tabindex="-1" aria-hidden="true" class="justify-center items-center w-full">
+<ng-template #newMessageTemplate tabindex="-1" aria-hidden="true" class="justify-center items-center w-full">
   <div class="relative w-full max-w-2xl max-h-full">
     <div class="relative bg-white rounded-lg">
-      <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+      <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
         <h3 class="text-xl font-semibold text-gray-900">New Message</h3>
         <button
+          (click)="closeModal()"
           type="button"
           class="bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
         >
@@ -102,17 +113,20 @@
         </button>
       </div>
       <div class="p-4 md:p-5 space-y-4">
-        <form>
+        <form [formGroup]="modalForm" (ngSubmit)="onFormClick($event)">
           <div class="mb-6">
             <label for="toEmail" class="block mb-2 text-sm font-medium text-gray-900">To</label>
             <select
               name="toEmail"
-              required
+              formControlName="receiverPublicId"
               class="w-full rounded-md border-0 ml-0 px-2 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-full0 sm:text-sm sm:leading-6"
             >
-              <option>Ticket Support</option>
-              <option>Ticket Support</option>
-              <option>Ticket Support</option>
+              <option disabled value="no_selection">Send my message to..</option>
+              @for (user of store.recipients(); track user.userPublicId) {
+                <option [value]="user.userPublicId">
+                  {{ `${user.firstName} ${user.lastName} - ` + roleLabel[user.role] }}
+                </option>
+              }
             </select>
           </div>
           <div class="mb-6">
@@ -120,20 +134,29 @@
             <textarea
               name="message"
               id="message"
+              formControlName="content"
               placeholder="Type your message here..."
               cols=""
               rows=""
               class="text-sm font-normal shadow-xs text-gray-900 placeholder-gray-400 rounded-lg border border-gray-300 w-full h-20 p-2"
-              required
             ></textarea>
           </div>
           <div class="flex items-center justify-end gap-3 mt-3 border-t border-gray-200">
             <button
               type="submit"
+              [disabled]="modalForm.invalid || store.loading() || modalForm.pristine"
               data-modal-hide="messagemodal"
               class="disabled:bg-gray-300 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 mt-3"
             >
-              Send Message
+              @if (store.loading()) {
+                <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                </svg>
+                Updating...
+              } @else {
+                Send my message
+              }
             </button>
           </div>
         </form>

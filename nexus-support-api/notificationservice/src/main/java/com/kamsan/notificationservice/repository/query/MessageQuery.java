@@ -6,32 +6,31 @@ public class MessageQuery {
     }
 
     public static final String INSERT_MESSAGE_QUERY = """
-            INSERT INTO messages m (
-                m.message_public_id,
-                m.conversation_id,
-                m.subject,
-                m.content,
-                m.sender_id,
-                m.receiver_id
+            INSERT INTO messages (
+                message_public_id,
+                conversation_id,
+                content,
+                sender_id,
+                receiver_id
             )
             SELECT
             :messagePublicId,
             :conversationId,
-            :subject,
             :content,
-            s.sender_id,
-            r.receiver_id
+            s.user_id,
+            r.user_id
             FROM users s
+            JOIN users r ON r.user_public_id = :receiverPublicId
             WHERE s.user_public_id = :userPublicId
-            JOIN users r ON r.email = :toEmail
             RETURNING *
             """;
 
     public static final String INSERT_MESSAGE_STATUS_QUERY = """
-            INSERT INTO message_statuses m (
-                m.message_id,
-                m.user_id,
-                m.message_status,
+            INSERT INTO message_statuses (
+                message_id,
+                user_id,
+                message_status
+            )
             VALUES
             (:messageId, :senderId, 'READ'),
             (:messageId, :receiverId, 'UNREAD');
@@ -82,11 +81,11 @@ public class MessageQuery {
                     ON receiver.user_id = m.receiver_id
                 WHERE (
                     sender.user_public_id = :authenticatedUserPublicId
-                    AND receiver.email = :receiverEmail
+                    AND receiver.user_public_id = :receiverPublicId
                 )
                 OR (
                     receiver.user_public_id = :authenticatedUserPublicId
-                    AND sender.email = :receiverEmail
+                    AND sender.user_public_id = :receiverPublicId
                 )
                 LIMIT 1
             """;
@@ -156,6 +155,38 @@ public class MessageQuery {
             ORDER BY m.created_at DESC;
             """;
 
+    public static final String SELECT_CONVERSATION_OVERVIEW_BY_CONVERSATION_ID_QUERY = """
+            SELECT
+                m.conversation_id,
+                m.message_public_id,
+                m.content AS last_message_content,
+                ms.message_status AS last_message_status,
+                m.created_at,
+                m.updated_at,
+                s.user_public_id AS senderPublicId,
+                s.first_name AS senderFirstname,
+                s.last_name AS senderLastname,
+                s.email AS senderEmail,
+                s.image_url AS senderImageUrl,
+                r.user_public_id AS receiverPublicId,
+                r.first_name AS receiverFirstname,
+                r.last_name AS receiverLastname,
+                r.email AS receiverEmail,
+                r.image_url AS receiverImageUrl,
+                CONCAT('You & ', r.first_name, ' ', r.last_name) AS title
+            FROM messages m
+            JOIN message_statuses ms
+            ON ms.message_id = m.message_id
+            AND ms.user_id = (SELECT user_id FROM users WHERE user_public_id = :authenticatedUserPublicId)
+            JOIN users s ON s.user_id = m.sender_id
+            JOIN users r ON r.user_id = m.receiver_id
+            WHERE m.conversation_id = :conversationId
+            AND s.user_public_id = :authenticatedUserPublicId
+            AND r.user_public_id = :receiverPublicId
+            ORDER BY m.created_at DESC
+            LIMIT 1
+            """;
+
 
     public static final String UPDATE_MESSAGE_STATUS_QUERY = """
             UPDATE message_statuses
@@ -171,5 +202,18 @@ public class MessageQuery {
               )
               AND message_status = 'UNREAD'
             RETURNING message_id
+            """;
+
+    public static final String SELECT_RECIPIENTS_QUERY = """
+            SELECT
+                u.user_public_id,
+                u.first_name,
+                u.last_name,
+                u.image_url,
+                r.name AS role
+            FROM users u
+            JOIN user_roles ur ON ur.user_id = u.user_id
+            JOIN roles r ON r.role_id = ur.role_id
+            ORDER by r.name
             """;
 }

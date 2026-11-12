@@ -1,10 +1,7 @@
 package com.kamsan.notificationservice.resource;
 
 import com.kamsan.notificationservice.domain.ApiResponse;
-import com.kamsan.notificationservice.dto.ConversationMessagesDTO;
-import com.kamsan.notificationservice.dto.ConversationOverviewsDTO;
-import com.kamsan.notificationservice.dto.MessageDTO;
-import com.kamsan.notificationservice.dto.SendMessageDTO;
+import com.kamsan.notificationservice.dto.*;
 import com.kamsan.notificationservice.service.MessageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -27,16 +25,6 @@ public class NotificationResource {
 
     private final MessageService messageService;
 
-    @PostMapping("/message")
-    public ResponseEntity<ApiResponse<UUID>> sendMessage(@NotNull Authentication authentication, @RequestBody @Valid SendMessageDTO sendMessageDTO) {
-        UUID messageUUID = messageService.sendMessage(UUID.fromString(authentication.getName()), sendMessageDTO);
-        return ResponseEntity.created(getUri()).body(getResponse(
-                messageUUID,
-                "Message delivered.",
-                HttpStatus.CREATED
-        ));
-    }
-
     @GetMapping("/message/get-all")
     public ResponseEntity<ApiResponse<ConversationOverviewsDTO>> getAllMessages(@NotNull Authentication authentication) {
         return ResponseEntity.ok().body(getResponse(
@@ -46,8 +34,17 @@ public class NotificationResource {
         ));
     }
 
+    @GetMapping("/message/recipients")
+    public ResponseEntity<ApiResponse<List<RecipientDTO>>> getAllRecipients(@NotNull Authentication authentication) {
+        return ResponseEntity.ok().body(getResponse(
+                messageService.getAllRecipients(),
+                "Recipients retrieved.",
+                HttpStatus.OK
+        ));
+    }
+
     @GetMapping("/message/{conversationId}")
-    public ResponseEntity<ApiResponse<ConversationMessagesDTO>> getAllMessages(@NotNull Authentication authentication, @PathVariable("conversationId") UUID conversationId) {
+    public ResponseEntity<ApiResponse<ConversationMessagesDTO>> getConversationMessages(@NotNull Authentication authentication, @PathVariable("conversationId") UUID conversationId) {
         return ResponseEntity.ok().body(getResponse(
                 messageService.getConversation(UUID.fromString(authentication.getName()), conversationId),
                 "Messages retrieved.",
@@ -55,8 +52,14 @@ public class NotificationResource {
         ));
     }
 
-    private URI getUri() {
-        return URI.create("/profile/<userId>");
+    @PostMapping("/message")
+    public ResponseEntity<ApiResponse<ConversationOverviewDTO>> sendMessage(@NotNull Authentication authentication, @RequestBody @Valid SendMessageDTO sendMessageDTO) {
+        ConversationOverviewDTO conversationOverviewDTO = messageService.sendMessage(UUID.fromString(authentication.getName()),
+                sendMessageDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(getResponse(
+                conversationOverviewDTO,
+                "Message delivered.",
+                HttpStatus.CREATED
+        ));
     }
-
 }

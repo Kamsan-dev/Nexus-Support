@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, TemplateRef } from '@angular/core';
 import { AuthStore } from '../../../../store/auth.store';
 import { MessageStore } from '../../../../store/message.store';
 import { ActivatedRoute } from '@angular/router';

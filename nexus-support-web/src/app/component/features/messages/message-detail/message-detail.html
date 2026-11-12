@@ -40,13 +40,19 @@
       @for (message of store.messages(); track message.messagePublicId) {
         @if (message.senderPublicId === user.userPublicId) {
           <div class="flex gap-2.5 justify-end mb-2">
-            <div class="grid">
+            <div class="grid justify-items-end">
               <h5 class="text-right text-gray-900 text-sm font-semibold leading-snug pb-1">You</h5>
-              <div class="px-3.5 py-2 bg-blue-600 rounded justify-start items-center gap-3 inline-flex">
-                <h5 class="text-gray-100 text-sm font-normal leading-snug break-words">{{ message.content }}</h5>
+
+              <div class="px-3.5 py-2 bg-blue-600 rounded justify-start items-center gap-3 inline-flex w-fit">
+                <h5 class="text-gray-100 text-sm font-normal leading-snug break-words">
+                  {{ message.content }}
+                </h5>
               </div>
+
               <div class="justify-start items-center inline-flex">
-                <h3 class="text-gray-900 text-xs font-normal leading-4 py-1">{{ message.createdAt | date: 'long' }}</h3>
+                <h3 class="text-gray-900 text-xs font-normal leading-4 py-1">
+                  {{ message.createdAt | date: 'long' }}
+                </h3>
               </div>
             </div>
             <img [src]="user.imageUrl" [alt]="'Image of' + user.lastName" class="w-11 h-11 rounded-full object-cover" loading="lazy" />
@@ -63,10 +69,10 @@
               <h5 class="text-gray-900 text-sm font-semibold leading-snug pb-1">
                 {{ message.senderFirstname }} {{ message.senderLastname }} - {{ message.senderEmail }}
               </h5>
-              <div class="px-3.5 py-2 bg-gray-200 rounded justify-start items-center gap-3 inline-flex">
+              <div class="px-3.5 py-2 bg-gray-200 rounded justify-start items-center gap-3 inline-flex w-fit">
                 <h5 class="text-gray-900 text-sm font-normal leading-snug break-words">{{ message.content }}</h5>
               </div>
-              <div class="justify-end items-center inline-flex mb-2.5">
+              <div class="justify-start items-center inline-flex mb-2.5">
                 <h3 class="text-gray-500 text-xs font-normal leading-4 py-1">{{ message.createdAt | date: 'long' }}</h3>
               </div>
             </div>

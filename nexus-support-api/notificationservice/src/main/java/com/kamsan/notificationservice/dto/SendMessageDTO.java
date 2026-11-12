@@ -1,10 +1,10 @@
 package com.kamsan.notificationservice.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.UUID;
+
 public record SendMessageDTO(
-        @Email String toEmail,
-        @NotBlank String subject,
+        UUID receiverPublicId,
         @NotBlank String content) {
 }

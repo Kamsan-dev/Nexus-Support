@@ -234,7 +234,7 @@ CREATE TABLE IF NOT EXISTS messages (
     message_id BIGSERIAL PRIMARY KEY,
     message_public_id UUID NOT NULL UNIQUE,
     conversation_id UUID NOT NULL,
-    subject VARCHAR(100) NOT NULL,
+    subject VARCHAR(100) DEFAULT NULL,
     content TEXT NOT NULL,
     sender_id BIGINT NOT NULL,
     receiver_id BIGINT NOT NULL,

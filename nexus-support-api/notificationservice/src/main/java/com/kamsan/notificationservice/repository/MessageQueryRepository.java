@@ -2,6 +2,7 @@ package com.kamsan.notificationservice.repository;
 
 import com.kamsan.notificationservice.dto.ConversationOverviewDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
+import com.kamsan.notificationservice.dto.RecipientDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
 import com.kamsan.notificationservice.model.Message;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,9 @@ public class MessageQueryRepository {
         return jdbc.sql(INSERT_MESSAGE_QUERY)
                    .param("messagePublicId", randomUUID.get())
                    .param("conversationId", conversationId)
-                   .param("subject", request.subject())
                    .param("content", request.content())
                    .param("userPublicId", authenticatedUser)
-                   .param("toEmail", request.toEmail())
+                   .param("receiverPublicId", request.receiverPublicId())
                    .query(Message.class)
                    .single();
     }
@@ -46,6 +46,15 @@ public class MessageQueryRepository {
                    .param("userPublicId", authenticatedUser)
                    .query(ConversationOverviewDTO.class)
                    .list();
+    }
+
+    public ConversationOverviewDTO findConversationOverviewByConversationId(UUID authenticatedUser, UUID conversationId, UUID receiverPublicId) {
+        return jdbc.sql(SELECT_CONVERSATION_OVERVIEW_BY_CONVERSATION_ID_QUERY)
+                   .param("authenticatedUserPublicId", authenticatedUser)
+                   .param("conversationId", conversationId)
+                   .param("receiverPublicId", receiverPublicId)
+                   .query(ConversationOverviewDTO.class)
+                   .single();
     }
 
     public List<MessageDTO> findMessagesByConversationId(UUID authenticatedUser, UUID conversationId) {
@@ -72,10 +81,10 @@ public class MessageQueryRepository {
                    .list();
     }
 
-    public Optional<UUID> findConversationId(UUID authenticatedUser, String toEmail) {
+    public Optional<UUID> findConversationId(UUID authenticatedUser, UUID receiverPublicId) {
         return jdbc.sql(SELECT_CONVERSATION_ID_QUERY)
                    .param("authenticatedUserPublicId", authenticatedUser)
-                   .param("receiverEmail", toEmail)
+                   .param("receiverPublicId", receiverPublicId)
                    .query(UUID.class)
                    .optional();
     }
@@ -85,6 +94,12 @@ public class MessageQueryRepository {
                      .param("userPublicId", authenticatedUser)
                      .query(Long.class)
                      .single();
+    }
+
+    public List<RecipientDTO> findRecipients() {
+        return jdbc.sql(SELECT_RECIPIENTS_QUERY)
+                   .query(RecipientDTO.class)
+                   .list();
     }
 }
 

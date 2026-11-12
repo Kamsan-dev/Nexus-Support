@@ -21,7 +21,6 @@ export class Navbar {
   private readonly TICKET_MODAL_ID = 'ticketModal';
   protected authStore = inject(AuthStore);
   protected messageStore = inject(MessageStore);
-  @ViewChild('addFormTicket') addTicketTemplate!: TemplateRef<any>;
   isNavOpen = signal(false);
   isMenuOpen = signal(false);
 
