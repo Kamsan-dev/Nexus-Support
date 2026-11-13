@@ -23,7 +23,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional(readOnly = true)
     public ConversationOverviewsDTO getMessages(UUID authenticatedUser) {
-        List<ConversationOverviewDTO> conversationOverviews = messageQueryRepository.findConversationOverviews(
+        List<MessageDTO> conversationOverviews = messageQueryRepository.findConversationOverviews(
                 authenticatedUser);
         long unreadMessagesCount = messageQueryRepository.findUnreadMessagesCount(authenticatedUser);
 
@@ -33,10 +33,21 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     @Transactional
-    public ConversationOverviewDTO sendMessage(UUID authenticatedUser, SendMessageDTO sendMessageDTO) {
+    public MessageDTO sendMessage(UUID authenticatedUser, SendMessageDTO sendMessageDTO) {
         UUID conversationId = messageQueryRepository.findConversationId(authenticatedUser,
                 sendMessageDTO.receiverPublicId()).orElse(NotificationUtils.randomUUID.get());
 
+        Message message = messageQueryRepository.saveNewMessage(authenticatedUser, sendMessageDTO, conversationId);
+        messageQueryRepository.createNewMessageStatus(message);
+        return messageQueryRepository.findConversationOverviewByConversationId(
+                authenticatedUser,
+                conversationId,
+                sendMessageDTO.receiverPublicId());
+    }
+
+    @Override
+    @Transactional
+    public MessageDTO sendMessageInConversation(UUID authenticatedUser, SendMessageDTO sendMessageDTO, UUID conversationId) {
         Message message = messageQueryRepository.saveNewMessage(authenticatedUser, sendMessageDTO, conversationId);
         messageQueryRepository.createNewMessageStatus(message);
         return messageQueryRepository.findConversationOverviewByConversationId(
@@ -75,8 +86,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<RecipientDTO> getAllRecipients() {
-        return messageQueryRepository.findRecipients();
+    public List<RecipientDTO> getAllRecipients(UUID authenticatedUser) {
+        return messageQueryRepository.findRecipients(authenticatedUser);
     }
 
     private List<Long> updateMessageStatus(UUID authenticatedUser, UUID conversationId) {

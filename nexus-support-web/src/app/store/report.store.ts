@@ -78,7 +78,6 @@ export const ReportStore = signalStore(
                 const blob = response.body!;
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
-                console.log(response.headers);
 
                 link.href = url;
                 link.download = response.headers.get('File-Name')!;

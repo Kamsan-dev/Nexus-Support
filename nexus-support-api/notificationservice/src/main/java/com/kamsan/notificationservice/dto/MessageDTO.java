@@ -12,21 +12,25 @@ import java.util.UUID;
 @Setter
 public class MessageDTO {
 
+    // sender last message data
     private UUID senderPublicId;
     private String senderFirstname;
     private String senderLastname;
     private String senderEmail;
     private String senderImageUrl;
 
+    // receiver last message data
     private UUID receiverPublicId;
     private String receiverFirstname;
     private String receiverLastname;
     private String receiverEmail;
     private String receiverImageUrl;
 
+    // last message data
     private Long messageId;
+    private UUID conversationId;
     private UUID messagePublicId;
-    private String subject;
+    private String title;
     private String content;
     private String status;
 

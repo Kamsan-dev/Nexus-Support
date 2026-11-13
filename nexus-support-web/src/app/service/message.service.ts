@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../core/model/response/api.response';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { ConversationMessages, ConversationOverview, ConversationOverviewsResponse, Message, Recipient } from '../core/model/message.model';
+import { ConversationMessages, ConversationOverviewsResponse, Message, Recipient } from '../core/model/message.model';
 import { NewMessageRequest } from '../core/model/request/new-message.request';
 
 @Injectable({
@@ -25,7 +25,11 @@ export class MessageService {
     return this.http.get<ApiResponse<ConversationMessages>>(`${this.server}/notifications/message/${conversationId}`);
   }
 
-  public sendMessage(payload: NewMessageRequest): Observable<ApiResponse<ConversationOverview>> {
-    return this.http.post<ApiResponse<ConversationOverview>>(`${this.server}/notifications/message`, payload);
+  public sendMessage(payload: NewMessageRequest): Observable<ApiResponse<Message>> {
+    return this.http.post<ApiResponse<Message>>(`${this.server}/notifications/message`, payload);
+  }
+
+  public sendMessageInConversation(payload: NewMessageRequest, conversationId: string): Observable<ApiResponse<Message>> {
+    return this.http.post<ApiResponse<Message>>(`${this.server}/notifications/message/${conversationId}`, payload);
   }
 }

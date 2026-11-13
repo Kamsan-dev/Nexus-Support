@@ -51,10 +51,7 @@ export class Messages {
   onFormClick = (event: TouchEvent | MouseEvent) => {
     event.stopImmediatePropagation();
     this.store.sendMessage(this.modalForm.value);
-  };
-
-  isAuthenticatedUser = (userPublicId: string) => {
-    return userPublicId === this.authStore.user()?.userPublicId;
+    this.closeModal();
   };
 
   private initModalForm(): void {

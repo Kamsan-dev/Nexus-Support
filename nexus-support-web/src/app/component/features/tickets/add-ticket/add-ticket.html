@@ -45,10 +45,10 @@
             <select
               id="type"
               formControlName="type"
-              [ngClass]="[f['type'].invalid && f['type'].touched ? 'border-red-500' : 'border-gray-200']"
+              [ngClass]="[f['type'].invalid && (f['priority'].touched || f['priority'].dirty) ? 'border-red-500' : 'border-gray-200']"
               class="border text-gray-900 text-sm rounded-lg w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option disabled selected>Select a type</option>
+              <option disabled value="no_selection">Select a type</option>
               @for (type of ticketTypes; track $index) {
                 <option [value]="type">{{ ticketTypeLabel[type] }}</option>
               }
@@ -60,10 +60,10 @@
             <select
               id="type"
               formControlName="priority"
-              [ngClass]="[f['priority'].invalid && f['priority'].touched ? 'border-red-500' : 'border-gray-200']"
+              [ngClass]="[f['priority'].invalid && (f['priority'].touched || f['priority'].dirty) ? 'border-red-500' : 'border-gray-200']"
               class="border text-gray-900 text-sm rounded-lg w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option disabled>Select a priority</option>
+              <option disabled value="no_selection">Select a priority</option>
               @for (priority of ticketPriorities; track $index) {
                 <option [value]="priority">{{ ticketPriorityLabel[priority] }}</option>
               }

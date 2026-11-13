@@ -37,7 +37,7 @@ public class NotificationResource {
     @GetMapping("/message/recipients")
     public ResponseEntity<ApiResponse<List<RecipientDTO>>> getAllRecipients(@NotNull Authentication authentication) {
         return ResponseEntity.ok().body(getResponse(
-                messageService.getAllRecipients(),
+                messageService.getAllRecipients(UUID.fromString(authentication.getName())),
                 "Recipients retrieved.",
                 HttpStatus.OK
         ));
@@ -53,11 +53,22 @@ public class NotificationResource {
     }
 
     @PostMapping("/message")
-    public ResponseEntity<ApiResponse<ConversationOverviewDTO>> sendMessage(@NotNull Authentication authentication, @RequestBody @Valid SendMessageDTO sendMessageDTO) {
-        ConversationOverviewDTO conversationOverviewDTO = messageService.sendMessage(UUID.fromString(authentication.getName()),
-                sendMessageDTO);
+    public ResponseEntity<ApiResponse<MessageDTO>> sendMessage(@NotNull Authentication authentication, @RequestBody @Valid SendMessageDTO sendMessageDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(getResponse(
-                conversationOverviewDTO,
+                messageService.sendMessage(UUID.fromString(authentication.getName()),
+                        sendMessageDTO),
+                "Message delivered.",
+                HttpStatus.CREATED
+        ));
+    }
+
+    @PostMapping("/message/{conversationId}")
+    public ResponseEntity<ApiResponse<MessageDTO>> sendMessageInConversation(@NotNull Authentication authentication,
+                                                                                          @PathVariable("conversationId") UUID conversationId,
+                                                                                          @RequestBody @Valid SendMessageDTO sendMessageDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(getResponse(
+                messageService.sendMessageInConversation(UUID.fromString(authentication.getName()),
+                        sendMessageDTO, conversationId),
                 "Message delivered.",
                 HttpStatus.CREATED
         ));

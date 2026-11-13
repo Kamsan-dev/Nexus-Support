@@ -60,13 +60,18 @@
           >
             <div class="flex flex-row items-center justify-between flex-wrap">
               <div class="flex flex-row items-center justify-between gap-4">
-                <div class="hidden md:block border overflow-hidden border-white w-16 h-16 [&:not(:first-child)]:-ml-[4.3rem] rounded-full">
+                <div class="hidden md:block border overflow-hidden border-white w-16 h-16 [&:not(:first-child)]:-ml-[2.3rem] rounded-full">
                   <img
-                    [src]="isAuthenticatedUser(conversation.senderPublicId) ? conversation.receiverImageUrl : conversation.senderImageUrl"
-                    [alt]="
-                      'Profile image of ' +
-                      (isAuthenticatedUser(conversation.senderPublicId) ? conversation.receiverLastname : conversation.senderLastname)
-                    "
+                    [src]="conversation.senderImageUrl"
+                    [alt]="'Profile image of ' + conversation.senderLastname"
+                    class="w-16 h-16 object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="hidden md:block border overflow-hidden border-white w-16 h-16 [&:not(:first-child)]:-ml-[2.3rem] rounded-full">
+                  <img
+                    [src]="conversation.receiverImageUrl"
+                    [alt]="'Profile image of ' + conversation.receiverLastname"
                     class="w-16 h-16 object-cover"
                     loading="lazy"
                   />
@@ -75,19 +80,15 @@
                   <div>
                     <p class="text-sm md:text-xl font-bold">{{ conversation.title }}</p>
                     <p class="text-sm text-gray-500 font-normal line-clamp-1">
-                      {{
-                        conversation.lastMessageContent.length > 200
-                          ? (conversation.lastMessageContent | slice: 0 : 200) + '...'
-                          : conversation.lastMessageContent
-                      }}
+                      {{ conversation.content.length > 200 ? (conversation.content | slice: 0 : 200) + '...' : conversation.content }}
                     </p>
                   </div>
                 </div>
               </div>
               <span
-                [ngClass]="[conversation.lastMessageStatus === 'UNREAD' ? 'bg-yellow-400 text-black' : 'bg-gray-300']"
+                [ngClass]="[conversation.status === 'UNREAD' ? 'bg-yellow-400 text-black' : 'bg-gray-300']"
                 class="text-xs md:text-sm font-medium mt-2 xl:mt-0 px-1.5 py-0.5 rounded"
-                >{{ conversation.lastMessageStatus === 'UNREAD' ? 'Unread' : 'Read' }}</span
+                >{{ conversation.status === 'UNREAD' ? 'Unread' : 'Read' }}</span
               >
             </div>
           </div>

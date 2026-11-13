@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { TicketPriorityEnum, TicketPriorityLabel } from '../../../../enum/ticket-priority';
 import { TicketTypeEnum, TicketTypeLabel } from '../../../../enum/ticket-type';
@@ -27,6 +27,7 @@ export class AddTicket {
 
   //form
   modalForm!: FormGroup;
+  private readonly statusPriorityValidator: ValidatorFn = (control) => (control.value === 'no_selection' ? { required: true } : null);
 
   //files
   files = signal<{ name: string; size: string }[]>([]);
@@ -81,8 +82,8 @@ export class AddTicket {
         'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. ',
         Validators.required,
       ],
-      priority: ['', Validators.required],
-      type: ['', Validators.required],
+      priority: ['no_selection', this.statusPriorityValidator],
+      type: ['no_selection', this.statusPriorityValidator],
     });
   }
 

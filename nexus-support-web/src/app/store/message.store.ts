@@ -5,18 +5,18 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { HotToastService } from '@ngxpert/hot-toast';
 import { exhaustMap, pipe, switchMap, tap } from 'rxjs';
-import { ConversationOverview, Message, Recipient } from '../core/model/message.model';
+import { Message, Recipient } from '../core/model/message.model';
 import { MessageService } from '../service/message.service';
 import { setError, setFulfilled, setLoading, withRequestStatus } from './request-status.feature';
 import { NewMessageRequest } from '../core/model/request/new-message.request';
 
 interface state {
-  conversations: ConversationOverview[];
+  conversations: Message[];
   unreadMessagesCount: number;
+  recipients: Recipient[];
   messages: Message[];
   currentConversationId: string | undefined;
   correspondentPublicId: string | undefined;
-  recipients: Recipient[];
 }
 
 const initialAuthState: state = {
@@ -86,9 +86,6 @@ export const MessageStore = signalStore(
                   messages: response.data.messages,
                   currentConversationId: conversationId,
                   correspondentPublicId: response.data.correspondentPublicId,
-                  // conversations: store
-                  //   .conversations()
-                  //   .map((c) => (c.conversationId === conversationId ? { ...c, lastMessageStatus: (c.lastMessageStatus = 'READ') } : c)),
                 });
               },
               error: (error: HttpErrorResponse) => {
@@ -108,6 +105,25 @@ export const MessageStore = signalStore(
               next: (response) => {
                 patchState(store, setFulfilled(), {
                   conversations: [response.data, ...store.conversations().filter((c) => c.conversationId !== response.data.conversationId)],
+                });
+              },
+              error: (error: HttpErrorResponse) => {
+                patchState(store, setError(error));
+              },
+            }),
+          ),
+        ),
+      ),
+    ),
+    sendMessageInConversation: rxMethod<{ payload: NewMessageRequest; conversationId: string }>(
+      pipe(
+        tap(() => patchState(store, setLoading())),
+        exhaustMap((request) =>
+          messageService.sendMessageInConversation(request.payload, request.conversationId).pipe(
+            tapResponse({
+              next: (response) => {
+                patchState(store, setFulfilled(), {
+                  messages: [...store.messages(), response.data],
                 });
               },
               error: (error: HttpErrorResponse) => {

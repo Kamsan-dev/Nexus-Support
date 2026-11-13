@@ -50,7 +50,9 @@ public class MessageQuery {
                 r.image_url AS receiverImageUrl,
                 ms.message_status AS status,
                 m.message_public_id,
+                m.conversation_id,
                 m.message_id,
+                NULL AS title,
                 m.subject,
                 m.content,
                 m.created_at,
@@ -120,10 +122,11 @@ public class MessageQuery {
             )
             
             SELECT
+                NULL::BIGINT AS message_id,
                 m.conversation_id,
                 m.message_public_id,
-                m.content AS last_message_content,
-                ms.message_status AS last_message_status,
+                m.content AS content,
+                ms.message_status AS status,
                 m.created_at,
                 m.updated_at,
                 s.user_public_id AS senderPublicId,
@@ -157,10 +160,11 @@ public class MessageQuery {
 
     public static final String SELECT_CONVERSATION_OVERVIEW_BY_CONVERSATION_ID_QUERY = """
             SELECT
+                NULL::BIGINT AS message_id,
                 m.conversation_id,
                 m.message_public_id,
-                m.content AS last_message_content,
-                ms.message_status AS last_message_status,
+                m.content AS content,
+                ms.message_status AS status,
                 m.created_at,
                 m.updated_at,
                 s.user_public_id AS senderPublicId,
@@ -214,6 +218,7 @@ public class MessageQuery {
             FROM users u
             JOIN user_roles ur ON ur.user_id = u.user_id
             JOIN roles r ON r.role_id = ur.role_id
+            WHERE u.user_public_id <> :userPublicId
             ORDER by r.name
             """;
 }

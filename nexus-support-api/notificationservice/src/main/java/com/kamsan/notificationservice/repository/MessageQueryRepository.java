@@ -1,6 +1,5 @@
 package com.kamsan.notificationservice.repository;
 
-import com.kamsan.notificationservice.dto.ConversationOverviewDTO;
 import com.kamsan.notificationservice.dto.MessageDTO;
 import com.kamsan.notificationservice.dto.RecipientDTO;
 import com.kamsan.notificationservice.dto.SendMessageDTO;
@@ -41,19 +40,19 @@ public class MessageQueryRepository {
             .update();
     }
 
-    public List<ConversationOverviewDTO> findConversationOverviews(UUID authenticatedUser) {
+    public List<MessageDTO> findConversationOverviews(UUID authenticatedUser) {
         return jdbc.sql(SELECT_CONVERSATION_OVERVIEW_QUERY)
                    .param("userPublicId", authenticatedUser)
-                   .query(ConversationOverviewDTO.class)
+                   .query(MessageDTO.class)
                    .list();
     }
 
-    public ConversationOverviewDTO findConversationOverviewByConversationId(UUID authenticatedUser, UUID conversationId, UUID receiverPublicId) {
+    public MessageDTO findConversationOverviewByConversationId(UUID authenticatedUser, UUID conversationId, UUID receiverPublicId) {
         return jdbc.sql(SELECT_CONVERSATION_OVERVIEW_BY_CONVERSATION_ID_QUERY)
                    .param("authenticatedUserPublicId", authenticatedUser)
                    .param("conversationId", conversationId)
                    .param("receiverPublicId", receiverPublicId)
-                   .query(ConversationOverviewDTO.class)
+                   .query(MessageDTO.class)
                    .single();
     }
 
@@ -96,8 +95,9 @@ public class MessageQueryRepository {
                      .single();
     }
 
-    public List<RecipientDTO> findRecipients() {
+    public List<RecipientDTO> findRecipients(UUID authenticatedUser) {
         return jdbc.sql(SELECT_RECIPIENTS_QUERY)
+                   .param("userPublicId", authenticatedUser)
                    .query(RecipientDTO.class)
                    .list();
     }
