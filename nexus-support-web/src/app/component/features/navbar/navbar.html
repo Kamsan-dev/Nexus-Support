@@ -21,7 +21,7 @@
         </button>
       </div>
       <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-        <div href="" class="flex-shrink-0 items-center hidden cursor-pointer lg:block" [routerLink]="['']">
+        <div href="" class="flex-shrink-0 items-center hidden cursor-pointer lg:block" [routerLink]="['/app/dashboard']">
           <img class="h-8 w-auto" src="https://cdn-icons-png.flaticon.com/512/9732/9732800.png" alt="Ticket App" />
         </div>
         <div class="hidden sm:ml-6 lg:block">
@@ -155,7 +155,7 @@
                     d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
                   />
                 </svg>
-                <div class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</div>
+                <div (click)="logout()" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</div>
               </li>
             </ul>
           </div>

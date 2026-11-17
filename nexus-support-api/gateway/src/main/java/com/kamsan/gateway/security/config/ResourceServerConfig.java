@@ -3,6 +3,10 @@ package com.kamsan.gateway.security.config;
 import com.kamsan.gateway.security.handler.GatewayAccessDeniedHandler;
 import com.kamsan.gateway.security.handler.GatewayAuthenticationEntryPoint;
 import com.kamsan.gateway.security.token.JwtConverter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +16,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,6 +41,7 @@ public class ResourceServerConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        http.logout(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(authorize -> authorize
@@ -43,7 +51,8 @@ public class ResourceServerConfig {
                             "/user/image/**",
                             "/oauth2/**",
                             "/error/**",
-                            "/login/**")
+                            "/login/**",
+                            "/logout/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

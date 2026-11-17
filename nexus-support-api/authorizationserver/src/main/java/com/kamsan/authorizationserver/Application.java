@@ -25,7 +25,7 @@ import static java.util.UUID.randomUUID;
 public class Application {
 
     @Value("${ui.app.url}")
-    private String redirectUri;
+    private String appUrl;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -36,7 +36,7 @@ public class Application {
         return args -> {
             if (registeredClientRepository.findByClientId("client") == null) {
                 try {
-                    log.info("redirect uri : {}", this.redirectUri);
+                    log.info("redirect uri : {}", this.appUrl + "/auth/callback");
                     var registerClient = RegisteredClient.withId(randomUUID().toString())
                                                          .clientId("client")
                                                          .clientSecret("secret")
@@ -50,7 +50,7 @@ public class Application {
                                                              scopes.add(OidcScopes.PROFILE);
                                                              scopes.add(OidcScopes.EMAIL);
                                                          })
-                                                         .redirectUri(redirectUri)
+                                                         .redirectUri(this.appUrl + "/auth/callback")
                                                          .postLogoutRedirectUri("http://127.0.0.1:8080")
                                                          .clientSettings(ClientSettings.builder()
                                                                                        .requireAuthorizationConsent(
@@ -60,7 +60,7 @@ public class Application {
                                                          .tokenSettings(TokenSettings.builder()
                                                                                      .refreshTokenTimeToLive(Duration.ofDays(
                                                                                              90))
-                                                                                     .accessTokenTimeToLive(Duration.ofDays(
+                                                                                     .accessTokenTimeToLive(Duration.ofMinutes(
                                                                                              1))
                                                                                      .build()).build();
 

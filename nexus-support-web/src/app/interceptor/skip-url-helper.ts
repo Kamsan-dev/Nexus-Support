@@ -1,4 +1,4 @@
-const keyword = ['register', 'reset', 'verify', 'refresh', 'oauth2'];
+const keyword = ['register', 'reset', 'verify', 'refresh', 'oauth2', 'home'];
 
 export const shouldNotIntercept = (url: string): boolean => {
   return keyword.some((key) => url.includes(key));

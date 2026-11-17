@@ -32,4 +32,8 @@ export class StorageService {
   removeRedirectUrl(): void {
     this.storage.removeItem(Key.REDIRECT_URL);
   }
+
+  clear(): void {
+    this.storage.clear();
+  }
 }

@@ -14,7 +14,7 @@ spring:
             - id: authorization-server
               uri: lb://AUTHORIZATIONSERVER
               predicates:
-                - Path=/oauth2/**,/login/**,/mfa/**
+                - Path=/oauth2/**,/login/**,/mfa/**,/logout
 
             - id: user-service
               uri: lb://USERSERVICE

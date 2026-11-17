@@ -1,11 +1,14 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { delay, firstValueFrom } from 'rxjs';
-import { PkceService } from './pcke.service';
-import { OAuthStorageService } from './oauthstorage.service';
+import { inject, Injectable } from '@angular/core';
+import { catchError, firstValueFrom, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Key } from '../enum/cache.key';
+import { StorageService } from '../service/storage.service';
+import { OAuthStorageService } from './oauthstorage.service';
+import { PkceService } from './pcke.service';
+import { Router } from '@angular/router';
 
-interface TokenResponse {
+export interface TokenResponse {
   access_token: string;
   refresh_token: string;
   token_type: string;
@@ -21,14 +24,13 @@ export class OAuthService {
   private readonly http = inject(HttpClient);
   private readonly pkce = inject(PkceService);
   private readonly storage = inject(OAuthStorageService);
+  private readonly localStorage = inject(StorageService);
   private readonly server: string = environment.API_URL;
 
   private readonly authorizationEndpoint = `${this.server}/oauth2/authorize`;
-
   private readonly tokenEndpoint = `${this.server}/oauth2/token`;
 
   private readonly clientId = 'client';
-
   private readonly redirectUri = 'http://localhost:3000/auth/callback';
 
   async login(): Promise<void> {
@@ -53,20 +55,22 @@ export class OAuthService {
     window.location.href = `${this.authorizationEndpoint}?${params.toString()}`;
   }
 
+  logout(): void {
+    this.storage.clear();
+    this.localStorage.clear();
+  }
+
   async handleCallback(code: string, state: string): Promise<TokenResponse> {
     const storedState = this.storage.getState();
-
     const codeVerifier = this.storage.getCodeVerifier();
 
     if (!storedState || state !== storedState) {
       this.storage.clear();
-
       throw new Error('Invalid OAuth state');
     }
 
     if (!codeVerifier) {
       this.storage.clear();
-
       throw new Error('PKCE code verifier not found');
     }
 
@@ -78,7 +82,6 @@ export class OAuthService {
       .set('code_verifier', codeVerifier);
 
     try {
-      delay(5000);
       const response = await firstValueFrom(
         this.http.post<TokenResponse>(this.tokenEndpoint, body.toString(), {
           headers: {
@@ -92,5 +95,21 @@ export class OAuthService {
     } finally {
       this.storage.clear();
     }
+  }
+
+  refreshToken(refreshToken: string): Observable<TokenResponse> {
+    const body = new HttpParams().set('refresh_token', refreshToken).set('grant_type', 'refresh_token').set('client_id', this.clientId);
+    return this.http
+      .post<TokenResponse>(this.tokenEndpoint, body.toString(), {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+      .pipe(
+        tap((response: TokenResponse) => {
+          this.localStorage.set(Key.TOKEN, response.access_token);
+          this.localStorage.set(Key.REFRESH_TOKEN, response.refresh_token);
+        }),
+      );
   }
 }

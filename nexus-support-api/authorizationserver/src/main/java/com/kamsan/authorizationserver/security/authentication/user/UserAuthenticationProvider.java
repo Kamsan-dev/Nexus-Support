@@ -41,10 +41,14 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
             } else {
                 throw new BadCredentialsException("Incorrect email/password. Please try again.");
             }
-        } catch (BadCredentialsException | ApiException | LockedException | DisabledException exception) {
-            throw new ApiException(exception.getMessage());
+        } catch (AuthenticationException exception) {
+            throw exception;
         } catch (Exception exception) {
-            throw new ApiException("Unable to authenticate. Please try again");
+            log.error("Unable to authenticate user", exception);
+            throw new InternalAuthenticationServiceException(
+                    "Unable to authenticate. Please try again.",
+                    exception
+            );
         }
     }
 

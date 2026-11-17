@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { Logout } from './component/logout/logout';
 
 export const routes: Routes = [
   {
@@ -7,7 +8,10 @@ export const routes: Routes = [
   },
   {
     path: 'app',
-    loadChildren: () =>
-      import('./component/features/features.routes').then((r) => r.FEATURES_ROUTES),
+    loadChildren: () => import('./component/features/features.routes').then((r) => r.FEATURES_ROUTES),
+  },
+  {
+    path: 'logout',
+    component: Logout,
   },
 ];

@@ -18,9 +18,7 @@ export class Guest {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-      this.storage.getRedirectUrl()
-        ? this.router.navigate([this.storage.getRedirectUrl])
-        : this.router.navigate(['/app/dashboard']);
+      this.storage.getRedirectUrl() ? this.router.navigate([this.storage.getRedirectUrl]) : this.router.navigate(['/app/dashboard']);
     }
   }
   public onLoginButtonClick(event: TouchEvent | MouseEvent): void {

@@ -7,6 +7,8 @@ import { AuthStore } from '../../../store/auth.store';
 import { MessageStore } from '../../../store/message.store';
 import { AddTicket } from '../tickets/add-ticket/add-ticket';
 import { RoleEnum } from '../../../enum/role';
+import { OAuthService } from '../../../auth/oauth.service';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -20,10 +22,13 @@ export class Navbar {
   private dialogService = inject(DialogService);
   private readonly TICKET_MODAL_ID = 'ticketModal';
   protected authStore = inject(AuthStore);
+  private authService = inject(AuthService);
   protected messageStore = inject(MessageStore);
+
+  logoutUrl = this.authService.logoutUrl;
+
   isNavOpen = signal(false);
   isMenuOpen = signal(false);
-
   readonly Roles = RoleEnum;
 
   constructor() {
@@ -37,6 +42,10 @@ export class Navbar {
   ngOnInit(): void {
     this.authStore.loadProfile();
   }
+
+  logout = () => {
+    window.location.href = this.logoutUrl;
+  };
 
   toggleNav = () => {
     this.isNavOpen.update(() => !this.isNavOpen());

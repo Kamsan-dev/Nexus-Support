@@ -35,6 +35,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -63,7 +64,6 @@ public class AuthorizationServerConfig {
     @Order(1)
     public SecurityFilterChain oauth2ServerConfig(HttpSecurity http, RegisteredClientRepository registeredClientRepository) {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
-
         return http.oauth2AuthorizationServer(authorizationServer -> {
             http.securityMatcher(authorizationServer.getEndpointsMatcher())
                 .with(authorizationServer, Customizer.withDefaults())
@@ -89,7 +89,6 @@ public class AuthorizationServerConfig {
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
-
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/login").permitAll()
                 .requestMatchers(POST, "/logout").permitAll()
@@ -99,8 +98,15 @@ public class AuthorizationServerConfig {
                 .loginPage("/login")
                 .successHandler(new MfaAuthenticationHandler("/mfa", "MFA_REQUIRED"))
                 .failureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error")));
-        http.logout(logout -> logout.logoutSuccessUrl("http://localhost:3000")
-                                    .addLogoutHandler(new CookieClearingLogoutHandler("JSESSIONID")));
+        http.logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("http://localhost:3000/logout")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .addLogoutHandler(
+                        new CookieClearingLogoutHandler("AUTHSESSIONID")
+                )
+        );
         return http.build();
     }
 
