@@ -35,7 +35,10 @@ public class RSAKeyManager {
     }
 
     private RSAKey generateRSAKeyPair(String privateKeyFileName, String publicKeyFileName) {
-        var keysDirectory = Paths.get("src", "main", "resources", "keys");
+        var keysDirectory = Paths.get(
+                System.getProperty("user.dir"),
+                "src", "main", "resources", "keys"
+        );
         verifyKeysDirectory(keysDirectory);
         // case : Dev environement && les fichiers clés public & privé existent déjà.
         if (Files.exists(keysDirectory.resolve(publicKeyFileName)) && Files.exists(keysDirectory.resolve(
@@ -56,7 +59,7 @@ public class RSAKeyManager {
                 byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
                 PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
                 RSAPrivateKey privateKey = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
-                var keyId = "eb0f85b4-22bb-4856-8357-5b1ac0d06c1c"; //UUID.randomUUID().toString();
+                var keyId = "ccb5c12a-5ac0-4026-97df-7759feebee07"; //UUID.randomUUID().toString();
                 log.info("Key id : {}", keyId);
                 return new RSAKey.Builder(publicKey).privateKey(privateKey).keyID(keyId).build();
             } catch (Exception ex) {
@@ -102,6 +105,7 @@ public class RSAKeyManager {
     }
 
     private void verifyKeysDirectory(Path keysDirectory) {
+        log.info("user dir : {}", System.getProperty("user.dir"));
         if (!Files.exists(keysDirectory)) {
             try {
                 Files.createDirectories(keysDirectory);

@@ -126,7 +126,7 @@ public class TicketQuery {
             JOIN tickets t ON t.ticket_id = c.ticket_id
             JOIN users u ON c.user_id = u.user_id
             WHERE t.ticket_public_id = :ticketPublicId
-            ORDER BY c.created_at DESC
+            ORDER BY c.created_at ASC
             """;
 
     public static final String SELECT_TASKS_BY_TICKET_PUBLIC_ID_QUERY = """

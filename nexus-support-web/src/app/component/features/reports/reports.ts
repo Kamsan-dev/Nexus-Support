@@ -116,13 +116,13 @@ export class Reports {
     const type = this.element.nativeElement.querySelector('.type');
     const priority = this.element.nativeElement.querySelector('.priority');
 
-    if (!status.contains(target) && this.statusMenuOpen()) {
+    if (status && !status.contains(target) && this.statusMenuOpen()) {
       this.statusMenuOpen.update(() => false);
     }
-    if (!type.contains(target) && this.typeMenuOpen()) {
+    if (type && !type.contains(target) && this.typeMenuOpen()) {
       this.typeMenuOpen.update(() => false);
     }
-    if (!priority.contains(target) && this.priorityMenuOpen()) {
+    if (priority && !priority.contains(target) && this.priorityMenuOpen()) {
       this.priorityMenuOpen.update(() => false);
     }
   }

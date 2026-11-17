@@ -26,7 +26,7 @@ public class UserQuery {
             FROM users u
             JOIN user_roles ur ON ur.user_id = u.user_id
             JOIN roles r ON r.role_id = ur.role_id
-            ORDER BY u.user_id
+            ORDER BY r.name
             LIMIT :limit OFFSET :offset
             """;
 

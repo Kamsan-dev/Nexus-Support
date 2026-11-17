@@ -1,4 +1,5 @@
 import {
+  faCalendar,
   faCheck,
   faChevronDown,
   faChevronLeft,
@@ -39,4 +40,5 @@ export const fontAwesomeIcons: IconDefinition[] = [
   faDownload,
   faUpload,
   faArrowAltCircleUp,
+  faCalendar,
 ];

@@ -207,7 +207,7 @@ export const TicketDetailsStore = signalStore(
                 patchState(store, setFulfilled(), {
                   ticket: {
                     ...currentTicket,
-                    comments: [response.data, ...currentTicket.comments],
+                    comments: [...currentTicket.comments, response.data],
                   },
                 });
                 toastService.success(response.message);

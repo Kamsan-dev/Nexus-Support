@@ -1,60 +1,70 @@
 <div
   [routerLink]="['/app/tickets/', ticketPublicId()]"
-  class="p-4 flex flex-col rounded-xl bg-white border border-solid border-gray-200 overflow-auto"
+  class="group flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 sm:p-5 transition-all duration-200 hover:border-blue-300 hover:shadow-md cursor-pointer"
 >
-  <div class="flex flex-row justify-between items-center">
-    <div class="flex flex-row justify-between items-center gap-2">
-      <div class="bg-gray-300 p-1 rounded-full text-[#0a365e] cursor-pointer">
+  <!-- Header -->
+  <div class="flex items-center justify-between gap-3">
+    <div class="flex min-w-0 flex-wrap items-center gap-2">
+      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
         <fa-icon [icon]="'ticket'" class="fa-fw"></fa-icon>
-      </div>
-      <div class="flex space-x-2">
-        <h4 class="cursor-pointer font-sans text-md font-medium text-gray-900">Ticket #{{ ticketNumber() }}</h4>
+      </span>
 
-        <span class="text-sm font-medium w-fit px-1.5 py-0.5 rounded" [ngClass]="ticketTypeColor[type()]">
-          {{ ticketTypeLabel[type()] }}
-        </span>
-        <span class="text-sm font-semibold px-1 py-0.5 rounded" [ngClass]="ticketStatusColor[status()]">
-          {{ ticketStatusLabel[status()] }}
-        </span>
-      </div>
+      <span class="text-sm font-semibold text-gray-700"> #{{ ticketNumber() }} </span>
+
+      <span class="rounded-md px-2 py-1 text-xs font-medium" [ngClass]="ticketTypeColor[type()]">
+        {{ ticketTypeLabel[type()] }}
+      </span>
     </div>
-    <div class="cursor-pointer">
-      <fa-icon [icon]="['far', 'pen-to-square']" class="fa-fw fa-regular"></fa-icon>
-    </div>
-  </div>
-  <h5 class="mt-4 cursor-pointer text-base font-semibold text-gray-900 line-clamp-1">
-    {{ title() }}
-  </h5>
-  <p class="cursor-pointer overflow-hidden line-clamp-2 text-md">
-    {{ description() }}
-  </p>
-  <div class="mt-4 flex flex-row justify-between items-center">
-    <div class="flex flex-row justify-between items-center gap-8">
-      <div class="flex flex-row justify-between items-center gap-1">
-        <div class="cursor-pointer">
-          <fa-icon [icon]="'paperclip'" class="fa-fw"></fa-icon>
-        </div>
-        <span>{{ fileCount() }}</span>
-      </div>
-      <div class="flex flex-row justify-between items-center gap-1">
-        <div class="cursor-pointer">
-          <fa-icon [icon]="['far', 'comment']" class="fa-fw"></fa-icon>
-        </div>
-        <span>{{ commentCount() }}</span>
-      </div>
+
+    <div class="flex shrink-0 items-center gap-2">
+      <span class="rounded-full px-2.5 py-1 text-xs font-medium" [ngClass]="ticketStatusColor[status()]">
+        {{ ticketStatusLabel[status()] }}
+      </span>
+
+      <fa-icon [icon]="['far', 'pen-to-square']" class="text-gray-400 transition-colors group-hover:text-blue-600"></fa-icon>
     </div>
   </div>
-  <div class="mt-2 flex flex-row justify-between items-center flex-wrap gap-1">
-    <div class="min-w-44 bg-gray-200 rounded-full h-3">
-      <div
-        class="text-blue-100 bg-blue-600 text-xs font-medium text-center h-3 leading-none rounded-full"
-        [style.width.%]="progress()"
-      >
-        {{ progress() }}%
-      </div>
-    </div>
-    <p class="antialiased font-sans text-sm font-medium text-blue-gray-500">
-      Since {{ createdAt() | date: 'dd/MM/yyyy' }}
+
+  <!-- Content -->
+  <div class="min-w-0 space-y-1.5">
+    <h4 class="line-clamp-1 text-base font-semibold text-gray-900 transition-colors group-hover:text-blue-700">
+      {{ title() }}
+    </h4>
+
+    <p class="line-clamp-2 text-sm leading-relaxed text-gray-500">
+      {{ description() }}
     </p>
+  </div>
+
+  <!-- Metadata -->
+  <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-500">
+    <div class="flex items-center gap-1.5">
+      <fa-icon [icon]="'paperclip'" class="text-gray-400"></fa-icon>
+      <span>{{ fileCount() }}</span>
+    </div>
+
+    <div class="flex items-center gap-1.5">
+      <fa-icon [icon]="['far', 'comment']" class="text-gray-400"></fa-icon>
+      <span>{{ commentCount() }}</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-3">
+    <div class="flex min-w-28 flex-1 flex-col gap-1.5">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-gray-500">Progression</span>
+        <span class="text-xs font-semibold text-gray-700"> {{ progress() }}% </span>
+      </div>
+
+      <div class="h-1.5 overflow-hidden rounded-full bg-gray-100">
+        <div class="h-full rounded-full bg-blue-600 transition-all duration-300" [style.width.%]="progress()"></div>
+      </div>
+    </div>
+
+    <span class="whitespace-nowrap text-xs text-gray-400">
+      <fa-icon [icon]="'calendar'" class="mr-1"></fa-icon>
+      {{ createdAt() | date: 'dd/MM/yyyy' }}
+    </span>
   </div>
 </div>
